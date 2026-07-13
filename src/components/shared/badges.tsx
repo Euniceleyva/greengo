@@ -23,25 +23,25 @@ import type {
 } from "@/types";
 
 export const TripStatusBadge = ({ status }: { status: TripStatus }) => (
-  <Badge tone={TRIP_STATUS_TONE[status]}>{TRIP_STATUS_LABELS[status]}</Badge>
+  <Badge tone={TRIP_STATUS_TONE[status]} dot>{TRIP_STATUS_LABELS[status]}</Badge>
 );
 
 export const VehicleStatusBadge = ({ status }: { status: VehicleStatus }) => (
-  <Badge tone={VEHICLE_STATUS_TONE[status]}>{VEHICLE_STATUS_LABELS[status]}</Badge>
+  <Badge tone={VEHICLE_STATUS_TONE[status]} dot>{VEHICLE_STATUS_LABELS[status]}</Badge>
 );
 
 export const DriverStatusBadge = ({ status }: { status: DriverStatus }) => (
-  <Badge tone={DRIVER_STATUS_TONE[status]}>{DRIVER_STATUS_LABELS[status]}</Badge>
+  <Badge tone={DRIVER_STATUS_TONE[status]} dot>{DRIVER_STATUS_LABELS[status]}</Badge>
 );
 
 export const AlertPriorityBadge = ({ priority }: { priority: AlertPriority }) => (
-  <Badge tone={ALERT_PRIORITY_TONE[priority]}>{ALERT_PRIORITY_LABELS[priority]}</Badge>
+  <Badge tone={ALERT_PRIORITY_TONE[priority]} dot>{ALERT_PRIORITY_LABELS[priority]}</Badge>
 );
 
 export const MaintenanceStatusBadge = ({ status }: { status: MaintenanceStatus }) => (
-  <Badge tone={MAINTENANCE_STATUS_TONE[status]}>{MAINTENANCE_STATUS_LABELS[status]}</Badge>
+  <Badge tone={MAINTENANCE_STATUS_TONE[status]} dot>{MAINTENANCE_STATUS_LABELS[status]}</Badge>
 );
 
 export const FuelValidationBadge = ({ status }: { status: FuelValidation }) => (
-  <Badge tone={FUEL_VALIDATION_TONE[status]}>{FUEL_VALIDATION_LABELS[status]}</Badge>
+  <Badge tone={FUEL_VALIDATION_TONE[status]} dot>{FUEL_VALIDATION_LABELS[status]}</Badge>
 );

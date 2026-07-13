@@ -8,28 +8,47 @@ interface KpiCardProps {
   value: string | number;
   icon: LucideIcon;
   hint?: string;
-  tone?: "primary" | "success" | "warning" | "danger" | "neutral";
+  tone?: "primary" | "success" | "warning" | "danger" | "info" | "neutral";
+  /** "hero" para los indicadores de primera jerarquía, "compact" para la fila secundaria. */
+  size?: "hero" | "compact";
 }
 
 const toneClasses: Record<NonNullable<KpiCardProps["tone"]>, string> = {
-  primary: "bg-primary/10 text-primary",
-  success: "bg-emerald-50 text-emerald-700",
-  warning: "bg-amber-50 text-amber-700",
-  danger: "bg-red-50 text-red-700",
-  neutral: "bg-slate-100 text-slate-700",
+  primary: "bg-primary-soft text-primary",
+  success: "bg-success-soft text-success",
+  warning: "bg-warning-soft text-warning",
+  danger: "bg-destructive-soft text-destructive",
+  info: "bg-info-soft text-info",
+  neutral: "bg-muted text-muted-foreground",
 };
 
-export function KpiCard({ label, value, icon: Icon, hint, tone = "neutral" }: KpiCardProps) {
+export function KpiCard({ label, value, icon: Icon, hint, tone = "neutral", size = "hero" }: KpiCardProps) {
+  const compact = size === "compact";
   return (
-    <Card className="p-4">
+    <Card className={cn(compact ? "p-3" : "p-4 sm:p-5")}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate text-xs font-medium text-muted-foreground">{label}</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums">{value}</p>
-          {hint && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
+          <p
+            className={cn(
+              "font-medium text-muted-foreground",
+              compact ? "line-clamp-2 text-[11px] leading-tight" : "truncate text-xs",
+            )}
+          >
+            {label}
+          </p>
+          <p className={cn("mt-1 font-bold tabular-nums text-foreground", compact ? "text-lg" : "text-2xl sm:text-3xl")}>
+            {value}
+          </p>
+          {hint && !compact && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
         </div>
-        <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-lg", toneClasses[tone])}>
-          <Icon className="h-5 w-5" />
+        <div
+          className={cn(
+            "flex shrink-0 items-center justify-center rounded-lg",
+            compact ? "h-8 w-8" : "h-11 w-11",
+            toneClasses[tone],
+          )}
+        >
+          <Icon className={compact ? "h-4 w-4" : "h-5 w-5"} />
         </div>
       </div>
     </Card>

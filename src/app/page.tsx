@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { ShieldCheck, Smartphone, MapPin, ArrowRight } from "lucide-react";
+import { ShieldCheck, Smartphone, ArrowRight, Sparkles } from "lucide-react";
 import { MOCK_USERS } from "@/mocks/users";
 import { useSessionStore } from "@/stores/session-store";
 import type { DemoUser } from "@/types";
@@ -22,82 +22,92 @@ export default function HomePage() {
   const driverUser = MOCK_USERS.find((u) => u.role === "conductor")!;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-brand-green/10 via-background to-background">
-      <div className="mx-auto flex min-h-screen max-w-5xl flex-col items-center justify-center px-4 py-12">
-        <div className="mb-10 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg ring-1 ring-border">
-            <Image src="/logo.png" alt="GreenGo Traslados" width={48} height={40} className="h-10 w-auto" priority />
+    <main className="route-pattern relative min-h-screen bg-gradient-to-b from-primary-soft via-background to-background">
+      <div className="mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center px-4 py-8">
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-3xl bg-white shadow-card ring-1 ring-border">
+            <Image src="/logo.png" alt="GreenGo Traslados" width={72} height={60} className="h-16 w-auto" priority />
           </div>
-          <h1 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
+          <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-warning-soft px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-warning">
+            <Sparkles className="h-3 w-3" /> Demo
+          </div>
+          <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             GreenGo Traslados
           </h1>
           <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-            Gestión y monitoreo de traslados turísticos en Cancún · <span className="font-medium">DEMO</span>
+            Gestión y monitoreo de traslados turísticos en Cancún.
           </p>
-          <p className="mx-auto mt-2 max-w-xl text-xs text-muted-foreground">
-            Selecciona con qué experiencia deseas entrar. Los usuarios son simulados y
-            no requieren contraseña.
+          <p className="mt-1 text-sm font-medium text-foreground">
+            ¿Con qué experiencia quieres entrar?
           </p>
         </div>
 
         <div className="grid w-full gap-5 sm:grid-cols-2">
           {/* Administrador / operador */}
-          <Card className="flex flex-col p-6">
-            <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-blue/10 text-brand-blue">
-                <ShieldCheck className="h-5 w-5" />
+          <Card className="flex flex-col overflow-hidden">
+            <div className="h-1.5 w-full bg-primary" aria-hidden />
+            <div className="flex flex-1 flex-col p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="font-heading font-semibold leading-tight">Panel administrativo</h2>
+                  <p className="text-xs text-muted-foreground">Dueño · Administrador · Operador</p>
+                </div>
               </div>
-              <div>
-                <h2 className="font-heading font-semibold">Panel administrativo</h2>
-                <p className="text-xs text-muted-foreground">Dueño · Administrador · Operador</p>
+              <p className="mb-4 text-sm text-muted-foreground">
+                Servicios, monitoreo en tiempo real, flota, combustible, alertas y reportes.
+              </p>
+              <div className="mt-auto space-y-2">
+                {adminUsers.map((u) => (
+                  <UserButton key={u.id} user={u} cta="Entrar al panel" onClick={() => enter(u)} />
+                ))}
               </div>
-            </div>
-            <p className="mb-4 text-sm text-muted-foreground">
-              Servicios, monitoreo en tiempo real, vehículos, conductores, combustible,
-              alertas, mantenimiento y reportes.
-            </p>
-            <div className="mt-auto space-y-2">
-              {adminUsers.map((u) => (
-                <UserButton key={u.id} user={u} onClick={() => enter(u)} />
-              ))}
             </div>
           </Card>
 
           {/* Conductor */}
-          <Card className="flex flex-col p-6">
-            <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-orange/10 text-brand-orange">
-                <Smartphone className="h-5 w-5" />
+          <Card className="flex flex-col overflow-hidden">
+            <div className="h-1.5 w-full bg-brand-orange" aria-hidden />
+            <div className="flex flex-1 flex-col p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-warning-soft text-warning">
+                  <Smartphone className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="font-heading font-semibold leading-tight">Aplicación del conductor</h2>
+                  <p className="text-xs text-muted-foreground">Vista móvil · una mano</p>
+                </div>
               </div>
-              <div>
-                <h2 className="font-heading font-semibold">Experiencia del conductor</h2>
-                <p className="text-xs text-muted-foreground">Optimizada para móvil</p>
-              </div>
-            </div>
-            <p className="mb-4 text-sm text-muted-foreground">
-              Servicios del día, detalle de traslados, inicio y cierre de viaje, registro
-              de gasolina, incidencias y perfil.
-            </p>
-            <div className="mt-auto space-y-2">
-              <UserButton user={driverUser} onClick={() => enter(driverUser)} />
-              <p className="flex items-center gap-1 pt-1 text-xs text-muted-foreground">
-                <MapPin className="h-3 w-3" /> Sugerencia: ábrelo desde un teléfono o
-                reduce la ventana.
+              <p className="mb-4 text-sm text-muted-foreground">
+                Servicio activo, siguiente acción, registro de gasolina e incidencias.
               </p>
+              <div className="mt-auto space-y-2">
+                <UserButton user={driverUser} cta="Ver experiencia del conductor" onClick={() => enter(driverUser)} />
+              </div>
             </div>
           </Card>
         </div>
 
-        <p className="mt-8 max-w-2xl text-center text-xs text-muted-foreground">
-          Prototipo con datos simulados (mocks). No hay backend, base de datos, GPS real
-          ni autenticación. Los cambios se guardan temporalmente en tu navegador.
+        <p className="mt-6 max-w-xl text-center text-[11px] text-muted-foreground">
+          Prototipo con datos simulados. Sin backend ni autenticación real — los cambios se guardan
+          solo en este navegador.
         </p>
       </div>
     </main>
   );
 }
 
-function UserButton({ user, onClick }: { user: DemoUser; onClick: () => void }) {
+function UserButton({
+  user,
+  cta,
+  onClick,
+}: {
+  user: DemoUser;
+  cta: string;
+  onClick: () => void;
+}) {
   const initials = user.name
     .split(" ")
     .slice(0, 2)
@@ -113,20 +123,22 @@ function UserButton({ user, onClick }: { user: DemoUser; onClick: () => void }) 
     <button
       onClick={onClick}
       className={cn(
-        "group flex w-full items-center gap-3 rounded-lg border border-border bg-card p-3 text-left transition-colors hover:border-primary hover:bg-secondary",
+        "group flex w-full items-center gap-3 rounded-xl border border-border bg-card p-3 text-left shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
       )}
     >
       <span
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
         style={{ backgroundColor: user.avatarColor }}
       >
         {initials}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-medium">{user.name}</span>
-        <span className="block text-xs text-muted-foreground">{roleLabel}</span>
+        <span className="block truncate text-sm font-semibold">{user.name}</span>
+        <span className="block text-xs text-muted-foreground">
+          {roleLabel} · <span className="font-medium text-primary">{cta}</span>
+        </span>
       </span>
-      <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+      <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
     </button>
   );
 }

@@ -131,19 +131,19 @@ export default function FuelPage() {
       </div>
 
       {anomalies.length > 0 && (
-        <Card className="mt-4 border-amber-200 bg-amber-50/50">
+        <Card className="mt-4 border-warning/30 bg-warning-soft">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-amber-800">
+            <CardTitle className="flex items-center gap-2 text-warning">
               <AlertCircle className="h-4 w-4" /> Anomalías por revisar
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p className="text-xs text-amber-700">
+            <p className="text-xs text-warning/90">
               Variaciones de consumo respecto al promedio de la unidad. Requieren revisión
               y evidencia; no implican una conclusión automática.
             </p>
             {anomalies.map((f) => (
-              <div key={f.id} className="rounded-md border border-amber-200 bg-card p-2 text-sm">
+              <div key={f.id} className="rounded-md border border-warning/25 bg-card p-2 text-sm">
                 <div className="flex items-center justify-between">
                   <span className="font-medium">{vehicleName(f.vehicleId)} · {formatDate(f.date, "dd MMM")}</span>
                   <FuelValidationBadge status={f.validation} />

@@ -5,6 +5,8 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Home, ListChecks, Fuel, AlertTriangle, User, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSessionStore } from "@/stores/session-store";
+import { useHydrated } from "@/lib/hooks";
 
 const NAV = [
   { href: "/driver/home", label: "Inicio", icon: Home },
@@ -17,27 +19,37 @@ const NAV = [
 export function DriverShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const hydrated = useHydrated();
+  const currentUser = useSessionStore((s) => s.currentUser);
+  const driverName = hydrated ? currentUser?.name.split(" ")[0] ?? "Conductor" : "Conductor";
 
   return (
-    <div className="flex min-h-screen justify-center bg-slate-100">
+    <div className="flex min-h-screen justify-center bg-muted">
       {/* Contenedor tipo teléfono en pantallas grandes */}
       <div className="relative flex min-h-screen w-full max-w-md flex-col bg-background shadow-xl">
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-primary px-4 text-primary-foreground">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90">
+        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b border-black/10 bg-primary px-4 text-primary-foreground">
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white">
               <Image src="/logo.png" alt="GreenGo" width={24} height={20} className="h-5 w-auto" />
             </div>
-            <span className="font-heading text-sm font-semibold">GreenGo · Conductor</span>
+            <div className="min-w-0 leading-tight">
+              <p className="font-heading truncate text-sm font-semibold">GreenGo</p>
+              <p className="truncate text-[11px] text-primary-foreground/80">{driverName} · Conductor</p>
+            </div>
           </div>
-          <button onClick={() => router.push("/")} aria-label="Salir" className="rounded-md p-1.5 hover:bg-white/15">
+          <button
+            onClick={() => router.push("/")}
+            aria-label="Salir de la sesión simulada"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          >
             <LogOut className="h-5 w-5" />
           </button>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-4 pb-24 pt-4">{children}</main>
+        <main className="flex-1 overflow-y-auto px-4 pb-28 pt-4">{children}</main>
 
         {/* Navegación inferior */}
-        <nav className="fixed bottom-0 z-30 w-full max-w-md border-t border-border bg-card">
+        <nav className="fixed bottom-0 z-30 w-full max-w-md border-t border-border bg-card pb-safe">
           <div className="grid grid-cols-5">
             {NAV.map((item) => {
               const active = pathname.startsWith(item.href);
@@ -46,12 +58,15 @@ export function DriverShell({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.href}
                   href={item.href}
+                  aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium transition-colors",
+                    "flex min-h-[52px] flex-col items-center justify-center gap-1 py-2 text-[11px] font-medium transition-colors",
                     active ? "text-primary" : "text-muted-foreground",
                   )}
                 >
-                  <Icon className={cn("h-5 w-5", active && "fill-primary/10")} />
+                  <span className={cn("flex h-7 w-11 items-center justify-center rounded-full", active && "bg-primary-soft")}>
+                    <Icon className="h-5 w-5" />
+                  </span>
                   {item.label}
                 </Link>
               );

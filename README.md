@@ -105,6 +105,20 @@ Los cuatro tonos están disponibles como utilidades de Tailwind (`bg-brand-green
 - **Poppins** (`--font-heading`, clase `font-heading`) — títulos, encabezados de página y nombres de marca. Geométrica y amigable, refuerza el tono turístico de GreenGo.
 - **Inter** (`--font-body`, fuente base `font-sans`) — texto de cuerpo, tablas y formularios. Muy legible en pantallas pequeñas y densidades de datos altas.
 
+**Tokens semánticos.** Además de los colores de marca, `globals.css` define variables de estado independientes (`--info`, `--success`, `--warning`, `--destructive`, cada una con su variante `-soft` para fondos) y una escala de sombras (`shadow-soft`, `shadow-card`, `shadow-popover` en `tailwind.config.ts`). Los componentes (`Button`, `Badge`, `Card`, `KpiCard`) consumen estos tokens en vez de clases de color de Tailwind sueltas, para que toda la app cambie de forma consistente si se ajusta la paleta.
+
+### 5.1 Mejora de UX/UI (segunda pasada)
+
+Sobre la base anterior se hizo una revisión integral de usabilidad y jerarquía visual, sin tocar rutas, mocks ni lógica de estado:
+
+- **Componentes base**: `Button` con variantes semánticas correctas (antes "success" usaba azul por error), alturas ≥44px para cumplir área táctil mínima; `Badge` con punto de color + texto (no depende solo del color); nuevo `DropdownMenu` propio (sin dependencias nuevas) para menús contextuales.
+- **Pantalla de acceso** (`/`): logo más grande, insignia "DEMO", copy más corto, CTA explícito por perfil ("Entrar al panel" / "Ver experiencia del conductor"), fondo sutil de rutas y tarjetas con estados hover/focus visibles.
+- **Panel administrativo**: sidebar agrupado por secciones (Operación / Flota / Gestión), colapsable con tooltips, estado activo con icono + fondo suave (ya no un bloque sólido); "Restablecer DEMO" se movió del header a un menú secundario de cuenta para no competir con las acciones operativas.
+- **Dashboard**: jerarquía en dos niveles — 4 KPIs principales (programados, en curso, disponibles, alertas) + una franja secundaria compacta y desplazable (completados, incidencias, km, combustible, mantenimiento) — más una sección de Acciones rápidas y alertas recientes con color según prioridad.
+- **Experiencia del conductor**: la pantalla de inicio se reordenó por prioridad (estado → servicio activo con botón de siguiente acción según el estado → unidad asignada compacta → alertas → estadísticas secundarias). Se agregó un stepper de progreso del servicio (`trip-stepper.tsx`) y el encabezado/nav inferior móvil respetan el *safe area* del dispositivo.
+
+Verificado con `npm run lint` y `npm run build` sin errores, y revisión manual en navegador en 375px y escritorio.
+
 ---
 
 ## 6. Decisiones técnicas del DEMO
@@ -180,7 +194,7 @@ Ubicación: **`src/mocks/`**
 
 | Archivo | Contenido |
 |---------|-----------|
-| `vehicles.ts` | 8 vehículos |
+| `vehicles.ts` | 3 vehículos |
 | `drivers.ts` | 10 conductores |
 | `trips.ts` | 20 viajes/servicios |
 | `alerts.ts` | 12 alertas |
@@ -296,3 +310,5 @@ src/
 - **Fix aplicado (`src/components/maps/fleet-map.tsx`):** el mapa de Leaflet se montaba con altura 0 dentro de contenedores flex/grid y no cargaba los tiles. Se corrigió forzando `h-full w-full` en el contenedor y añadiendo un `invalidateSize()` tras el primer montaje (`InvalidateOnMount`). Verificado visualmente en `/admin/monitoring`: el mapa de Cancún y los marcadores por estado ya renderizan correctamente.
 - Se eliminó un import sin usar (`vehicleLabel`) en `src/app/driver/home/page.tsx`, detectado durante la verificación en navegador.
 - Se agregó `.claude/launch.json` (config local de desarrollo, no forma parte del código de producción) para poder previsualizar `npm run dev` en el navegador integrado del asistente.
+- **Mejora integral de UX/UI** (ver [§5.1](#51-mejora-de-uxui-segunda-pasada)): tokens semánticos de color/sombra, componentes base (`Button`, `Badge`, `DropdownMenu`) revisados, rediseño de la pantalla de acceso, del panel administrativo (sidebar colapsable, jerarquía del dashboard) y de la experiencia del conductor (servicio activo con CTA por estado, stepper de progreso, safe area móvil).
+- **Datos mock reducidos:** `src/mocks/vehicles.ts` pasó de 8 a 3 vehículos (`veh-01`, `veh-02`, `veh-03` / U-01 a U-03). Las referencias a las unidades eliminadas en `drivers.ts`, `trips.ts`, `alerts.ts`, `incidents.ts`, `fuel.ts` y `maintenance.ts` se remapearon a las 3 unidades restantes para conservar la integridad de los datos simulados.

@@ -40,9 +40,9 @@ export const toast = {
 };
 
 const icons: Record<ToastType, React.ReactNode> = {
-  success: <CheckCircle2 className="h-5 w-5 text-emerald-600" />,
-  info: <Info className="h-5 w-5 text-sky-600" />,
-  warning: <AlertTriangle className="h-5 w-5 text-amber-600" />,
+  success: <CheckCircle2 className="h-5 w-5 text-success" />,
+  info: <Info className="h-5 w-5 text-info" />,
+  warning: <AlertTriangle className="h-5 w-5 text-warning" />,
 };
 
 export function Toaster() {

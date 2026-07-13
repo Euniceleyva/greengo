@@ -14,7 +14,14 @@ import {
   Cell,
 } from "recharts";
 
-const AXIS = { fontSize: 12, fill: "#64748b" };
+const AXIS = { fontSize: 12, fill: "#5f7770" };
+const GRID_COLOR = "#d9e5e1";
+const TOOLTIP_STYLE = {
+  borderRadius: 10,
+  border: "1px solid #d9e5e1",
+  fontSize: 12,
+  boxShadow: "0 4px 14px rgba(19,43,36,0.08)",
+};
 
 export interface BarDatum {
   label: string;
@@ -24,8 +31,8 @@ export interface BarDatum {
 
 export function SimpleBarChart({
   data,
-  color = "#0369a1",
-  height = 240,
+  color = "#29876B",
+  height = 220,
   unit = "",
 }: {
   data: BarDatum[];
@@ -36,13 +43,13 @@ export function SimpleBarChart({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart data={data} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={GRID_COLOR} />
         <XAxis dataKey="label" tick={AXIS} tickLine={false} axisLine={false} />
         <YAxis tick={AXIS} tickLine={false} axisLine={false} width={44} />
         <Tooltip
           formatter={(v: number) => [`${v.toLocaleString("es-MX")} ${unit}`.trim(), ""]}
-          contentStyle={{ borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 12 }}
-          cursor={{ fill: "rgba(3,105,161,0.06)" }}
+          contentStyle={TOOLTIP_STYLE}
+          cursor={{ fill: "rgba(41,135,107,0.08)" }}
         />
         <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={48}>
           {data.map((d, i) => (
@@ -56,8 +63,8 @@ export function SimpleBarChart({
 
 export function SimpleLineChart({
   data,
-  color = "#059669",
-  height = 240,
+  color = "#00AFEE",
+  height = 220,
   unit = "",
 }: {
   data: BarDatum[];
@@ -68,12 +75,12 @@ export function SimpleLineChart({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <LineChart data={data} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={GRID_COLOR} />
         <XAxis dataKey="label" tick={AXIS} tickLine={false} axisLine={false} />
         <YAxis tick={AXIS} tickLine={false} axisLine={false} width={44} />
         <Tooltip
           formatter={(v: number) => [`${v.toLocaleString("es-MX")} ${unit}`.trim(), ""]}
-          contentStyle={{ borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 12 }}
+          contentStyle={TOOLTIP_STYLE}
         />
         <Line
           type="monotone"

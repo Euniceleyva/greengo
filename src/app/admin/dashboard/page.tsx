@@ -4,20 +4,22 @@ import Link from "next/link";
 import {
   CalendarClock,
   PlayCircle,
-  CheckCircle2,
-  AlertTriangle,
   Car,
+  Bell,
   Route as RouteIcon,
   Fuel,
-  Bell,
   Gauge,
   MapPinned,
+  CheckCircle2,
+  Wrench,
+  Plus,
+  UserCog,
 } from "lucide-react";
 import { useDemoStore } from "@/stores/demo-store";
 import { useHydrated } from "@/lib/hooks";
 import { PageHeader } from "@/components/shared/page-header";
 import { KpiCard } from "@/components/shared/kpi-card";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/misc";
 import { SimpleBarChart } from "@/components/charts/charts";
 import { MapView, type MapMarker } from "@/components/maps/map-view";
@@ -49,6 +51,7 @@ export default function DashboardPage() {
   const kmOffRoute = trips.reduce((sum, t) => sum + t.offRouteKm, 0);
   const fuelEstimate = todayTrips.reduce((sum, t) => sum + (t.realKm ?? t.plannedKm) / 8, 0);
   const pendingAlerts = alerts.filter((a) => a.status === "pendiente").length;
+  const criticalAlerts = alerts.filter((a) => a.status === "pendiente" && a.priority === "alta").length;
 
   // Km recorridos por día de la semana (mock derivado)
   const weekData = [
@@ -95,32 +98,72 @@ export default function DashboardPage() {
         actions={
           <Link
             href="/admin/monitoring"
-            className="inline-flex h-8 items-center gap-2 rounded-md border border-input bg-card px-3 text-xs font-medium hover:bg-secondary"
+            className="inline-flex h-11 items-center gap-2 rounded-md border border-input bg-card px-3 text-sm font-medium transition-colors hover:bg-secondary"
           >
             <MapPinned className="h-4 w-4" /> Ver monitoreo
           </Link>
         }
       />
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        <KpiCard label="Programados hoy" value={scheduledToday} icon={CalendarClock} tone="primary" />
-        <KpiCard label="En curso" value={inProgress} icon={PlayCircle} tone="primary" />
-        <KpiCard label="Completados hoy" value={completedToday} icon={CheckCircle2} tone="success" />
-        <KpiCard label="Con incidencias" value={withIncidents} icon={AlertTriangle} tone="danger" />
-        <KpiCard label="Disponibles" value={available} icon={Car} tone="success" />
-        <KpiCard label="En ruta" value={onRoute} icon={RouteIcon} tone="primary" />
-        <KpiCard label="En mantenimiento" value={inMaintenance} icon={Car} tone="neutral" />
-        <KpiCard label="Alertas pendientes" value={pendingAlerts} icon={Bell} tone="warning" />
-        <KpiCard label="Km recorridos hoy" value={formatNumber(kmToday)} icon={Gauge} tone="primary" hint="Suma de km reales" />
-        <KpiCard label="Km fuera de servicio" value={formatNumber(kmOffRoute, 1)} icon={RouteIcon} tone="warning" hint="Desvíos detectados" />
-        <KpiCard label="Combustible estimado" value={`${formatNumber(fuelEstimate)} L`} icon={Fuel} tone="neutral" hint="Consumo del día" />
-        <KpiCard label="Ingreso estimado hoy" value={formatMXN(todayTrips.reduce((s, t) => s + t.amount, 0))} icon={CheckCircle2} tone="success" />
+      {/* Primera jerarquía: lo que hay que saber en los primeros segundos */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <KpiCard label="Programados hoy" value={scheduledToday} icon={CalendarClock} tone="primary" hint="Servicios de hoy" />
+        <KpiCard label="En curso" value={inProgress} icon={PlayCircle} tone="info" hint="Traslados activos" />
+        <KpiCard label="Unidades disponibles" value={available} icon={Car} tone="success" hint={`${onRoute} en ruta`} />
+        <KpiCard
+          label="Alertas por atender"
+          value={pendingAlerts}
+          icon={Bell}
+          tone={criticalAlerts > 0 ? "danger" : pendingAlerts > 0 ? "warning" : "success"}
+          hint={criticalAlerts > 0 ? `${criticalAlerts} crítica(s)` : "Sin críticas"}
+        />
+      </div>
+
+      {/* Acciones rápidas */}
+      <div className="mt-5">
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Acciones rápidas</h2>
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
+          <QuickAction href="/admin/trips" icon={Plus} label="Crear servicio" tone="primary" />
+          <QuickAction href="/admin/drivers" icon={UserCog} label="Asignar conductor" tone="info" />
+          <QuickAction href="/admin/monitoring" icon={MapPinned} label="Ver monitoreo" tone="info" />
+          <QuickAction href="/admin/fuel" icon={Fuel} label="Registrar combustible" tone="warning" />
+          <QuickAction href="/admin/alerts" icon={Bell} label="Revisar alertas" tone="danger" />
+        </div>
+      </div>
+
+      {/* Segunda jerarquía: indicadores de apoyo, en franja compacta */}
+      <div className="mt-5">
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Resumen secundario</h2>
+        <div className="-mx-4 flex gap-2.5 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+          <div className="w-36 shrink-0">
+            <KpiCard size="compact" label="Completados hoy" value={completedToday} icon={CheckCircle2} tone="success" />
+          </div>
+          <div className="w-36 shrink-0">
+            <KpiCard size="compact" label="Incidencias" value={withIncidents} icon={RouteIcon} tone="danger" />
+          </div>
+          <div className="w-36 shrink-0">
+            <KpiCard size="compact" label="Km hoy" value={formatNumber(kmToday)} icon={Gauge} tone="info" />
+          </div>
+          <div className="w-36 shrink-0">
+            <KpiCard size="compact" label="Km fuera ruta" value={formatNumber(kmOffRoute, 1)} icon={RouteIcon} tone="warning" />
+          </div>
+          <div className="w-36 shrink-0">
+            <KpiCard size="compact" label="Combustible" value={`${formatNumber(fuelEstimate)} L`} icon={Fuel} tone="neutral" />
+          </div>
+          <div className="w-36 shrink-0">
+            <KpiCard size="compact" label="Mantenimiento" value={inMaintenance} icon={Wrench} tone="neutral" />
+          </div>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Ingreso estimado hoy: <span className="font-semibold text-foreground">{formatMXN(todayTrips.reduce((s, t) => s + t.amount, 0))}</span>
+        </p>
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Kilómetros recorridos (semana)</CardTitle>
+            <CardTitle>Kilómetros recorridos por día</CardTitle>
+            <CardDescription>Suma de kilómetros reales registrados · unidad: km</CardDescription>
           </CardHeader>
           <CardContent>
             <SimpleBarChart data={weekData} unit="km" />
@@ -129,9 +172,10 @@ export default function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle>Consumo estimado por unidad</CardTitle>
+            <CardDescription>Aproximación según nivel de combustible actual · unidad: litros</CardDescription>
           </CardHeader>
           <CardContent>
-            <SimpleBarChart data={consumptionData} color="#059669" unit="L" />
+            <SimpleBarChart data={consumptionData} color="#00AFEE" unit="L" />
           </CardContent>
         </Card>
       </div>
@@ -142,14 +186,19 @@ export default function DashboardPage() {
             <CardTitle>Próximos servicios</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
+            {upcoming.length === 0 && (
+              <p className="rounded-md bg-muted px-3 py-6 text-center text-xs text-muted-foreground">
+                No hay servicios próximos.
+              </p>
+            )}
             {upcoming.map((t) => (
               <Link
                 key={t.id}
                 href={`/admin/trips/${t.id}`}
-                className="block rounded-md border border-border p-3 transition-colors hover:bg-secondary"
+                className="block rounded-lg border border-border p-3 transition-colors hover:border-primary/40 hover:bg-primary-soft/60"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-medium">{t.folio}</span>
+                  <span className="text-sm font-semibold">{t.folio}</span>
                   <TripStatusBadge status={t.status} />
                 </div>
                 <p className="mt-1 truncate text-xs text-muted-foreground">
@@ -168,11 +217,16 @@ export default function DashboardPage() {
             <CardTitle>Alertas recientes</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
+            {recentAlerts.length === 0 && (
+              <p className="rounded-md bg-muted px-3 py-6 text-center text-xs text-muted-foreground">
+                Sin alertas pendientes. Todo en orden.
+              </p>
+            )}
             {recentAlerts.map((a) => (
               <Link
                 key={a.id}
                 href="/admin/alerts"
-                className="block rounded-md border border-border p-3 transition-colors hover:bg-secondary"
+                className={cnAlert(a.priority)}
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-medium">{ALERT_TYPE_LABELS[a.type]}</span>
@@ -199,13 +253,55 @@ export default function DashboardPage() {
   );
 }
 
+function cnAlert(priority: "alta" | "media" | "baja") {
+  const base = "block rounded-lg border p-3 transition-colors";
+  if (priority === "alta") return `${base} border-destructive/30 bg-destructive-soft hover:border-destructive/50`;
+  if (priority === "media") return `${base} border-warning/30 bg-warning-soft hover:border-warning/50`;
+  return `${base} border-border hover:bg-secondary`;
+}
+
+function QuickAction({
+  href,
+  icon: Icon,
+  label,
+  tone,
+}: {
+  href: string;
+  icon: typeof Plus;
+  label: string;
+  tone: "primary" | "info" | "warning" | "danger";
+}) {
+  const toneClass = {
+    primary: "bg-primary-soft text-primary",
+    info: "bg-info-soft text-info",
+    warning: "bg-warning-soft text-warning",
+    danger: "bg-destructive-soft text-destructive",
+  }[tone];
+  return (
+    <Link
+      href={href}
+      className="flex min-h-[44px] flex-col items-center gap-2 rounded-xl border border-border bg-card p-3 text-center shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      <span className={`flex h-9 w-9 items-center justify-center rounded-lg ${toneClass}`}>
+        <Icon className="h-4 w-4" />
+      </span>
+      <span className="text-xs font-medium leading-tight text-foreground">{label}</span>
+    </Link>
+  );
+}
+
 function DashboardSkeleton() {
   return (
     <div>
       <Skeleton className="mb-6 h-8 w-48" />
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {Array.from({ length: 8 }).map((_, i) => (
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
           <Skeleton key={i} className="h-24" />
+        ))}
+      </div>
+      <div className="mt-5 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="h-16" />
         ))}
       </div>
       <div className="mt-6 grid gap-4 lg:grid-cols-2">

@@ -91,8 +91,8 @@ function ServiceCard({ trip, vehicleText }: { trip: Trip; vehicleText: string })
             <TripStatusBadge status={trip.status} />
           </div>
           <div className="mt-3 space-y-1.5 text-sm">
-            <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-emerald-600" /> {trip.origin}</p>
-            <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-red-600" /> {trip.destination}</p>
+            <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-success" /> {trip.origin}</p>
+            <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-destructive" /> {trip.destination}</p>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-border pt-2 text-xs text-muted-foreground">
             <span>{formatDate(trip.date, "dd MMM")}</span>

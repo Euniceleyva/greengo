@@ -24,6 +24,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/misc";
 import { EmptyState } from "@/components/shared/states";
 import { TripStatusBadge } from "@/components/shared/badges";
+import { TripStepper } from "@/components/driver/trip-stepper";
 import { MapView, type MapMarker, type MapRoute } from "@/components/maps/map-view";
 import { PhotoInput } from "@/components/driver/photo-input";
 import { toast } from "@/components/ui/toast";
@@ -100,25 +101,35 @@ function ActiveTripContent() {
     toast.success("Viaje finalizado y registrado.");
   };
 
-  const routes: MapRoute[] = [{ points: trip.plannedRoute, color: "#0369a1" }];
+  const routes: MapRoute[] = [{ points: trip.plannedRoute, color: "#00AFEE" }];
   const markers: MapMarker[] = [
-    { id: "o", position: trip.originCoord, color: "#059669", title: "Origen" },
+    { id: "o", position: trip.originCoord, color: "#29876B", title: "Origen" },
     { id: "d", position: trip.destinationCoord, color: "#dc2626", title: "Destino" },
   ];
 
   return (
     <div className="space-y-4">
-      <button onClick={() => router.back()} className="flex items-center gap-1 text-sm text-muted-foreground">
+      <button
+        onClick={() => router.back()}
+        className="flex h-9 items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+      >
         <ChevronLeft className="h-4 w-4" /> Volver
       </button>
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-bold">{trip.folio}</h1>
+          <h1 className="font-heading text-lg font-bold">{trip.folio}</h1>
           <p className="text-xs text-muted-foreground">{SERVICE_TYPE_LABELS[trip.serviceType]}</p>
         </div>
         <TripStatusBadge status={trip.status} />
       </div>
+
+      {/* Progreso del servicio */}
+      <Card>
+        <CardContent className="p-4">
+          <TripStepper status={trip.status} />
+        </CardContent>
+      </Card>
 
       {/* Mapa mock */}
       <div className="h-40 overflow-hidden rounded-lg">
@@ -128,8 +139,8 @@ function ActiveTripContent() {
       {/* Ruta */}
       <Card>
         <CardContent className="space-y-2 p-4 text-sm">
-          <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-emerald-600" /> <strong>Origen:</strong> {trip.origin}</p>
-          <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-red-600" /> <strong>Destino:</strong> {trip.destination}</p>
+          <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-success" /> <strong>Origen:</strong> {trip.origin}</p>
+          <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-destructive" /> <strong>Destino:</strong> {trip.destination}</p>
           <p className="flex items-center gap-2 text-muted-foreground"><Car className="h-4 w-4" /> {vehicleLabel(vehicles, trip.vehicleId)}</p>
         </CardContent>
       </Card>
@@ -148,7 +159,7 @@ function ActiveTripContent() {
             <Row label="Tarifa" value={formatMXN(trip.amount)} />
           </div>
           {trip.specialReception && (
-            <div className="mt-2 flex items-start gap-2 rounded-md bg-violet-50 p-2 text-xs text-violet-700">
+            <div className="mt-2 flex items-start gap-2 rounded-md bg-info-soft p-2 text-xs text-info">
               <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" /> Recepción personalizada solicitada.
             </div>
           )}
@@ -168,13 +179,13 @@ function ActiveTripContent() {
             <ArrowRight />
           </Button>
         ) : (
-          <div className="rounded-lg bg-emerald-50 p-3 text-center text-sm font-medium text-emerald-700">
+          <div className="rounded-lg bg-success-soft p-3 text-center text-sm font-medium text-success">
             Servicio {TRIP_STATUS_LABELS[trip.status].toLowerCase()}.
           </div>
         )}
 
         <Link href={`/driver/incidents?trip=${trip.id}`}>
-          <Button variant="outline" className="h-11 w-full text-destructive">
+          <Button variant="outline" className="h-11 w-full border-destructive/30 text-destructive hover:bg-destructive-soft">
             <AlertTriangle /> Reportar incidencia
           </Button>
         </Link>

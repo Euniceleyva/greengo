@@ -39,6 +39,22 @@ const config: Config = {
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
+          soft: "hsl(var(--destructive-soft))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+          soft: "hsl(var(--info-soft))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+          soft: "hsl(var(--success-soft))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+          soft: "hsl(var(--warning-soft))",
         },
         card: {
           DEFAULT: "hsl(var(--card))",
@@ -48,6 +64,8 @@ const config: Config = {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
         },
+        "surface-soft": "hsl(var(--surface-soft))",
+        "primary-soft": "hsl(var(--primary-soft))",
         brand: {
           green: "hsl(var(--brand-green))",
           orange: "hsl(var(--brand-orange))",
@@ -63,6 +81,12 @@ const config: Config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "calc(var(--radius) + 4px)",
+      },
+      boxShadow: {
+        soft: "0 1px 2px hsl(var(--shadow-color) / 0.04), 0 2px 8px hsl(var(--shadow-color) / 0.06)",
+        card: "0 1px 2px hsl(var(--shadow-color) / 0.05), 0 4px 14px hsl(var(--shadow-color) / 0.07)",
+        popover: "0 8px 24px hsl(var(--shadow-color) / 0.14)",
       },
       keyframes: {
         "fade-in": {

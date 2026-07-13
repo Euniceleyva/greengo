@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 /** Barra de nivel de combustible con color según el porcentaje. */
 export function FuelBar({ level }: { level: number }) {
   const color =
-    level <= 20 ? "bg-red-500" : level <= 40 ? "bg-amber-500" : "bg-emerald-500";
+    level <= 20 ? "bg-destructive" : level <= 40 ? "bg-warning" : "bg-success";
   return (
     <div className="flex items-center gap-2">
       <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">

@@ -9,7 +9,10 @@
       "Bash(mkdir -p ~/.claude/skills)",
       "Bash(cp -R /private/tmp/claude-501/-Users-aplatam-Documents-greengo/3c840432-2f8f-4617-bc69-0aee8535b1c6/scratchpad/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max ~/.claude/skills/ui-ux-pro-max)",
       "Bash(git -C /Users/aplatam/Documents/greengo mv src/public/logo.png public/logo.png)",
-      "Bash(python3 -)"
+      "Bash(python3 -)",
+      "Bash(kill 10251 10252)",
+      "Bash(lsof -ti:3000)",
+      "Bash(xargs kill)"
     ]
   }
 }

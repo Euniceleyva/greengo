@@ -4,11 +4,21 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { Menu, X, RotateCcw, Bell, LogOut } from "lucide-react";
-import { ADMIN_NAV } from "./nav";
+import {
+  Menu,
+  X,
+  RotateCcw,
+  Bell,
+  LogOut,
+  ChevronsLeft,
+  ChevronsRight,
+  Settings,
+} from "lucide-react";
+import { ADMIN_NAV, ADMIN_NAV_GROUPS } from "./nav";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/toast";
 import { useDemoStore } from "@/stores/demo-store";
 import { useSessionStore } from "@/stores/session-store";
@@ -19,6 +29,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [collapsed, setCollapsed] = React.useState(false);
   const [confirmReset, setConfirmReset] = React.useState(false);
   const resetDemo = useDemoStore((s) => s.resetDemo);
   const pendingAlerts = useDemoStore((s) =>
@@ -27,6 +38,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const sessionUser = useSessionStore((s) => s.currentUser);
   const hydrated = useHydrated();
   const user = hydrated ? sessionUser ?? MOCK_USERS[0] : MOCK_USERS[0];
+  const currentSection = ADMIN_NAV.find((item) => pathname.startsWith(item.href));
 
   const handleReset = () => {
     resetDemo();
@@ -35,10 +47,24 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="flex min-h-screen bg-secondary/40">
+    <div className="flex min-h-screen bg-surface-soft">
       {/* Sidebar desktop */}
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-card lg:flex">
-        <SidebarContent pathname={pathname} />
+      <aside
+        className={cn(
+          "hidden shrink-0 flex-col border-r border-border bg-card transition-[width] duration-200 lg:flex",
+          collapsed ? "w-[4.5rem]" : "w-64",
+        )}
+      >
+        <SidebarContent pathname={pathname} collapsed={collapsed} />
+        <div className="border-t border-border p-2">
+          <button
+            onClick={() => setCollapsed((v) => !v)}
+            className="flex h-10 w-full items-center justify-center gap-2 rounded-md text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            aria-label={collapsed ? "Expandir menú" : "Colapsar menú"}
+          >
+            {collapsed ? <ChevronsRight className="h-4 w-4" /> : <><ChevronsLeft className="h-4 w-4" /> Colapsar</>}
+          </button>
+        </div>
       </aside>
 
       {/* Sidebar móvil */}
@@ -58,44 +84,52 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           >
             <Menu />
           </Button>
-          <div className="flex-1" />
+
+          <div className="min-w-0 flex-1">
+            <p className="font-heading truncate text-sm font-semibold text-foreground sm:text-base">
+              {currentSection?.label ?? "Panel administrativo"}
+            </p>
+          </div>
 
           <Link href="/admin/alerts" className="relative">
-            <Button variant="ghost" size="icon" aria-label="Alertas">
+            <Button variant="ghost" size="icon" aria-label="Ver alertas pendientes">
               <Bell />
             </Button>
             {hydrated && pendingAlerts > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+              <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
                 {pendingAlerts}
               </span>
             )}
           </Link>
 
-          <Button variant="outline" size="sm" onClick={() => setConfirmReset(true)}>
-            <RotateCcw />
-            <span className="hidden sm:inline">Restablecer DEMO</span>
-          </Button>
-
-          <div className="flex items-center gap-2 pl-1">
-            <span
-              className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white"
-              style={{ backgroundColor: user.avatarColor }}
-            >
-              {user.name.split(" ").slice(0, 2).map((n) => n[0]).join("")}
-            </span>
-            <div className="hidden text-right sm:block">
-              <p className="text-xs font-medium leading-tight">{user.name}</p>
-              <p className="text-[10px] capitalize text-muted-foreground">{user.role}</p>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.push("/")}
-              aria-label="Salir"
-            >
-              <LogOut />
-            </Button>
-          </div>
+          <DropdownMenu
+            trigger={
+              <button
+                className="flex items-center gap-2 rounded-lg py-1 pl-1 pr-2 transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label="Menú de cuenta y configuración"
+              >
+                <span
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold text-white"
+                  style={{ backgroundColor: user.avatarColor }}
+                >
+                  {user.name.split(" ").slice(0, 2).map((n) => n[0]).join("")}
+                </span>
+                <span className="hidden text-left sm:block">
+                  <span className="block text-xs font-medium leading-tight text-foreground">{user.name}</span>
+                  <span className="block text-[10px] capitalize text-muted-foreground">{user.role}</span>
+                </span>
+              </button>
+            }
+          >
+            <DropdownMenuLabel>Cuenta</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => setConfirmReset(true)}>
+              <RotateCcw /> Restablecer datos del DEMO
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => router.push("/")} className="text-destructive [&_svg]:text-destructive">
+              <LogOut /> Salir
+            </DropdownMenuItem>
+          </DropdownMenu>
         </header>
 
         <main className="flex-1 px-4 py-6 sm:px-6">{children}</main>
@@ -123,54 +157,78 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
 function SidebarContent({
   pathname,
+  collapsed = false,
   onNavigate,
 }: {
   pathname: string;
+  collapsed?: boolean;
   onNavigate?: () => void;
 }) {
   return (
     <>
-      <div className="flex h-16 items-center gap-2 border-b border-border px-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white ring-1 ring-border">
+      <div className={cn("flex h-16 items-center gap-2 border-b border-border px-5", collapsed && "justify-center px-2")}>
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white ring-1 ring-border">
           <Image src="/logo.png" alt="GreenGo" width={28} height={23} className="h-6 w-auto" />
         </div>
-        <div>
-          <p className="font-heading text-sm font-bold leading-tight">GreenGo</p>
-          <p className="text-[10px] text-muted-foreground">Panel administrativo</p>
-        </div>
+        {!collapsed && (
+          <div className="min-w-0">
+            <p className="font-heading truncate text-sm font-bold leading-tight">GreenGo</p>
+            <p className="truncate text-[10px] text-muted-foreground">Panel administrativo</p>
+          </div>
+        )}
         {onNavigate && (
           <Button variant="ghost" size="icon" className="ml-auto" onClick={onNavigate} aria-label="Cerrar">
             <X />
           </Button>
         )}
       </div>
-      <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-        {ADMIN_NAV.map((item) => {
-          const active = pathname.startsWith(item.href);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onNavigate}
-              className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                active
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-secondary hover:text-foreground",
-              )}
-            >
-              <Icon className="h-4 w-4" />
-              {item.label}
-            </Link>
-          );
-        })}
+      <nav className="flex-1 space-y-4 overflow-y-auto p-3">
+        {ADMIN_NAV_GROUPS.map((group) => (
+          <div key={group.label}>
+            {!collapsed && (
+              <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">
+                {group.label}
+              </p>
+            )}
+            <div className="space-y-0.5">
+              {group.items.map((item) => {
+                const active = pathname.startsWith(item.href);
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={onNavigate}
+                    title={collapsed ? item.label : undefined}
+                    className={cn(
+                      "group/nav relative flex items-center gap-3 rounded-lg border-l-[3px] px-3 py-2.5 text-sm font-medium transition-colors",
+                      collapsed && "justify-center px-0",
+                      active
+                        ? "border-primary bg-primary-soft text-primary font-semibold"
+                        : "border-transparent text-muted-foreground hover:bg-secondary hover:text-foreground",
+                    )}
+                  >
+                    <Icon className="h-[18px] w-[18px] shrink-0" />
+                    {!collapsed && <span className="truncate">{item.label}</span>}
+                    {collapsed && (
+                      <span className="pointer-events-none absolute left-full z-50 ml-2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs font-medium text-background opacity-0 shadow-popover transition-opacity duration-150 group-hover/nav:opacity-100">
+                        {item.label}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
-      <div className="border-t border-border p-3">
-        <p className="rounded-md bg-secondary px-3 py-2 text-[11px] text-muted-foreground">
-          DEMO con datos simulados. Sin backend ni GPS real.
-        </p>
-      </div>
+      {!collapsed && (
+        <div className="border-t border-border p-3">
+          <p className="flex items-center gap-1.5 rounded-md bg-secondary px-3 py-2 text-[11px] text-muted-foreground">
+            <Settings className="h-3 w-3 shrink-0" /> DEMO con datos simulados. Sin backend ni GPS real.
+          </p>
+        </div>
+      )}
     </>
   );
 }

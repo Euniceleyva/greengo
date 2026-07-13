@@ -73,12 +73,12 @@ export default function TripDetailPage() {
   const diffKm = trip.realKm !== null ? trip.realKm - trip.plannedKm : null;
   const diffMin = trip.realMinutes !== null ? trip.realMinutes - trip.estimatedMinutes : null;
 
-  const routes: MapRoute[] = [{ points: trip.plannedRoute, color: "#0369a1" }];
+  const routes: MapRoute[] = [{ points: trip.plannedRoute, color: "#00AFEE" }];
   if (trip.actualRoute.length > 1) {
     routes.push({ points: trip.actualRoute, color: "#dc2626", dashed: true });
   }
   const markers: MapMarker[] = [
-    { id: "o", position: trip.originCoord, color: "#059669", title: "Origen", popup: <span className="text-xs">Origen: {trip.origin}</span> },
+    { id: "o", position: trip.originCoord, color: "#29876B", title: "Origen", popup: <span className="text-xs">Origen: {trip.origin}</span> },
     { id: "d", position: trip.destinationCoord, color: "#dc2626", title: "Destino", popup: <span className="text-xs">Destino: {trip.destination}</span> },
   ];
 
@@ -154,7 +154,7 @@ export default function TripDetailPage() {
               <Row label="Unidad" value={vehicleLabel(vehicles, trip.vehicleId)} />
               <Row label="Importe" value={formatMXN(trip.amount)} />
               {trip.specialReception && (
-                <div className="flex items-start gap-2 rounded-md bg-violet-50 p-2 text-xs text-violet-700">
+                <div className="flex items-start gap-2 rounded-md bg-info-soft p-2 text-xs text-info">
                   <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" /> Recepción personalizada solicitada.
                 </div>
               )}
@@ -176,10 +176,10 @@ export default function TripDetailPage() {
             <CardContent>
               <div className="mb-3 flex flex-wrap gap-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5">
-                  <span className="h-1 w-6 rounded bg-[#0369a1]" /> Ruta planeada
+                  <span className="h-1 w-6 rounded bg-info" /> Ruta planeada
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="h-1 w-6 rounded bg-[#dc2626]" style={{ borderTop: "2px dashed #dc2626" }} /> Ruta recorrida
+                  <span className="h-1 w-6 rounded bg-destructive" style={{ borderTop: "2px dashed #dc2626" }} /> Ruta recorrida
                 </span>
               </div>
               <div className="h-72 overflow-hidden rounded-lg">
@@ -213,7 +213,7 @@ export default function TripDetailPage() {
           {(trip.serviceType === "aeropuerto" && trip.flightNumber) && (
             <Card>
               <CardContent className="flex items-center gap-3 py-4 text-sm">
-                <Plane className="h-5 w-5 text-sky-600" />
+                <Plane className="h-5 w-5 text-info" />
                 Vuelo <strong>{trip.flightNumber}</strong> · {trip.airline} — monitorea el estatus del vuelo con la aerolínea.
               </CardContent>
             </Card>
@@ -308,7 +308,7 @@ function Metric({
   tone?: "neutral" | "warning" | "danger";
 }) {
   const toneClass =
-    tone === "danger" ? "text-red-600" : tone === "warning" ? "text-amber-600" : "text-foreground";
+    tone === "danger" ? "text-destructive" : tone === "warning" ? "text-warning" : "text-foreground";
   return (
     <div className="rounded-lg border border-border p-3">
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
