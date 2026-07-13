@@ -3,7 +3,8 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Bus, Menu, X, RotateCcw, Bell, LogOut } from "lucide-react";
+import Image from "next/image";
+import { Menu, X, RotateCcw, Bell, LogOut } from "lucide-react";
 import { ADMIN_NAV } from "./nav";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -130,11 +131,11 @@ function SidebarContent({
   return (
     <>
       <div className="flex h-16 items-center gap-2 border-b border-border px-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <Bus className="h-5 w-5" />
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white ring-1 ring-border">
+          <Image src="/logo.png" alt="GreenGo" width={28} height={23} className="h-6 w-auto" />
         </div>
         <div>
-          <p className="text-sm font-bold leading-tight">GreenGo</p>
+          <p className="font-heading text-sm font-bold leading-tight">GreenGo</p>
           <p className="text-[10px] text-muted-foreground">Panel administrativo</p>
         </div>
         {onNavigate && (

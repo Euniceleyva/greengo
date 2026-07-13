@@ -4,25 +4,31 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
+    /* Paleta de marca GreenGo */
+    --brand-green: 162 53% 35%;   /* #29876B */
+    --brand-orange: 25 92% 58%;   /* #F68634 */
+    --brand-blue: 196 100% 47%;   /* #00AFEE */
+    --brand-lime: 77 58% 54%;     /* #A8CE46 */
+
+    --background: 160 25% 98%;
+    --foreground: 165 35% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 165 35% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 201 96% 32%;
+    --popover-foreground: 165 35% 11%;
+    --primary: 162 53% 35%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 158 64% 42%;
+    --secondary: 160 25% 95%;
+    --secondary-foreground: 165 35% 14%;
+    --muted: 160 20% 95%;
+    --muted-foreground: 165 12% 42%;
+    --accent: 196 100% 47%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 201 96% 32%;
+    --border: 160 18% 88%;
+    --input: 160 18% 88%;
+    --ring: 162 53% 35%;
     --radius: 0.6rem;
   }
 }

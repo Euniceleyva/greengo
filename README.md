@@ -27,7 +27,7 @@
 3. **Transporte abierto:** renta de vehículo con chofer durante un periodo determinado.
 4. **Soluciones a medida:** servicios personalizados, recepción especial y descuentos.
 
-**Usuarios principales.** Dueño, administrador, operador, conductor, contabilidad y cliente/agencia. En este DEMO solo se representan visualmente el **administrador/operador** y el **conductor** (ver [Roles](#6-roles)).
+**Usuarios principales.** Dueño, administrador, operador, conductor, contabilidad y cliente/agencia. En este DEMO solo se representan visualmente el **administrador/operador** y el **conductor** (ver [Roles](#7-roles)).
 
 **Objetivo del DEMO.** Entregar un frontend navegable para presentar al cliente, de modo que pueda: visualizar cómo funcionaría el sistema, identificar qué módulos necesita, decidir qué conservar y qué descartar, proponer cambios y validar los flujos de administrador y conductor **antes** de construir el sistema real.
 
@@ -85,7 +85,29 @@ En este DEMO, ambas experiencias (admin y conductor) conviven en **una sola apli
 
 ---
 
-## 5. Decisiones técnicas del DEMO
+## 5. Identidad visual
+
+**Paleta de marca.** El frontend usa la identidad de GreenGo como base y deriva de ella el resto de tokens semánticos (fondos, bordes, estados):
+
+| Rol | Color | Hex | Uso |
+|-----|-------|-----|-----|
+| Primario | 🟢 Verde GreenGo | `#29876B` | Marca principal: botones primarios, sidebar activo, enlaces, `--ring`. |
+| Secundario / acento cálido | 🟠 Naranja | `#F68634` | Acentos de la experiencia del conductor, detalles cálidos, `bg-brand-orange`. |
+| Acento | 🔵 Azul | `#00AFEE` | Acento informativo/administrativo, `--accent`, `bg-brand-blue`. |
+| Highlight | 🟩 Verde lima | `#A8CE46` | Detalles de apoyo y variaciones sutiles, `bg-brand-lime`. |
+
+Los cuatro tonos están disponibles como utilidades de Tailwind (`bg-brand-green`, `bg-brand-orange`, `bg-brand-blue`, `bg-brand-lime`) y como variables CSS en `src/app/globals.css` (`--brand-green`, `--brand-orange`, `--brand-blue`, `--brand-lime`). Los tokens semánticos de shadcn (`--primary`, `--accent`, `--secondary`, `--muted`, `--border`, etc.) se recalcularon en tonos verdes/neutros para que todo el sistema (botones, tarjetas, badges, mapas) parta de la misma paleta. Los colores semánticos de estado (éxito, advertencia, peligro, información) se mantienen independientes de la marca para no perder claridad en tablas y alertas.
+
+**Logo.** `public/logo.png` (logo oficial de GreenGo) se usa en: la pantalla de selección de experiencia (`src/app/page.tsx`), el sidebar del panel administrativo (`src/components/admin/admin-shell.tsx`), el encabezado de la experiencia del conductor (`src/components/driver/driver-shell.tsx`) y como favicon/ícono de la app (`src/app/layout.tsx`).
+
+**Tipografía.** Dos familias de Google Fonts vía `next/font`:
+
+- **Poppins** (`--font-heading`, clase `font-heading`) — títulos, encabezados de página y nombres de marca. Geométrica y amigable, refuerza el tono turístico de GreenGo.
+- **Inter** (`--font-body`, fuente base `font-sans`) — texto de cuerpo, tablas y formularios. Muy legible en pantallas pequeñas y densidades de datos altas.
+
+---
+
+## 6. Decisiones técnicas del DEMO
 
 | Tema | Decisión | Motivo |
 |------|----------|--------|
@@ -104,7 +126,7 @@ En este DEMO, ambas experiencias (admin y conductor) conviven en **una sola apli
 
 ---
 
-## 6. Roles
+## 7. Roles
 
 | Rol | Descripción | En el DEMO |
 |-----|-------------|------------|
@@ -123,7 +145,7 @@ En este DEMO, ambas experiencias (admin y conductor) conviven en **una sola apli
 
 ---
 
-## 7. Módulos del prototipo
+## 8. Módulos del prototipo
 
 **Panel administrativo (`/admin`)**
 
@@ -152,7 +174,7 @@ En este DEMO, ambas experiencias (admin y conductor) conviven en **una sola apli
 
 ---
 
-## 8. Datos mock
+## 9. Datos mock
 
 Ubicación: **`src/mocks/`**
 
@@ -173,7 +195,7 @@ Lugares usados (Cancún y alrededores): Aeropuerto Internacional de Cancún, Zon
 
 ---
 
-## 9. Instalación y ejecución
+## 10. Instalación y ejecución
 
 ```bash
 npm install       # instala dependencias
@@ -187,7 +209,7 @@ Requisitos: **Node.js 18.18+**.
 
 ---
 
-## 10. Rutas principales
+## 11. Rutas principales
 
 | Ruta | Descripción |
 |------|-------------|
@@ -212,13 +234,13 @@ Requisitos: **Node.js 18.18+**.
 
 ---
 
-## 11. Credenciales simuladas
+## 12. Credenciales simuladas
 
 **No hay autenticación real.** La pantalla inicial **no** pide contraseñas. Seleccionar un usuario simulado (Laura Martínez, Carlos Méndez o José Ramírez) únicamente **cambia de experiencia** dentro del DEMO y guarda la sesión activa en `localStorage`. No existen contraseñas, tokens ni verificación de identidad.
 
 ---
 
-## 12. Estructura del proyecto
+## 13. Estructura del proyecto
 
 ```text
 src/
@@ -242,7 +264,7 @@ src/
 
 ---
 
-## 13. Convenciones de calidad
+## 14. Convenciones de calidad
 
 - **TypeScript estricto**, sin `any` (salvo casos inevitables justificados con comentario).
 - Tipos centralizados en `src/types`.
@@ -255,7 +277,7 @@ src/
 
 ---
 
-## 14. Notas de uso del DEMO
+## 15. Notas de uso del DEMO
 
 - **Cómo empezar:** `npm install` → `npm run dev` → abre `http://localhost:3000`. Elige "Laura Martínez" (admin) o "José Ramírez" (conductor).
 - **Persistencia:** los cambios se guardan en `localStorage` (`greengo-demo-store`). Para volver al estado inicial usa **"Restablecer DEMO"** en el encabezado del panel admin.
@@ -264,7 +286,7 @@ src/
 - **Simulación de movimiento:** en `/admin/monitoring`, elige una unidad y usa *Iniciar / Pausar / Avanzar*; las coordenadas se actualizan localmente sobre una ruta mock.
 - **Vista móvil del conductor:** `/driver` está diseñada mobile-first; para verla como app, reduce la ventana o abre desde un teléfono.
 
-## 15. Estado del DEMO / cambios
+## 16. Estado del DEMO / cambios
 
 - Contexto, alcance y arquitectura documentados en este README (paso inicial obligatorio).
 - Frontend Next.js 14 (App Router) + TypeScript estricto + Tailwind, con panel admin y experiencia de conductor sobre mocks + Zustand persistido en `localStorage`.

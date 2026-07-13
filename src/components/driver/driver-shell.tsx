@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Home, ListChecks, Fuel, AlertTriangle, User, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -23,8 +24,10 @@ export function DriverShell({ children }: { children: React.ReactNode }) {
       <div className="relative flex min-h-screen w-full max-w-md flex-col bg-background shadow-xl">
         <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-primary px-4 text-primary-foreground">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/20 text-sm font-bold">GG</div>
-            <span className="text-sm font-semibold">GreenGo · Conductor</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90">
+              <Image src="/logo.png" alt="GreenGo" width={24} height={20} className="h-5 w-auto" />
+            </div>
+            <span className="font-heading text-sm font-semibold">GreenGo · Conductor</span>
           </div>
           <button onClick={() => router.push("/")} aria-label="Salir" className="rounded-md p-1.5 hover:bg-white/15">
             <LogOut className="h-5 w-5" />

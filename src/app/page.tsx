@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Bus, ShieldCheck, Smartphone, MapPin, ArrowRight } from "lucide-react";
+import Image from "next/image";
+import { ShieldCheck, Smartphone, MapPin, ArrowRight } from "lucide-react";
 import { MOCK_USERS } from "@/mocks/users";
 import { useSessionStore } from "@/stores/session-store";
 import type { DemoUser } from "@/types";
@@ -21,13 +22,13 @@ export default function HomePage() {
   const driverUser = MOCK_USERS.find((u) => u.role === "conductor")!;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-sky-50 via-background to-background">
+    <main className="min-h-screen bg-gradient-to-b from-brand-green/10 via-background to-background">
       <div className="mx-auto flex min-h-screen max-w-5xl flex-col items-center justify-center px-4 py-12">
         <div className="mb-10 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg">
-            <Bus className="h-7 w-7" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg ring-1 ring-border">
+            <Image src="/logo.png" alt="GreenGo Traslados" width={48} height={40} className="h-10 w-auto" priority />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+          <h1 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
             GreenGo Traslados
           </h1>
           <p className="mt-2 text-sm text-muted-foreground sm:text-base">
@@ -43,11 +44,11 @@ export default function HomePage() {
           {/* Administrador / operador */}
           <Card className="flex flex-col p-6">
             <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-100 text-sky-700">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-blue/10 text-brand-blue">
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="font-semibold">Panel administrativo</h2>
+                <h2 className="font-heading font-semibold">Panel administrativo</h2>
                 <p className="text-xs text-muted-foreground">Dueño · Administrador · Operador</p>
               </div>
             </div>
@@ -65,11 +66,11 @@ export default function HomePage() {
           {/* Conductor */}
           <Card className="flex flex-col p-6">
             <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-orange/10 text-brand-orange">
                 <Smartphone className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="font-semibold">Experiencia del conductor</h2>
+                <h2 className="font-heading font-semibold">Experiencia del conductor</h2>
                 <p className="text-xs text-muted-foreground">Optimizada para móvil</p>
               </div>
             </div>

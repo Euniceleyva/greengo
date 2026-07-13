@@ -3,7 +3,13 @@
     "allow": [
       "Bash(npm install *)",
       "Bash(npx tsc *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(git clone *)",
+      "Bash(ls -la ~/.claude/skills 2>&1 | head -30)",
+      "Bash(mkdir -p ~/.claude/skills)",
+      "Bash(cp -R /private/tmp/claude-501/-Users-aplatam-Documents-greengo/3c840432-2f8f-4617-bc69-0aee8535b1c6/scratchpad/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max ~/.claude/skills/ui-ux-pro-max)",
+      "Bash(git -C /Users/aplatam/Documents/greengo mv src/public/logo.png public/logo.png)",
+      "Bash(python3 -)"
     ]
   }
 }
