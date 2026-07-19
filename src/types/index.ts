@@ -261,3 +261,115 @@ export interface NamedLocation {
   coord: LatLng;
   category: "aeropuerto" | "hotel" | "puerto" | "destino" | "terminal";
 }
+
+// ---------------------------------------------------------------------------
+// Landing page — destinos
+// ---------------------------------------------------------------------------
+
+export interface Destination {
+  slug: string;
+  locationId: string; // referencia a NamedLocation.id en src/mocks/locations.ts
+  name: string;
+  shortDescription: string;
+  description: string;
+  image: string; // placeholder local en /public/images/destinations
+  airportMinutes: number; // tiempo estimado desde el aeropuerto de Cancún
+  priceFrom: number; // MXN, tarifa "desde" (traslado sencillo desde el aeropuerto)
+  highlights: string[];
+}
+
+// ---------------------------------------------------------------------------
+// Landing page — testimonios
+// ---------------------------------------------------------------------------
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  origin: string; // ciudad/país de origen (ficticio)
+  avatarColor: string;
+  rating: number; // 1-5
+  quote: string;
+  serviceType: ServiceType;
+}
+
+// ---------------------------------------------------------------------------
+// Landing page — preguntas frecuentes
+// ---------------------------------------------------------------------------
+
+export interface FaqItem {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+// ---------------------------------------------------------------------------
+// Landing page — tarifas mock
+// ---------------------------------------------------------------------------
+
+export interface PricingRate {
+  id: string;
+  originLocationId: string;
+  destinationLocationId: string;
+  vehicleType: VehicleType;
+  basePrice: number; // MXN, incluye hasta 4 pasajeros
+  pricePerExtraPassenger: number; // MXN por pasajero adicional
+}
+
+// ---------------------------------------------------------------------------
+// Landing page — galería
+// ---------------------------------------------------------------------------
+
+export interface GalleryImage {
+  id: string;
+  src: string; // placeholder local en /public/images/gallery
+  alt: string;
+  width: number;
+  height: number;
+}
+
+// ---------------------------------------------------------------------------
+// Chatbot guiado (sin IA, árbol de decisión con respuestas predefinidas)
+// ---------------------------------------------------------------------------
+
+export type ChatbotAction =
+  | { kind: "node"; nodeId: string }
+  | { kind: "whatsapp" }
+  | { kind: "link"; href: string };
+
+export interface ChatbotOption {
+  id: string;
+  label: string;
+  action: ChatbotAction;
+}
+
+export interface ChatbotNode {
+  id: string;
+  message: string;
+  options: ChatbotOption[];
+}
+
+// ---------------------------------------------------------------------------
+// Formulario de reserva multi-paso (/reservar)
+// ---------------------------------------------------------------------------
+
+export type TripDirection = "sencillo" | "redondo";
+
+export interface ReservationDraft {
+  // Paso 1 — Servicio
+  serviceType: ServiceType | null;
+  originLocationId: string | null;
+  destinationLocationId: string | null;
+  direction: TripDirection;
+  // Paso 2 — Detalles
+  date: string; // yyyy-MM-dd
+  time: string; // HH:mm
+  passengers: number;
+  bags: number;
+  flightNumber: string;
+  notes: string;
+  // Paso 3 — Contacto
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
+  hotel: string;
+}

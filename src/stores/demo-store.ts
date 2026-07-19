@@ -13,6 +13,7 @@ import type {
   Driver,
   FuelRecord,
   Incident,
+  LatLng,
   MaintenanceRecord,
   Trip,
   TripStatus,
@@ -45,6 +46,9 @@ export interface NewTripInput {
   specialInstructions?: string;
   specialReception?: boolean;
   discount?: number;
+  originCoord?: LatLng;
+  destinationCoord?: LatLng;
+  folioPrefix?: string;
 }
 
 interface DemoState {
@@ -103,14 +107,14 @@ export const useDemoStore = create<DemoState>()(
         const sequence = String(trips.length + 1).padStart(3, "0");
         const trip: Trip = {
           id: shortId("trip"),
-          folio: `GG-2607-${sequence}`,
+          folio: `${input.folioPrefix ?? "GG-2607"}-${sequence}`,
           serviceType: input.serviceType,
           client: input.client,
           passengers: input.passengers,
           origin: input.origin,
-          originCoord: [21.0417, -86.874],
+          originCoord: input.originCoord ?? [21.0417, -86.874],
           destination: input.destination,
-          destinationCoord: [21.1329, -86.7466],
+          destinationCoord: input.destinationCoord ?? [21.1329, -86.7466],
           date: input.date,
           time: input.time,
           flightNumber: input.flightNumber,

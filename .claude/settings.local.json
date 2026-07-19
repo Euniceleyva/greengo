@@ -12,7 +12,11 @@
       "Bash(python3 -)",
       "Bash(kill 10251 10252)",
       "Bash(lsof -ti:3000)",
-      "Bash(xargs kill)"
+      "Bash(xargs kill)",
+      "Bash(git mv *)",
+      "Bash(python3 -c \"import PIL; print\\(PIL.__version__\\)\")",
+      "Bash(node -e \"console.log\\(require\\('sharp'\\)\\)\")",
+      "Bash(python3 \"/private/tmp/claude-501/-Users-aplatam-Documents-greengo/534fb35b-76e3-42fb-893a-a378842086a9/scratchpad/gen_placeholders.py\")"
     ]
   }
 }

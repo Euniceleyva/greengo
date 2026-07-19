@@ -126,7 +126,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <RotateCcw /> Restablecer datos del DEMO
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push("/")} className="text-destructive [&_svg]:text-destructive">
+            <DropdownMenuItem onClick={() => router.push("/demo")} className="text-destructive [&_svg]:text-destructive">
               <LogOut /> Salir
             </DropdownMenuItem>
           </DropdownMenu>

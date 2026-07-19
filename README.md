@@ -63,6 +63,8 @@ Por decisión explícita, en este DEMO **no** se implementa nada de lo siguiente
 
 > Cuando una función dependa de backend, se **simula localmente** y se deja un comentario `// TODO(prod): ...` indicando que se reemplazará en producción.
 
+> **Nota sobre la Landing Page.** La pasarela de pago (`/pago/checkout`) y el chatbot guiado del sitio público son **simulaciones locales adicionales**, construidas bajo el mismo principio que el resto del DEMO: no procesan pagos reales ni se conectan a ningún motor conversacional. No representan una excepción al alcance descrito arriba.
+
 ---
 
 ## 4. Arquitectura futura (conceptual — NO implementar ahora)
@@ -200,8 +202,14 @@ Ubicación: **`src/mocks/`**
 | `alerts.ts` | 12 alertas |
 | `fuel.ts` | 15 registros de combustible |
 | `maintenance.ts` | 8 registros de mantenimiento |
-| `locations.ts` | Lugares de Cancún y rutas (coordenadas) |
+| `locations.ts` | Lugares de Cancún y rutas (coordenadas) — fuente única de lugares, extendida (no duplicada) por `destinations.ts` |
 | `users.ts` | Usuarios simulados (admin/operador/conductor) |
+| `destinations.ts` | 6 destinos destacados para la Landing Page, referenciando `locations.ts` |
+| `testimonials.ts` | 6 testimonios ficticios para la Landing Page |
+| `faq.ts` | 8 preguntas frecuentes de la Landing Page |
+| `pricing.ts` | Tarifas mock por par origen-destino + `estimateTripPrice`/`getFareBreakdown` para el formulario de reserva |
+| `gallery.ts` | 6 imágenes del carrusel de la Landing Page |
+| `chatbot.ts` | Árbol de decisión del chatbot guiado (sin IA) |
 
 **Cómo modificarlos.** Edita los archivos anteriores (arreglos tipados con TypeScript). Al recargar la app se toman como estado inicial. Para volver al estado original después de haber interactuado, usa **"Restablecer datos del DEMO"** en la barra superior del panel admin (limpia el `localStorage` de la app).
 
@@ -227,7 +235,12 @@ Requisitos: **Node.js 18.18+**.
 
 | Ruta | Descripción |
 |------|-------------|
-| `/` | Selección de experiencia (administrador / conductor) con usuarios simulados. |
+| `/` | Landing Page comercial: header, hero con cotización rápida, carrusel, servicios, destinos, cómo funciona, testimonios, FAQ y footer. |
+| `/reservar` | Formulario de reserva multi-paso (servicio, detalles, contacto, resumen). Acepta query params (`origin`, `destination`, `date`, `passengers`, `serviceType`) para prellenar desde la LP. |
+| `/pago/checkout` | Pasarela de pago simulada (tarjeta con validación Luhn, OXXO, SPEI). No procesa pagos reales. |
+| `/pago/confirmacion` | Confirmación de la reserva; genera folio y escribe el viaje en el store de Zustand (aparece en `/admin/trips`). |
+| `/destinos/[slug]` | Página individual por destino (6 páginas estáticas). |
+| `/demo` | Selección de experiencia (administrador / conductor) con usuarios simulados — antes vivía en `/`. |
 | `/admin` | Redirige al dashboard administrativo. |
 | `/admin/dashboard` | KPIs y resumen. |
 | `/admin/trips` | Servicios / viajes. |
@@ -250,7 +263,7 @@ Requisitos: **Node.js 18.18+**.
 
 ## 12. Credenciales simuladas
 
-**No hay autenticación real.** La pantalla inicial **no** pide contraseñas. Seleccionar un usuario simulado (Laura Martínez, Carlos Méndez o José Ramírez) únicamente **cambia de experiencia** dentro del DEMO y guarda la sesión activa en `localStorage`. No existen contraseñas, tokens ni verificación de identidad.
+**No hay autenticación real.** La pantalla de selección de experiencia (`/demo`) **no** pide contraseñas. Seleccionar un usuario simulado (Laura Martínez, Carlos Méndez o José Ramírez) únicamente **cambia de experiencia** dentro del DEMO y guarda la sesión activa en `localStorage`. No existen contraseñas, tokens ni verificación de identidad.
 
 ---
 
@@ -259,21 +272,33 @@ Requisitos: **Node.js 18.18+**.
 ```text
 src/
 ├── app/
-│   ├── page.tsx                # Selección de experiencia
-│   ├── admin/                  # Panel administrativo (layout + módulos)
-│   └── driver/                 # Experiencia del conductor (mobile-first)
+│   ├── layout.tsx               # Root layout: <html>, fonts, metadata base, WA sticky + chatbot
+│   ├── page.tsx                 # Landing Page comercial
+│   ├── reservar/                # Formulario de reserva multi-paso
+│   ├── pago/
+│   │   ├── checkout/            # Pasarela de pago simulada
+│   │   └── confirmacion/        # Confirmación + alta de viaje en el store
+│   ├── destinos/[slug]/         # Páginas de destino individuales (SSG)
+│   └── (app)/                   # Grupo de rutas del panel (no afecta URLs)
+│       ├── layout.tsx           # Toaster (específico del panel)
+│       ├── demo/                # Selección de experiencia (antes en `/`)
+│       ├── admin/                # Panel administrativo (layout + módulos)
+│       └── driver/               # Experiencia del conductor (mobile-first)
 ├── components/
 │   ├── admin/                  # Componentes del panel
 │   ├── driver/                 # Componentes del conductor
-│   ├── maps/                   # Leaflet / mapas
-│   ├── charts/                 # Recharts
-│   ├── shared/                 # Reutilizables (KPI, tablas, estados vacíos…)
-│   └── ui/                     # Primitivas estilo shadcn/ui
-├── mocks/                      # Datos simulados (ver §8)
-├── stores/                     # Zustand (estado + persistencia localStorage)
-├── types/                      # Tipos centralizados
-├── lib/                        # Utilidades (cn, csv, geo, format…)
-└── constants/                  # Estados, etiquetas, colores, catálogos
+│   ├── landing/                 # Componentes de la Landing Page
+│   ├── reservar/                 # Pasos del formulario de reserva
+│   ├── pago/                     # Pasarela simulada y confirmación
+│   ├── maps/                    # Leaflet / mapas
+│   ├── charts/                  # Recharts
+│   ├── shared/                   # Reutilizables (KPI, tablas, WA sticky, chatbot…)
+│   └── ui/                      # Primitivas estilo shadcn/ui (incl. Accordion, Carousel)
+├── mocks/                       # Datos simulados (ver §9)
+├── stores/                      # Zustand (estado + persistencia localStorage)
+├── types/                       # Tipos centralizados
+├── lib/                         # Utilidades (cn, csv, geo, format, Luhn…)
+└── constants/                   # Estados, etiquetas, colores, catálogos
 ```
 
 ---
@@ -312,3 +337,32 @@ src/
 - Se agregó `.claude/launch.json` (config local de desarrollo, no forma parte del código de producción) para poder previsualizar `npm run dev` en el navegador integrado del asistente.
 - **Mejora integral de UX/UI** (ver [§5.1](#51-mejora-de-uxui-segunda-pasada)): tokens semánticos de color/sombra, componentes base (`Button`, `Badge`, `DropdownMenu`) revisados, rediseño de la pantalla de acceso, del panel administrativo (sidebar colapsable, jerarquía del dashboard) y de la experiencia del conductor (servicio activo con CTA por estado, stepper de progreso, safe area móvil).
 - **Datos mock reducidos:** `src/mocks/vehicles.ts` pasó de 8 a 3 vehículos (`veh-01`, `veh-02`, `veh-03` / U-01 a U-03). Las referencias a las unidades eliminadas en `drivers.ts`, `trips.ts`, `alerts.ts`, `incidents.ts`, `fuel.ts` y `maintenance.ts` se remapearon a las 3 unidades restantes para conservar la integridad de los datos simulados.
+- **Landing Page comercial añadida** (`/`), con reestructura previa de rutas: el selector admin/conductor se movió a `/demo`; `(app)/layout.tsx` concentra ahora lo específico del panel (Toaster), y el root `layout.tsx` quedó solo con `<html>`, fonts y metadata base. `/admin` y `/driver` siguen funcionando igual que antes.
+- **Mocks y tipos nuevos** para la LP: `destinations.ts` (extiende `locations.ts`, no lo duplica), `testimonials.ts`, `faq.ts`, `pricing.ts` (con `getFareBreakdown`), `gallery.ts` y `chatbot.ts`. Tipos correspondientes agregados a `src/types`.
+- **Componentes de la LP**: header sticky con menú móvil, hero con mini-cotizador, carrusel (Embla, cargado de forma diferida), tipos de servicio, destinos, cómo funciona, testimonios, FAQ (acordeón propio) y footer con enlace discreto a `/demo`. Primitivas UI nuevas: `Accordion` y `Carousel`, mismo estilo shadcn del proyecto.
+- **Formulario de reserva multi-paso** (`/reservar`): React Hook Form + Zod por paso, estado en Zustand persistido en `localStorage` (`greengo-reservation-draft`), prellenado desde query params del mini-cotizador del hero.
+- **Pasarela de pago simulada** (`/pago/checkout`): selector tarjeta/OXXO/SPEI, validación Luhn real sobre el número de tarjeta, toggle de demo para forzar pago rechazado, loading simulado (~2s). `/pago/confirmacion` genera folio y escribe el viaje en `useDemoStore` (aparece en `/admin/trips`), reutilizando el tipo `Trip` existente.
+- **WhatsApp sticky y chatbot guiado**: componentes propios (sin librerías nuevas), ocultos en `/admin` y `/driver`. El chatbot usa un árbol de decisión 100% predefinido (sin IA) con delay de "escribiendo…" simulado.
+- **Páginas de destino** (`/destinos/[slug]`): 6 páginas estáticas (SSG) con `generateMetadata` y `notFound()` para slugs inválidos.
+- **Pulido de accesibilidad:** `Input`/`Select` (`src/components/ui/input.tsx`) pasaron de `h-10` (40px) a `h-11` (44px) para cumplir el área táctil mínima en toda la app (incluye admin/driver, mejora sin regresiones). Foco gestionado en la apertura del chatbot. Padding inferior agregado en `/reservar`, `/pago/*` y el footer de la LP para que el CTA final no quede permanentemente tapado por los botones flotantes en móvil.
+- **Rendimiento:** `/` reporta ~113 kB de First Load JS (presupuesto: ≤120 kB). Carrusel y chatbot se cargan con `next/dynamic({ ssr: false })`.
+- Verificado en navegador: flujo completo LP → cotización rápida → `/reservar` (4 pasos) → `/pago/checkout` (pago aceptado y rechazado) → `/pago/confirmacion` → viaje visible en `/admin/trips`; responsive en 375px y escritorio; `/admin` y `/driver` sin cambios de comportamiento. `npm run lint` y `npm run build` sin errores en cada fase.
+
+---
+
+## 17. Imágenes pendientes (placeholders)
+
+Todas las imágenes de la Landing Page son **placeholders locales generados por código** (fondo gris con patrón de rayas, texto "PLACEHOLDER" + dimensiones + etiqueta), guardados en `public/images/`. Antes de producción deben reemplazarse por fotografía real de Cancún y la Riviera Maya **respetando las mismas rutas y dimensiones**:
+
+| Archivo | Dimensiones | Uso |
+|---------|-------------|-----|
+| `public/images/hero-cancun.png` | 1920 × 1080 | Fondo del Hero |
+| `public/images/gallery/gallery-01.png` … `gallery-06.png` | 1600 × 900 (16:9) | Carrusel de fotos |
+| `public/images/destinations/zona-hotelera.png` | 800 × 600 (4:3) | Tarjeta/hero de destino |
+| `public/images/destinations/playa-del-carmen.png` | 800 × 600 (4:3) | Tarjeta/hero de destino |
+| `public/images/destinations/tulum.png` | 800 × 600 (4:3) | Tarjeta/hero de destino |
+| `public/images/destinations/isla-mujeres.png` | 800 × 600 (4:3) | Tarjeta/hero de destino |
+| `public/images/destinations/cozumel.png` | 800 × 600 (4:3) | Tarjeta/hero de destino |
+| `public/images/destinations/xcaret.png` | 800 × 600 (4:3) | Tarjeta/hero de destino |
+
+Las rutas están referenciadas desde `src/mocks/gallery.ts` y `src/mocks/destinations.ts` — no requieren cambios de código, solo sustituir el archivo binario manteniendo el mismo nombre y proporción.

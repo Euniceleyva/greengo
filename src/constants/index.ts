@@ -210,3 +210,9 @@ export const INCIDENT_TYPE_LABELS: Record<IncidentType, string> = {
 };
 
 export const CANCUN_CENTER: [number, number] = [21.0619, -86.8515];
+
+// --- Contacto (LP) -----------------------------------------------------------
+
+// Número ficticio del DEMO. Sin formato "+" ni espacios para uso en enlaces wa.me.
+export const WHATSAPP_PHONE = "529980000000";
+export const WHATSAPP_DISPLAY = "+52 998 000 0000";

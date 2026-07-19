@@ -38,7 +38,7 @@ export function DriverShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <button
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/demo")}
             aria-label="Salir de la sesión simulada"
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >

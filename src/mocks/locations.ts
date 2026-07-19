@@ -14,6 +14,8 @@ export const LOCATIONS: NamedLocation[] = [
   { id: "loc-moon-palace", name: "Moon Palace", coord: [20.9741, -86.809], category: "hotel" },
   { id: "loc-xcaret", name: "Xcaret", coord: [20.5808, -87.1189], category: "destino" },
   { id: "loc-puerto-juarez", name: "Terminal de ferry de Puerto Juárez", coord: [21.1858, -86.7975], category: "terminal" },
+  { id: "loc-isla-mujeres", name: "Isla Mujeres", coord: [21.227, -86.73], category: "destino" },
+  { id: "loc-cozumel", name: "Cozumel", coord: [20.4229, -86.9223], category: "destino" },
 ];
 
 export function locationByName(name: string): NamedLocation | undefined {
