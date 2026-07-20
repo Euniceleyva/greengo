@@ -210,6 +210,10 @@ Ubicación: **`src/mocks/`**
 | `pricing.ts` | Tarifas mock por par origen-destino + `estimateTripPrice`/`getFareBreakdown` para el formulario de reserva |
 | `gallery.ts` | 6 imágenes del carrusel de la Landing Page |
 | `chatbot.ts` | Árbol de decisión del chatbot guiado (sin IA) |
+| `hotels.ts` | ~1,390 hoteles/condos de la Riviera Maya (catálogo de búsqueda del mini-cotizador) |
+| `airports.ts` | 4 aeropuertos (CUN, TQO, CZM, CTM) para traslados hotel ↔ aeropuerto |
+| `tour-destinations.ts` | 10 destinos de tour con precio "desde" (USD) y tiempo estimado desde el aeropuerto |
+| `hero-quote.ts` | Lógica de estimación de tarifa del mini-cotizador y mapeo hacia el borrador de `/reservar` |
 
 **Cómo modificarlos.** Edita los archivos anteriores (arreglos tipados con TypeScript). Al recargar la app se toman como estado inicial. Para volver al estado original después de haber interactuado, usa **"Restablecer datos del DEMO"** en la barra superior del panel admin (limpia el `localStorage` de la app).
 
@@ -347,6 +351,7 @@ src/
 - **Pulido de accesibilidad:** `Input`/`Select` (`src/components/ui/input.tsx`) pasaron de `h-10` (40px) a `h-11` (44px) para cumplir el área táctil mínima en toda la app (incluye admin/driver, mejora sin regresiones). Foco gestionado en la apertura del chatbot. Padding inferior agregado en `/reservar`, `/pago/*` y el footer de la LP para que el CTA final no quede permanentemente tapado por los botones flotantes en móvil.
 - **Rendimiento:** `/` reporta ~113 kB de First Load JS (presupuesto: ≤120 kB). Carrusel y chatbot se cargan con `next/dynamic({ ssr: false })`.
 - Verificado en navegador: flujo completo LP → cotización rápida → `/reservar` (4 pasos) → `/pago/checkout` (pago aceptado y rechazado) → `/pago/confirmacion` → viaje visible en `/admin/trips`; responsive en 375px y escritorio; `/admin` y `/driver` sin cambios de comportamiento. `npm run lint` y `npm run build` sin errores en cada fase.
+- **Mini-cotizador ampliado** (hero de la LP, `src/components/landing/landing-hero.tsx`): el select "Tipo de traslado" ahora ofrece Hotel-Hotel, Hotel-Aeropuerto, Aeropuerto-Hotel y Tour, cada uno con sus propios campos condicionales — dos selectores de hotel (Hotel-Hotel), hotel + aeropuerto (Hotel-Aeropuerto / Aeropuerto-Hotel), o radio "Salida desde" (Aeropuerto/Hotel) + destino de tour (Tour). Se agregó un campo "Horario". El selector de hotel usa un nuevo componente `Combobox` (`src/components/ui/combobox.tsx`) con filtro de búsqueda, necesario porque el catálogo de hoteles (`src/mocks/hotels.ts`) tiene ~1,390 entradas. Al enviar el formulario se calcula un estimado ilustrativo (`src/mocks/hero-quote.ts`, MXN u USD según el tipo) que se muestra inline; un botón "Continuar con mi reserva" navega a `/reservar` con query params (incluye `time`, `hotel` y `notes`, que `reservation-wizard.tsx` ahora también prellena) reutilizando el multi-step existente sin tocar su lógica de precios (los hoteles/aeropuertos elegidos se mapean a ubicaciones genéricas de `locations.ts` para la tarifa, conservando el nombre real elegido en `hotel`/`notes`). Todo es mock de frontend; no se tocó backend ni base de datos.
 
 ---
 

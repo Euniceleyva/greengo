@@ -39,18 +39,24 @@ export function ReservationWizard() {
     const origin = searchParams.get("origin");
     const destination = searchParams.get("destination");
     const date = searchParams.get("date");
+    const time = searchParams.get("time");
     const passengers = searchParams.get("passengers");
     const serviceTypeParam = searchParams.get("serviceType");
+    const hotel = searchParams.get("hotel");
+    const notes = searchParams.get("notes");
 
-    if (origin || destination || date || passengers || serviceTypeParam) {
+    if (origin || destination || date || time || passengers || serviceTypeParam || hotel || notes) {
       updateDraft({
         ...(origin ? { originLocationId: origin } : {}),
         ...(destination ? { destinationLocationId: destination } : {}),
         ...(date ? { date } : {}),
+        ...(time ? { time } : {}),
         ...(passengers ? { passengers: Number(passengers) } : {}),
         ...(serviceTypeParam && VALID_SERVICE_TYPES.includes(serviceTypeParam as ServiceType)
           ? { serviceType: serviceTypeParam as ServiceType }
           : {}),
+        ...(hotel ? { hotel } : {}),
+        ...(notes ? { notes } : {}),
       });
       setStep(1);
       clearConfirmedFolio();

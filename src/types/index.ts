@@ -354,6 +354,24 @@ export interface ChatbotNode {
 
 export type TripDirection = "sencillo" | "redondo";
 
+// ---------------------------------------------------------------------------
+// Mini-cotizador (Landing Page — hero)
+// ---------------------------------------------------------------------------
+
+// Tipo de traslado elegido en el mini-cotizador del hero. Es más granular que
+// ServiceType (usado en /reservar): se traduce a ServiceType al continuar con
+// la reserva (ver src/mocks/hero-quote.ts).
+export type TransferKind = "hotel_hotel" | "hotel_aeropuerto" | "aeropuerto_hotel" | "tour";
+
+// Punto de salida elegido para un traslado tipo "Tour".
+export type TourOrigin = "aeropuerto" | "hotel";
+
+export interface HeroQuoteEstimate {
+  currency: "MXN" | "USD";
+  total: number;
+  label: string; // descripción corta del cálculo, p. ej. "Tarifa base + 2 pasajeros extra"
+}
+
 export interface ReservationDraft {
   // Paso 1 — Servicio
   serviceType: ServiceType | null;

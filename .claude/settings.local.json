@@ -16,7 +16,8 @@
       "Bash(git mv *)",
       "Bash(python3 -c \"import PIL; print\\(PIL.__version__\\)\")",
       "Bash(node -e \"console.log\\(require\\('sharp'\\)\\)\")",
-      "Bash(python3 \"/private/tmp/claude-501/-Users-aplatam-Documents-greengo/534fb35b-76e3-42fb-893a-a378842086a9/scratchpad/gen_placeholders.py\")"
+      "Bash(python3 \"/private/tmp/claude-501/-Users-aplatam-Documents-greengo/534fb35b-76e3-42fb-893a-a378842086a9/scratchpad/gen_placeholders.py\")",
+      "Bash(node /private/tmp/claude-501/-Users-aplatam-Documents-greengo/78e639ae-7b69-4b7d-9179-660c6a8ea914/scratchpad/gen-mocks.js)"
     ]
   }
 }
