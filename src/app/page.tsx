@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     title: "GreenGo Traslados — Transporte turístico en Cancún",
     description:
       "Traslados turísticos en Cancún y la Riviera Maya: aeropuerto, hotel a hotel, transporte abierto y soluciones a medida.",
-    images: ["/images/hero-cancun.png"],
+    images: ["/images/destinations/cancun.jpg"],
     locale: "es_MX",
     type: "website",
   },

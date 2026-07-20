@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -122,13 +121,15 @@ export function LandingHero() {
 
   return (
     <section className="relative overflow-hidden bg-primary">
-      <Image
-        src="/images/hero-cancun.png"
-        alt=""
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover opacity-30"
+      <video
+        src="/images/hero-cancun.mp4"
+        poster="/images/destinations/cancun.jpg"
+        autoPlay
+        muted
+        loop
+        playsInline
+        aria-hidden
+        className="absolute inset-0 h-full w-full object-cover opacity-30"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/80 to-background" aria-hidden />
 

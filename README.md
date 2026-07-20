@@ -355,19 +355,19 @@ src/
 
 ---
 
-## 17. Imágenes pendientes (placeholders)
+## 17. Imágenes de la Landing Page
 
-Todas las imágenes de la Landing Page son **placeholders locales generados por código** (fondo gris con patrón de rayas, texto "PLACEHOLDER" + dimensiones + etiqueta), guardados en `public/images/`. Antes de producción deben reemplazarse por fotografía real de Cancún y la Riviera Maya **respetando las mismas rutas y dimensiones**:
+Las imágenes placeholder generadas por código fueron sustituidas por fotografía y video reales, guardados en `public/images/`:
 
-| Archivo | Dimensiones | Uso |
-|---------|-------------|-----|
-| `public/images/hero-cancun.png` | 1920 × 1080 | Fondo del Hero |
-| `public/images/gallery/gallery-01.png` … `gallery-06.png` | 1600 × 900 (16:9) | Carrusel de fotos |
-| `public/images/destinations/zona-hotelera.png` | 800 × 600 (4:3) | Tarjeta/hero de destino |
-| `public/images/destinations/playa-del-carmen.png` | 800 × 600 (4:3) | Tarjeta/hero de destino |
-| `public/images/destinations/tulum.png` | 800 × 600 (4:3) | Tarjeta/hero de destino |
-| `public/images/destinations/isla-mujeres.png` | 800 × 600 (4:3) | Tarjeta/hero de destino |
-| `public/images/destinations/cozumel.png` | 800 × 600 (4:3) | Tarjeta/hero de destino |
-| `public/images/destinations/xcaret.png` | 800 × 600 (4:3) | Tarjeta/hero de destino |
+| Archivo | Uso |
+|---------|-----|
+| `public/images/hero-cancun.mp4` | Video de fondo del Hero (autoplay, muted, loop) |
+| `public/images/destinations/cancun.jpg` | Poster del video del Hero + Og:image + destino Zona Hotelera |
+| `public/images/gallery/1.jpg` … `6.jpg` | Carrusel de fotos (servicios reales de traslado) |
+| `public/images/destinations/playa.jpg` | Destino Playa del Carmen |
+| `public/images/destinations/tulum.jpg` | Destino Tulum |
+| `public/images/destinations/isla.jpg` | Destino Isla Mujeres |
+| `public/images/destinations/akumal.jpg` | Destino Cozumel |
+| `public/images/destinations/pventuras.jpg` | Destino Xcaret |
 
-Las rutas están referenciadas desde `src/mocks/gallery.ts` y `src/mocks/destinations.ts` — no requieren cambios de código, solo sustituir el archivo binario manteniendo el mismo nombre y proporción.
+Las rutas están referenciadas desde `src/mocks/gallery.ts`, `src/mocks/destinations.ts`, `src/components/landing/landing-hero.tsx` y `src/app/page.tsx`. Quedan sin usar en `public/images/destinations/` los archivos `bprincipe.jpg`, `petempich.jpg`, `playa-mujeres.jpg` y `puerto.jpg`, disponibles para futuros destinos o secciones.
