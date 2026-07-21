@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { LanguageSwitch } from "@/components/shared/public-language";
 
 const NAV_LINKS = [
   { href: "#servicios", label: "Servicios" },
@@ -52,12 +53,11 @@ export function LandingHeader() {
           ))}
         </nav>
 
-        <div className="hidden md:block">
-          <Button size="md" onClick={() => router.push("/reservar")} className="adventure-header-cta">
-            Reservar <ArrowUpRight aria-hidden />
+        <div className="flex items-center gap-2">
+          <LanguageSwitch compact />
+          <Button size="md" onClick={() => router.push("/reservar")} className="adventure-header-cta hidden md:inline-flex">
+              Reservar <ArrowUpRight aria-hidden />
           </Button>
-        </div>
-
         <button
           type="button"
           className="flex h-11 w-11 items-center justify-center text-foreground md:hidden"
@@ -68,6 +68,7 @@ export function LandingHeader() {
         >
           {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
+        </div>
       </div>
 
       {mobileOpen && (

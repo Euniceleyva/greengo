@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { ReservationWizard } from "@/components/reservar/reservation-wizard";
 import { Skeleton } from "@/components/ui/misc";
+import { LanguageSwitch, PublicLanguageProvider } from "@/components/shared/public-language";
 
 export const metadata: Metadata = {
   title: "Reserva tu ruta — Marea Club",
@@ -11,13 +12,17 @@ export const metadata: Metadata = {
 
 export default function ReservarPage() {
   return (
+    <PublicLanguageProvider>
     <div className="adventure-theme adventure-reservation min-h-screen bg-surface-soft">
       <header className="adventure-reservation__header">
         <div className="mx-auto flex h-[72px] max-w-5xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="adventure-wordmark">
             Marea<span>Club</span>
           </Link>
-          <span className="adventure-reservation__route">CUN → TU AVENTURA</span>
+          <div className="flex items-center gap-3">
+            <LanguageSwitch compact />
+            <span className="adventure-reservation__route">CUN → TU AVENTURA</span>
+          </div>
         </div>
       </header>
 
@@ -33,5 +38,6 @@ export default function ReservarPage() {
         </Suspense>
       </main>
     </div>
+    </PublicLanguageProvider>
   );
 }

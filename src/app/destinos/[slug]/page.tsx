@@ -8,6 +8,7 @@ import { LandingHeader } from "@/components/landing/landing-header";
 import { LandingFooter } from "@/components/landing/landing-footer";
 import { Button } from "@/components/ui/button";
 import { formatMXN } from "@/lib/utils";
+import { PublicLanguageProvider } from "@/components/shared/public-language";
 
 export function generateStaticParams() {
   return DESTINATIONS.map((d) => ({ slug: d.slug }));
@@ -38,6 +39,7 @@ export default function DestinationPage({ params }: { params: { slug: string } }
   const reserveHref = `/reservar?destination=${destination.locationId}&serviceType=aeropuerto`;
 
   return (
+    <PublicLanguageProvider>
     <div className="adventure-theme adventure-destination-page min-h-screen bg-background">
       <LandingHeader />
 
@@ -142,5 +144,6 @@ export default function DestinationPage({ params }: { params: { slug: string } }
 
       <LandingFooter />
     </div>
+    </PublicLanguageProvider>
   );
 }

@@ -9,6 +9,7 @@ import { LandingTestimonials } from "@/components/landing/landing-testimonials";
 import { LandingFaq } from "@/components/landing/landing-faq";
 import { LandingFooter } from "@/components/landing/landing-footer";
 import { LandingMotion } from "@/components/landing/landing-motion";
+import { PublicLanguageProvider } from "@/components/shared/public-language";
 
 export const metadata: Metadata = {
   title: "Marea Club — Tu aventura comienza en el camino",
@@ -26,6 +27,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
+    <PublicLanguageProvider>
     <div className="adventure-theme min-h-screen bg-background">
       <LandingMotion>
         <LandingHeader />
@@ -41,5 +43,6 @@ export default function HomePage() {
         <LandingFooter />
       </LandingMotion>
     </div>
+    </PublicLanguageProvider>
   );
 }

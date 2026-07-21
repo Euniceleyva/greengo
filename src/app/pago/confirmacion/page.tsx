@@ -1,22 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { ConfirmationClient } from "@/components/pago/confirmation-client";
+import { LanguageSwitch, PublicLanguageProvider } from "@/components/shared/public-language";
 
 export const metadata: Metadata = {
-  title: "Reservación confirmada — GreenGo Traslados",
+  title: "Reservación confirmada — Marea Club",
   description: "Confirmación de la reservación simulada del DEMO.",
 };
 
 export default function ConfirmacionPage() {
   return (
-    <div className="min-h-screen bg-surface-soft">
-      <header className="border-b border-border bg-card">
+    <PublicLanguageProvider>
+    <div className="adventure-theme min-h-screen bg-surface-soft">
+      <header className="adventure-reservation__header">
         <div className="mx-auto flex h-16 max-w-2xl items-center px-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="GreenGo Traslados" width={32} height={27} className="h-7 w-auto" priority />
-            <span className="font-heading text-base font-bold text-foreground">GreenGo</span>
-          </Link>
+          <Link href="/" className="adventure-wordmark">Marea<span>Club</span></Link>
+          <div className="ml-auto"><LanguageSwitch compact /></div>
         </div>
       </header>
 
@@ -24,5 +23,6 @@ export default function ConfirmacionPage() {
         <ConfirmationClient />
       </main>
     </div>
+    </PublicLanguageProvider>
   );
 }

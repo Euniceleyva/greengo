@@ -180,6 +180,15 @@
 .adventure-header-cta:active,
 .adventure-cta:active { transform: translate(2px, 2px) scale(.98); box-shadow: 1px 1px 0 var(--adventure-night); }
 .adventure-mobile-nav { background: var(--adventure-sand); border-top: 2px solid var(--adventure-night); }
+.adventure-language-switch { display: inline-flex; align-items: center; gap: .38rem; min-height: 42px; border: 2px solid var(--adventure-night); border-radius: 999px; background: var(--adventure-foam); padding: .3rem .48rem; box-shadow: 2px 2px 0 var(--adventure-night); color: var(--adventure-night); font-size: .66rem; font-weight: 1000; transition: transform 160ms cubic-bezier(.22,1,.36,1), box-shadow 160ms ease; }
+.adventure-language-switch:hover { transform: translateY(-1px); box-shadow: 3px 3px 0 var(--adventure-night); }
+.adventure-language-switch:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--adventure-night); }
+.adventure-language-switch span { min-width: 20px; text-align: center; opacity: .48; transition: opacity 160ms ease; }
+.adventure-language-switch span.is-active { opacity: 1; }
+.adventure-language-switch i { position: relative; width: 28px; height: 16px; border: 2px solid var(--adventure-night); border-radius: 999px; background: var(--adventure-sun); }
+.adventure-language-switch i::after { position: absolute; top: 2px; left: 2px; width: 8px; height: 8px; border-radius: 50%; background: var(--adventure-night); content: ""; transform: translateX(0); transition: transform 180ms cubic-bezier(.22,1,.36,1); }
+.adventure-language-switch[aria-checked="true"] i::after { transform: translateX(12px); }
+.adventure-language-switch--compact { min-height: 36px; }
 
 .adventure-hero { min-height: 1080px; padding-top: 72px; background: var(--adventure-caribbean); isolation: isolate; }
 .adventure-hero__grain,
