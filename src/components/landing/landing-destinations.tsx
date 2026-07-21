@@ -1,52 +1,43 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Clock, ArrowRight } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { ArrowUpRight } from "lucide-react";
 import { DESTINATIONS } from "@/mocks/destinations";
-import { formatMXN } from "@/lib/utils";
 
 export function LandingDestinations() {
   return (
-    <section id="destinos" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-      <div className="mx-auto max-w-2xl text-center">
-        <h2 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">Destinos populares</h2>
-        <p className="mt-3 text-base text-muted-foreground">
-          Los lugares a los que más viajan nuestros pasajeros.
-        </p>
-      </div>
+    <section id="destinos" className="bg-[#132e2a] px-5 py-32 text-white sm:px-8 md:py-48">
+      <div className="mx-auto max-w-[1380px]">
+        <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+          <h2 className="max-w-5xl text-[clamp(3rem,7vw,7.2rem)] font-black leading-[0.88] tracking-[-0.068em]">
+            Seis excusas perfectas para salir del hotel.
+          </h2>
+          <p className="max-w-sm text-lg font-medium leading-relaxed text-white/65">
+            Mar, selva, ruinas o ciudad. Elige la escena; GreenGo te deja justo donde empieza.
+          </p>
+        </div>
 
-      <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {DESTINATIONS.map((destination) => (
-          <Link key={destination.slug} href={`/destinos/${destination.slug}`} className="group">
-            <Card className="h-full overflow-hidden transition-shadow group-hover:shadow-card group-focus-visible:ring-2 group-focus-visible:ring-ring">
-              <div className="relative aspect-[4/3] w-full">
-                <Image
-                  src={destination.image}
-                  alt={destination.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-              </div>
-              <div className="p-5">
-                <h3 className="font-heading text-lg font-semibold text-foreground">{destination.name}</h3>
-                <p className="mt-1.5 text-sm text-muted-foreground">{destination.shortDescription}</p>
-                <div className="mt-4 flex items-center justify-between gap-2 text-sm">
-                  <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-                    <Clock className="h-4 w-4" aria-hidden />
-                    {destination.airportMinutes} min desde el aeropuerto
-                  </span>
-                  <span className="font-semibold text-primary">
-                    Desde {formatMXN(destination.priceFrom)}
-                  </span>
-                </div>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary">
-                  Ver destino <ArrowRight className="h-4 w-4" aria-hidden />
+        <div className="mt-20 flex flex-col gap-2 lg:h-[43rem] lg:flex-row" role="list">
+          {DESTINATIONS.map((destination, index) => (
+            <Link key={destination.slug} href={`/destinos/${destination.slug}`} data-gsap-image className="group relative min-h-[21rem] flex-1 overflow-hidden rounded-[1.5rem] transition-[flex] duration-700 ease-out hover:flex-[3.5] focus-visible:flex-[3.5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c8f04b]" role="listitem">
+              <Image
+                src={destination.image}
+                alt={destination.name}
+                fill
+                sizes="(max-width: 1024px) 100vw, 45vw"
+                className="object-cover opacity-90 contrast-125 transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#061816] via-[#061816]/10 to-transparent" aria-hidden />
+              <span className="absolute left-5 top-5 text-xs font-black tracking-[0.18em] text-white/75">{String(index + 1).padStart(2, "0")}</span>
+              <div className="absolute inset-x-0 bottom-0 p-6">
+                <h3 className="max-w-xs text-2xl font-black leading-none tracking-[-0.045em] sm:text-3xl">{destination.name}</h3>
+                <p className="mt-3 max-h-0 max-w-sm overflow-hidden text-sm leading-relaxed text-white/70 opacity-0 transition-all duration-500 group-hover:max-h-28 group-hover:opacity-100 group-focus-visible:max-h-28 group-focus-visible:opacity-100">{destination.shortDescription}</p>
+                <span className="mt-4 inline-flex items-center gap-2 text-sm font-black text-[#c8f04b]">
+                  Ir hasta allá <ArrowUpRight className="h-4 w-4" aria-hidden />
                 </span>
               </div>
-            </Card>
-          </Link>
-        ))}
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );

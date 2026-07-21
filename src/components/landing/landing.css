@@ -1,0 +1,40 @@
+@import url("https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,900&display=swap");
+
+.adventure-landing {
+  --adventure-ink: #132e2a;
+  --adventure-cream: #f4f0e6;
+  --adventure-lime: #c8f04b;
+  --adventure-orange: #ff6b35;
+  --adventure-blue: #0e9c9a;
+  font-family: "Satoshi", "Avenir Next", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 8% 6%, rgb(200 240 75 / 0.22), transparent 21rem),
+    var(--adventure-cream);
+}
+
+.adventure-landing ::selection {
+  color: var(--adventure-cream);
+  background: var(--adventure-ink);
+}
+
+.adventure-grain::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  opacity: 0.12;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.28'/%3E%3C/svg%3E");
+}
+
+.adventure-marquee-track {
+  width: max-content;
+  animation: adventure-marquee 28s linear infinite;
+}
+
+@keyframes adventure-marquee {
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .adventure-marquee-track { animation: none; }
+}

@@ -8,6 +8,8 @@ import { LandingHowItWorks } from "@/components/landing/landing-how-it-works";
 import { LandingTestimonials } from "@/components/landing/landing-testimonials";
 import { LandingFaq } from "@/components/landing/landing-faq";
 import { LandingFooter } from "@/components/landing/landing-footer";
+import { LandingMotion } from "@/components/landing/landing-motion";
+import "@/components/landing/landing.css";
 
 export const metadata: Metadata = {
   title: "GreenGo Traslados — Transporte turístico en Cancún",
@@ -25,14 +27,15 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="adventure-landing min-h-screen bg-[#f4f0e6] text-[#132e2a]">
+      <LandingMotion />
       <LandingHeader />
-      <main>
+      <main className="w-full max-w-full overflow-x-hidden">
         <LandingHero />
-        <LandingGalleryLazy />
         <LandingServices />
-        <LandingDestinations />
         <LandingHowItWorks />
+        <LandingDestinations />
+        <LandingGalleryLazy />
         <LandingTestimonials />
         <LandingFaq />
       </main>
