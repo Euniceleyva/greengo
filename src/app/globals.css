@@ -404,6 +404,48 @@
 .adventure-payment-action > p { display: flex; align-items: center; gap: .4rem; max-width: 30ch; color: hsl(var(--muted-foreground)); font-size: .72rem; font-weight: 750; }
 .adventure-payment-action > p svg { width: .9rem; flex: none; }
 
+.adventure-confirmation-page { background: var(--adventure-sand); }
+.adventure-confirmation__header { border-bottom: 3px solid var(--adventure-night); background: var(--adventure-sun); }
+.adventure-confirmation__status { border: 2px solid var(--adventure-night); padding: .4rem .55rem; font-size: .65rem; font-weight: 1000; transform: rotate(-1deg); }
+.adventure-confirmation-loading,
+.adventure-confirmation-empty { border: 3px solid var(--adventure-night) !important; border-radius: 6px !important; background: var(--adventure-foam) !important; box-shadow: 7px 8px 0 var(--adventure-night) !important; }
+.adventure-confirmation { display: grid; gap: 1.5rem; }
+.adventure-confirmation-hero { position: relative; display: grid; grid-template-columns: 150px minmax(0,1fr) minmax(220px,.42fr); align-items: center; gap: 2rem; overflow: hidden; border: 3px solid var(--adventure-night); background: var(--adventure-coral); padding: clamp(1.5rem,4vw,3.5rem); box-shadow: 8px 9px 0 var(--adventure-night); will-change: transform, opacity; }
+.adventure-confirmation-hero::after { position: absolute; right: -60px; bottom: -90px; width: 270px; height: 180px; border: 4px dashed var(--adventure-night); border-radius: 50%; content: ""; transform: rotate(-18deg); opacity: .24; }
+.adventure-confirmation-stamp { position: relative; z-index: 1; display: grid; place-items: center; width: 130px; aspect-ratio: 1; border: 5px double var(--adventure-night); border-radius: 50%; background: var(--adventure-sun); box-shadow: 5px 5px 0 var(--adventure-night); transform: rotate(-6deg); will-change: transform, opacity; }
+.adventure-confirmation-stamp svg { width: 2.3rem; height: 2.3rem; stroke-width: 4; }
+.adventure-confirmation-stamp span { font-family: var(--font-adventure-display); font-size: .64rem; }
+.adventure-confirmation-copy { position: relative; z-index: 1; }
+.adventure-confirmation-copy > p:first-child { margin-bottom: .55rem; font-size: .7rem; font-weight: 1000; letter-spacing: .04em; }
+.adventure-confirmation-copy h1 { max-width: 720px; font-size: clamp(2.4rem,5vw,4.85rem); line-height: .98; }
+.adventure-confirmation-copy > p:last-child { max-width: 56ch; margin-top: 1rem; font-weight: 800; line-height: 1.45; }
+.adventure-confirmation-folio { position: relative; z-index: 1; display: flex; min-height: 150px; flex-direction: column; justify-content: center; border: 3px solid var(--adventure-night); background: var(--adventure-foam); padding: 1.25rem; box-shadow: 5px 5px 0 var(--adventure-night); transform: rotate(1.5deg); }
+.adventure-confirmation-folio::before { position: absolute; top: -14px; left: 50%; width: 72px; height: 25px; background: rgba(255,216,61,.78); content: ""; transform: translateX(-50%) rotate(-2deg); }
+.adventure-confirmation-folio span,
+.adventure-confirmation-folio small { font-size: .63rem; font-weight: 1000; }
+.adventure-confirmation-folio strong { overflow-wrap: anywhere; margin-block: .5rem; color: var(--adventure-coral); font-family: var(--font-adventure-display); font-size: clamp(1.05rem,2vw,1.5rem); }
+.adventure-confirmation-grid { display: grid; grid-template-columns: minmax(0,1.25fr) minmax(280px,.75fr); gap: 1.5rem; align-items: start; }
+.adventure-confirmation-receipt { border: 3px solid var(--adventure-night); background: var(--adventure-foam); padding: clamp(1.4rem,3vw,2.2rem); box-shadow: 7px 8px 0 var(--adventure-night); }
+.adventure-confirmation-receipt__heading { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px dashed var(--adventure-night); padding-bottom: 1.2rem; }
+.adventure-confirmation-receipt__heading span { font-size: .66rem; font-weight: 1000; letter-spacing: .04em; }
+.adventure-confirmation-receipt__heading h2 { margin-top: .2rem; font-size: 1.55rem; }
+.adventure-confirmation-receipt__heading svg { width: 2.7rem; height: 2.7rem; border: 2px solid var(--adventure-night); border-radius: 50%; padding: .55rem; background: var(--adventure-caribbean); }
+.adventure-confirmation-summary { display: grid; grid-template-columns: repeat(2,1fr); gap: 0; margin-top: .8rem; }
+.adventure-confirmation-summary > div { min-width: 0; border-bottom: 1px solid color-mix(in srgb, var(--adventure-night) 24%, transparent); padding: .8rem .7rem .8rem 0; }
+.adventure-confirmation-summary dt { color: hsl(var(--muted-foreground)); font-size: .68rem; font-weight: 900; text-transform: uppercase; }
+.adventure-confirmation-summary dd { overflow-wrap: anywhere; margin-top: .15rem; font-size: .9rem; font-weight: 900; }
+.adventure-confirmation-total { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-top: 1.3rem; border-top: 3px solid var(--adventure-night); padding-top: 1rem; }
+.adventure-confirmation-total span { font-weight: 900; }
+.adventure-confirmation-total strong { color: var(--adventure-coral); font-family: var(--font-adventure-display); font-size: 1.5rem; }
+.adventure-confirmation-next { border: 3px solid var(--adventure-night); background: var(--adventure-caribbean); padding: clamp(1.4rem,3vw,2rem); box-shadow: 7px 8px 0 var(--adventure-night); }
+.adventure-confirmation-next__icon { display: grid; place-items: center; width: 52px; height: 52px; border: 2px solid var(--adventure-night); border-radius: 50%; background: var(--adventure-sun); }
+.adventure-confirmation-next h2 { margin-top: 1.2rem; font-size: 1.8rem; }
+.adventure-confirmation-next > p { margin-top: .65rem; font-weight: 750; line-height: 1.5; }
+.adventure-confirmation-next__route { margin-block: 1.5rem; border-block: 2px dashed var(--adventure-night); padding-block: 1.2rem; }
+.adventure-confirmation-next__route span { display: block; font-size: .7rem; font-weight: 1000; text-transform: uppercase; }
+.adventure-confirmation-next__route strong { display: block; margin-top: .3rem; font-family: var(--font-adventure-display); font-size: 1.45rem; line-height: 1.08; }
+.adventure-confirmation-demo { margin-top: 1.1rem !important; font-size: .68rem; opacity: .72; }
+
 @media (max-width: 900px) {
   .adventure-hero { min-height: 0; }
   .adventure-hero__layout { grid-template-columns: 1fr; grid-template-areas: "copy" "media" "quote"; gap: 2rem; }
@@ -425,6 +467,9 @@
   .adventure-checkout__intro .adventure-stamp { display: none; }
   .adventure-checkout__layout { grid-template-columns: 1fr; grid-template-areas: "notice" "receipt" "payment"; }
   .adventure-checkout-receipt { position: static; transform: none; }
+  .adventure-confirmation-hero { grid-template-columns: 110px 1fr; }
+  .adventure-confirmation-folio { grid-column: 1 / -1; min-height: 120px; }
+  .adventure-confirmation-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 640px) {
@@ -473,6 +518,12 @@
   .adventure-payment-method { min-height: 54px; justify-content: flex-start; }
   .adventure-payment-action { align-items: stretch; flex-direction: column; }
   .adventure-payment-action button { width: 100%; }
+  .adventure-confirmation__status { display: none; }
+  .adventure-confirmation-hero { grid-template-columns: 1fr; gap: 1.4rem; }
+  .adventure-confirmation-stamp { width: 100px; }
+  .adventure-confirmation-copy h1 { font-size: clamp(2.25rem,11vw,3.5rem); }
+  .adventure-confirmation-folio { grid-column: auto; }
+  .adventure-confirmation-summary { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

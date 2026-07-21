@@ -3,7 +3,9 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CheckCircle2 } from "lucide-react";
+import { ArrowRight, Check, Home, Mail, MapPin } from "lucide-react";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
 import { useReservationStore } from "@/stores/reservation-store";
 import { useDemoStore } from "@/stores/demo-store";
 import { useHydrated } from "@/lib/hooks";
@@ -15,6 +17,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/misc";
 
+gsap.registerPlugin(useGSAP);
+
 export function ConfirmationClient() {
   const hydrated = useHydrated();
   const router = useRouter();
@@ -25,6 +29,7 @@ export function ConfirmationClient() {
   const resetReservation = useReservationStore((s) => s.resetReservation);
   const createTrip = useDemoStore((s) => s.createTrip);
   const createdRef = React.useRef(false);
+  const confirmationRef = React.useRef<HTMLDivElement>(null);
 
   const hasDraft = Boolean(draft.serviceType && draft.originLocationId && draft.destinationLocationId);
 
@@ -72,9 +77,34 @@ export function ConfirmationClient() {
     router.push("/");
   };
 
+  useGSAP(
+    () => {
+      if (!hydrated || !confirmedFolio) return;
+      const mm = gsap.matchMedia();
+
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
+        timeline
+          .from("[data-confirmation-hero]", { y: 20, scale: 0.985, opacity: 0, duration: 0.62 })
+          .from("[data-confirmation-stamp]", { scale: 0.68, rotation: -14, opacity: 0, duration: 0.52 }, "-=0.34")
+          .from("[data-confirmation-copy] > *", { y: 18, opacity: 0, stagger: 0.065, duration: 0.48 }, "-=0.34")
+          .from("[data-confirmation-detail]", { y: 22, opacity: 0, stagger: 0.09, duration: 0.55 }, "-=0.2");
+      });
+
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.set("[data-confirmation-hero], [data-confirmation-stamp], [data-confirmation-copy] > *, [data-confirmation-detail]", {
+          clearProps: "all",
+        });
+      });
+
+      return () => mm.revert();
+    },
+    { scope: confirmationRef, dependencies: [hydrated, confirmedFolio], revertOnUpdate: true },
+  );
+
   if (!hydrated) {
     return (
-      <Card className="p-6 sm:p-8">
+      <Card className="adventure-confirmation-loading p-6 sm:p-8">
         <Skeleton className="h-8 w-2/3" />
         <Skeleton className="mt-6 h-40 w-full" />
       </Card>
@@ -83,10 +113,10 @@ export function ConfirmationClient() {
 
   if (!confirmedFolio && !hasDraft) {
     return (
-      <Card className="p-6 text-center sm:p-8">
-        <p className="text-sm text-muted-foreground">No encontramos información de una reservación reciente.</p>
+      <Card className="adventure-confirmation-empty p-6 text-center sm:p-8">
+        <p className="font-bold text-muted-foreground">No encontramos información de una reservación reciente.</p>
         <Link href="/reservar" className="mt-4 inline-block">
-          <Button>Iniciar una reservación</Button>
+          <Button className="adventure-cta">Iniciar una reservación</Button>
         </Link>
       </Card>
     );
@@ -107,23 +137,34 @@ export function ConfirmationClient() {
   });
 
   return (
-    <div className="space-y-6">
-      <Card className="flex flex-col items-center p-8 text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-success-soft text-success">
-          <CheckCircle2 className="h-8 w-8" aria-hidden />
+    <div ref={confirmationRef} className="adventure-confirmation">
+      <section data-confirmation-hero className="adventure-confirmation-hero">
+        <div data-confirmation-stamp className="adventure-confirmation-stamp" aria-hidden>
+          <Check />
+          <span>CONFIRMADO</span>
         </div>
-        <h1 className="mt-4 font-heading text-2xl font-bold text-foreground">¡Reservación confirmada!</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Te enviaremos la confirmación al correo proporcionado (simulado, sin envío real).
-        </p>
-        <p className="mt-4 rounded-lg bg-surface-soft px-4 py-2 font-heading text-lg font-bold text-primary">
-          {confirmedFolio}
-        </p>
-      </Card>
+        <div data-confirmation-copy className="adventure-confirmation-copy">
+          <p>YA ESTÁ EN EL MAPA</p>
+          <h1>¡Listo! Tu viaje ya está en marcha.</h1>
+          <p>Guardamos tu ruta y la enviamos al equipo. Conserva este folio para cualquier cambio.</p>
+        </div>
+        <div data-confirmation-copy className="adventure-confirmation-folio">
+          <span>FOLIO DE VIAJE</span>
+          <strong>{confirmedFolio}</strong>
+          <small>CUN · MAREA CLUB</small>
+        </div>
+      </section>
 
-      <Card className="p-6 sm:p-8">
-        <h2 className="font-heading text-lg font-semibold text-foreground">Resumen del viaje</h2>
-        <dl className="mt-4 grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
+      <div className="adventure-confirmation-grid">
+        <section data-confirmation-detail className="adventure-confirmation-receipt">
+          <div className="adventure-confirmation-receipt__heading">
+            <div>
+              <span>RECIBO DE RUTA</span>
+              <h2>Resumen del viaje</h2>
+            </div>
+            <MapPin aria-hidden />
+          </div>
+          <dl className="adventure-confirmation-summary">
           <SummaryRow label="Servicio" value={SERVICE_TYPE_LABELS[serviceType]} />
           <SummaryRow label="Sentido" value={draft.direction === "redondo" ? "Redondo" : "Sencillo"} />
           <SummaryRow label="Origen" value={origin?.name ?? "—"} />
@@ -132,21 +173,30 @@ export function ConfirmationClient() {
           <SummaryRow label="Pasajeros" value={String(draft.passengers)} />
           <SummaryRow label="Contacto" value={draft.contactName} />
           <SummaryRow label="Correo" value={draft.contactEmail} />
-        </dl>
-        <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
-          <span className="font-heading font-semibold text-foreground">Total pagado</span>
-          <span className="font-heading text-xl font-bold text-primary">
+          </dl>
+          <div className="adventure-confirmation-total">
+            <span>Total pagado</span>
+            <strong>
             {fare.isCustomQuote ? CUSTOM_QUOTE_LABEL : formatMXN(fare.total)}
-          </span>
-        </div>
-      </Card>
+            </strong>
+          </div>
+        </section>
 
-      <p className="text-center text-xs text-muted-foreground">
-        Esta reservación ya aparece en el panel administrativo del DEMO (Servicios / Viajes).
-      </p>
-
-      <div className="flex justify-center">
-        <Button onClick={onBackHome}>Volver al inicio</Button>
+        <aside data-confirmation-detail className="adventure-confirmation-next">
+          <div className="adventure-confirmation-next__icon"><Mail aria-hidden /></div>
+          <h2>¿Qué sigue?</h2>
+          <p>Te enviaremos la confirmación al correo proporcionado (simulado, sin envío real).</p>
+          <div className="adventure-confirmation-next__route">
+            <span>Ahora sí:</span>
+            <strong>maleta lista,<br />modo Caribe.</strong>
+          </div>
+          <Button onClick={onBackHome} className="adventure-cta w-full">
+            <Home aria-hidden /> Volver al inicio <ArrowRight aria-hidden />
+          </Button>
+          <p className="adventure-confirmation-demo">
+            Esta reservación ya aparece en el panel administrativo del DEMO (Servicios / Viajes).
+          </p>
+        </aside>
       </div>
     </div>
   );
@@ -154,9 +204,9 @@ export function ConfirmationClient() {
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between gap-2 sm:block">
-      <dt className="text-muted-foreground">{label}</dt>
-      <dd className="font-medium text-foreground">{value || "—"}</dd>
+    <div>
+      <dt>{label}</dt>
+      <dd>{value || "—"}</dd>
     </div>
   );
 }

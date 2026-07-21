@@ -11,15 +11,18 @@ export const metadata: Metadata = {
 export default function ConfirmacionPage() {
   return (
     <PublicLanguageProvider>
-    <div className="adventure-theme min-h-screen bg-surface-soft">
-      <header className="adventure-reservation__header">
-        <div className="mx-auto flex h-16 max-w-2xl items-center px-4 sm:px-6">
+    <div className="adventure-theme adventure-confirmation-page min-h-screen">
+      <header className="adventure-confirmation__header">
+        <div className="mx-auto flex h-[72px] max-w-6xl items-center px-4 sm:px-6">
           <Link href="/" className="adventure-wordmark">Marea<span>Club</span></Link>
-          <div className="ml-auto"><LanguageSwitch compact /></div>
+          <div className="ml-auto flex items-center gap-3">
+            <span className="adventure-confirmation__status">VIAJE CONFIRMADO</span>
+            <LanguageSwitch compact />
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-2xl px-4 py-10 pb-32 sm:px-6 sm:py-14 sm:pb-32">
+      <main className="mx-auto max-w-6xl px-4 py-8 pb-32 sm:px-6 sm:py-12 sm:pb-32">
         <ConfirmationClient />
       </main>
     </div>
