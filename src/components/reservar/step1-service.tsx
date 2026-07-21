@@ -9,10 +9,12 @@ import { SERVICE_TYPE_LABELS } from "@/constants";
 import { Button } from "@/components/ui/button";
 import { Select, Label } from "@/components/ui/input";
 import type { ServiceType } from "@/types";
+import { usePublicLocale } from "@/components/shared/public-locale";
 
 const SERVICE_TYPES = Object.keys(SERVICE_TYPE_LABELS) as ServiceType[];
 
 export function Step1Service() {
+  const { text, locale } = usePublicLocale();
   const draft = useReservationStore((s) => s.draft);
   const updateDraft = useReservationStore((s) => s.updateDraft);
   const setStep = useReservationStore((s) => s.setStep);
@@ -42,11 +44,11 @@ export function Step1Service() {
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <Label htmlFor="serviceType">Tipo de servicio</Label>
+          <Label htmlFor="serviceType">{text("Tipo de servicio", "Service type")}</Label>
           <Select id="serviceType" className="mt-1.5" {...register("serviceType")}>
             {SERVICE_TYPES.map((type) => (
               <option key={type} value={type}>
-                {SERVICE_TYPE_LABELS[type]}
+                {locale === "es" ? SERVICE_TYPE_LABELS[type] : ({hotel_hotel:"Hotel to hotel",aeropuerto:"Airport transfer",transporte_abierto:"Driver by the hour",a_medida:"Custom solution"} as Record<ServiceType,string>)[type]}
               </option>
             ))}
           </Select>
@@ -56,7 +58,7 @@ export function Step1Service() {
         </div>
 
         <div>
-          <Label htmlFor="originLocationId">Origen</Label>
+          <Label htmlFor="originLocationId">{text("Origen", "Pickup")}</Label>
           <Select id="originLocationId" className="mt-1.5" {...register("originLocationId")}>
             {LOCATIONS.map((loc) => (
               <option key={loc.id} value={loc.id}>
@@ -70,7 +72,7 @@ export function Step1Service() {
         </div>
 
         <div>
-          <Label htmlFor="destinationLocationId">Destino</Label>
+          <Label htmlFor="destinationLocationId">{text("Destino", "Destination")}</Label>
           <Select id="destinationLocationId" className="mt-1.5" {...register("destinationLocationId")}>
             {LOCATIONS.map((loc) => (
               <option key={loc.id} value={loc.id}>
@@ -84,22 +86,22 @@ export function Step1Service() {
         </div>
 
         <fieldset className="sm:col-span-2">
-          <legend className="text-sm font-medium text-foreground">Sentido</legend>
+          <legend className="text-sm font-medium text-foreground">{text("Sentido", "Trip type")}</legend>
           <div className="mt-1.5 flex gap-4">
             <label className="flex min-h-[44px] items-center gap-2 text-sm text-foreground">
               <input type="radio" value="sencillo" className="h-4 w-4" {...register("direction")} />
-              Sencillo
+              {text("Sencillo", "One way")}
             </label>
             <label className="flex min-h-[44px] items-center gap-2 text-sm text-foreground">
               <input type="radio" value="redondo" className="h-4 w-4" {...register("direction")} />
-              Redondo
+              {text("Redondo", "Round trip")}
             </label>
           </div>
         </fieldset>
       </div>
 
       <div className="mt-8 flex justify-end">
-        <Button type="submit">Continuar</Button>
+        <Button type="submit">{text("Continuar", "Continue")}</Button>
       </div>
     </form>
   );

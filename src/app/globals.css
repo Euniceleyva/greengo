@@ -105,3 +105,117 @@
   background-image: radial-gradient(hsl(var(--primary) / 0.12) 1.5px, transparent 1.5px);
   background-size: 28px 28px;
 }
+
+/* Public marketing theme — intentionally scoped away from /admin, /driver and /demo. */
+.public-theme {
+  --background: 39 46% 94%;
+  --foreground: 195 42% 15%;
+  --card: 40 52% 97%;
+  --card-foreground: 195 42% 15%;
+  --popover: 40 52% 97%;
+  --popover-foreground: 195 42% 15%;
+  --surface-soft: 34 38% 89%;
+  --border: 188 17% 73%;
+  --input: 188 17% 73%;
+  --muted: 38 28% 88%;
+  --muted-foreground: 191 17% 38%;
+  --primary: 190 51% 22%;
+  --primary-foreground: 42 65% 96%;
+  --primary-soft: 183 25% 83%;
+  --secondary: 181 24% 83%;
+  --secondary-foreground: 193 42% 17%;
+  --accent: 178 31% 37%;
+  --accent-foreground: 42 65% 96%;
+  --success: 178 31% 37%;
+  --success-foreground: 42 65% 96%;
+  --success-soft: 183 25% 87%;
+  --warning: 16 50% 49%;
+  --warning-soft: 20 57% 91%;
+  --ring: 16 50% 49%;
+  --radius: 0.45rem;
+  --shadow-color: 199 49% 9%;
+
+  /* Marketing-only semantic palette */
+  --mkt-bg: #f4eddf;
+  --mkt-bg-alt: #dfd3c1;
+  --mkt-night: #081f2b;
+  --mkt-ink: #173842;
+  --mkt-muted: #64777a;
+  --mkt-surface: #fbf7ee;
+  --mkt-border: rgba(23, 56, 66, 0.2);
+  --mkt-sea: #326f73;
+  --mkt-coral: #b95f46;
+  --mkt-gold: #c4a162;
+  --mkt-hover: #224f57;
+  --mkt-photo: #fff9ed;
+  --mkt-form: #eee4d2;
+  --mkt-decor: rgba(196, 161, 98, 0.55);
+
+  background: var(--mkt-bg);
+  color: var(--mkt-ink);
+  font-family: var(--font-marketing-body), sans-serif;
+}
+
+.public-theme .font-heading,
+.public-theme h1,
+.public-theme h2,
+.public-theme h3 {
+  font-family: var(--font-marketing-display), serif;
+  font-variation-settings: "SOFT" 80, "WONK" 0;
+}
+
+.public-theme ::selection { background: rgba(185, 95, 70, 0.25); }
+.public-theme :focus-visible { outline: 2px solid var(--mkt-coral); outline-offset: 3px; }
+
+.mkt-eyebrow {
+  font-size: .69rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.mkt-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+}
+.mkt-link::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -.3rem;
+  left: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(.25);
+  transform-origin: left;
+  transition: transform 220ms ease-out;
+}
+.mkt-link:hover::after { transform: scaleX(1); }
+.mkt-photo-frame { overflow: hidden; background: #d6c7b3; }
+.mkt-photo-frame img { transition: transform 700ms cubic-bezier(.22,1,.36,1); }
+.mkt-photo-frame:hover img { transform: scale(1.025); }
+.mkt-night { background: var(--mkt-night); color: var(--mkt-photo); }
+
+.public-theme input,
+.public-theme select,
+.public-theme textarea,
+.public-theme [role="combobox"] {
+  border-radius: 2px;
+}
+
+.public-theme .marketing-panel {
+  border: 1px solid var(--mkt-border);
+  background: var(--mkt-surface);
+  box-shadow: 0 24px 70px rgba(8, 31, 43, .10);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-theme *, .public-theme *::before, .public-theme *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

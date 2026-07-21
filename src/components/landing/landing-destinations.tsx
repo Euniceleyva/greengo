@@ -1,52 +1,37 @@
+ "use client";
+
 import Link from "next/link";
 import Image from "next/image";
-import { Clock, ArrowRight } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { ArrowRight } from "lucide-react";
 import { DESTINATIONS } from "@/mocks/destinations";
-import { formatMXN } from "@/lib/utils";
+import { usePublicLocale } from "@/components/shared/public-locale";
+
+const MOODS = ["Mar & pausa", "Mesa & ciudad", "Naturaleza", "Romance", "Con amigos", "Historia viva"];
+const MOODS_EN = ["Sea & stillness", "Dining & city", "Nature", "Romance", "With friends", "Living history"];
+const DESCRIPTIONS_EN = [
+  "Turquoise beaches and the liveliest nightlife in the Mexican Caribbean.",
+  "Bohemian energy, Fifth Avenue, and ferry access to Cozumel.",
+  "Seaside ruins, cenotes, and a bohemian-chic lifestyle.",
+  "A small island with calm beaches, a short ferry ride away.",
+  "One of the Caribbean’s finest diving and snorkeling destinations.",
+  "A nature park of underground rivers and Mexican culture.",
+];
 
 export function LandingDestinations() {
+  const { text } = usePublicLocale();
   return (
-    <section id="destinos" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-      <div className="mx-auto max-w-2xl text-center">
-        <h2 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">Destinos populares</h2>
-        <p className="mt-3 text-base text-muted-foreground">
-          Los lugares a los que más viajan nuestros pasajeros.
-        </p>
-      </div>
-
-      <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {DESTINATIONS.map((destination) => (
-          <Link key={destination.slug} href={`/destinos/${destination.slug}`} className="group">
-            <Card className="h-full overflow-hidden transition-shadow group-hover:shadow-card group-focus-visible:ring-2 group-focus-visible:ring-ring">
-              <div className="relative aspect-[4/3] w-full">
-                <Image
-                  src={destination.image}
-                  alt={destination.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-              </div>
-              <div className="p-5">
-                <h3 className="font-heading text-lg font-semibold text-foreground">{destination.name}</h3>
-                <p className="mt-1.5 text-sm text-muted-foreground">{destination.shortDescription}</p>
-                <div className="mt-4 flex items-center justify-between gap-2 text-sm">
-                  <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-                    <Clock className="h-4 w-4" aria-hidden />
-                    {destination.airportMinutes} min desde el aeropuerto
-                  </span>
-                  <span className="font-semibold text-primary">
-                    Desde {formatMXN(destination.priceFrom)}
-                  </span>
-                </div>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary">
-                  Ver destino <ArrowRight className="h-4 w-4" aria-hidden />
-                </span>
-              </div>
-            </Card>
-          </Link>
-        ))}
+    <section id="destinos" className="px-5 py-24 sm:px-8 lg:px-12 lg:py-40">
+      <div className="mx-auto max-w-[1480px]">
+        <div data-reveal className="flex flex-col gap-8 border-b border-[var(--mkt-border)] pb-10 lg:flex-row lg:items-end lg:justify-between"><div><p className="mkt-eyebrow text-[var(--mkt-coral)]">{text("Elige cómo quieres sentirte", "Choose how you want to feel")}</p><h2 className="mt-4 max-w-4xl font-heading text-5xl font-medium leading-[.92] tracking-[-.05em] sm:text-7xl lg:text-8xl">{text("Una costa, muchas formas de vivirla.", "One coast, countless ways to live it.")}</h2></div><p className="max-w-sm text-sm leading-7 text-[var(--mkt-muted)]">{text("Del agua en calma a una sobremesa que termina bailando. Tu traslado conecta cada momento.", "From calm waters to dinner that ends on the dance floor. Your transfer connects every moment.")}</p></div>
+        <div className="mt-12 grid grid-cols-1 gap-x-5 gap-y-16 sm:grid-cols-2 lg:grid-cols-12">
+          {DESTINATIONS.map((destination, i) => {
+            const size = i === 0 || i === 3 ? "lg:col-span-7" : i === 1 || i === 4 ? "lg:col-span-5 lg:pt-24" : "lg:col-span-6";
+            return <Link data-reveal key={destination.slug} href={`/destinos/${destination.slug}`} className={`group ${size}`}>
+              <div className={`mkt-photo-frame relative ${i % 3 === 1 ? "aspect-[4/5]" : "aspect-[16/10]"}`}><Image src={destination.image} alt={destination.name} fill sizes="(max-width:768px) 100vw, 55vw" className="object-cover" /><span className="absolute left-4 top-4 bg-[var(--mkt-surface)] px-3 py-2 text-[10px] font-bold uppercase tracking-[.15em] text-[var(--mkt-ink)]">{text(MOODS[i], MOODS_EN[i])}</span></div>
+              <div className="mt-5 flex items-start justify-between gap-4"><div><h3 className="font-heading text-3xl font-medium tracking-[-.03em]">{destination.name}</h3><p className="mt-2 max-w-lg text-sm leading-6 text-[var(--mkt-muted)]">{text(destination.shortDescription, DESCRIPTIONS_EN[i])}</p></div><ArrowRight className="mt-2 h-5 w-5 shrink-0 transition-transform duration-200 group-hover:translate-x-1" /></div>
+            </Link>;
+          })}
+        </div>
       </div>
     </section>
   );

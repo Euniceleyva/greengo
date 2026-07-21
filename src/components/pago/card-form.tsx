@@ -6,12 +6,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { cardPaymentSchema, type CardPaymentValues } from "@/lib/schemas";
 import { formatCardNumber, formatExpiry } from "@/lib/utils";
 import { Input, Label } from "@/components/ui/input";
+import { usePublicLocale } from "@/components/shared/public-locale";
 
 export interface CardFormHandle {
   submit: () => Promise<CardPaymentValues | null>;
 }
 
 export const CardForm = forwardRef<CardFormHandle>(function CardForm(_props, ref) {
+  const { text } = usePublicLocale();
   const {
     register,
     handleSubmit,
@@ -38,7 +40,7 @@ export const CardForm = forwardRef<CardFormHandle>(function CardForm(_props, ref
   return (
     <form className="grid gap-5 sm:grid-cols-2" noValidate>
       <div className="sm:col-span-2">
-        <Label htmlFor="cardNumber">Número de tarjeta</Label>
+        <Label htmlFor="cardNumber">{text("Número de tarjeta", "Card number")}</Label>
         <Input
           id="cardNumber"
           inputMode="numeric"
@@ -54,13 +56,13 @@ export const CardForm = forwardRef<CardFormHandle>(function CardForm(_props, ref
       </div>
 
       <div className="sm:col-span-2">
-        <Label htmlFor="cardName">Nombre en la tarjeta</Label>
+        <Label htmlFor="cardName">{text("Nombre en la tarjeta", "Name on card")}</Label>
         <Input id="cardName" className="mt-1.5" {...register("cardName")} />
         {errors.cardName && <p className="mt-1.5 text-xs text-destructive">{errors.cardName.message}</p>}
       </div>
 
       <div>
-        <Label htmlFor="expiry">Vigencia (MM/AA)</Label>
+        <Label htmlFor="expiry">{text("Vigencia (MM/AA)", "Expiration (MM/YY)")}</Label>
         <Input
           id="expiry"
           inputMode="numeric"

@@ -11,8 +11,10 @@ import { CHATBOT_NODES } from "@/mocks/chatbot";
 import { WHATSAPP_PHONE } from "@/constants";
 import { cn } from "@/lib/utils";
 import type { ChatbotOption } from "@/types";
+import { usePublicLocale } from "./public-locale";
 
 export function ChatbotWidget() {
+  const { locale } = usePublicLocale();
   const pathname = usePathname();
   const router = useRouter();
   const { isOpen, isTyping, currentNodeId, messages, toggleOpen, selectOption, recordChoice } = useChatbotStore();
@@ -37,6 +39,8 @@ export function ChatbotWidget() {
 
   if (pathname.startsWith("/admin") || pathname.startsWith("/driver")) return null;
 
+  const isDemo = pathname.startsWith("/demo");
+
   const node = CHATBOT_NODES[currentNodeId];
 
   const handleOption = (option: ChatbotOption) => {
@@ -46,7 +50,7 @@ export function ChatbotWidget() {
     }
     if (option.action.kind === "whatsapp") {
       recordChoice(option.label);
-      const message = "Hola, quiero hablar con un asesor de GreenGo Traslados.";
+      const message = "Hola, quiero hablar con un asesor de Marea.";
       window.open(`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
       return;
     }
@@ -61,13 +65,13 @@ export function ChatbotWidget() {
       {isOpen && (
         <div
           role="dialog"
-          aria-label="Asistente virtual de GreenGo"
-          className="fixed bottom-40 right-5 z-40 flex h-[28rem] w-[calc(100vw-2.5rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-popover sm:bottom-44 sm:right-6"
+          aria-label="Asistente virtual de Marea"
+          className={cn("fixed bottom-40 right-5 z-40 flex h-[28rem] w-[calc(100vw-2.5rem)] max-w-sm flex-col overflow-hidden border shadow-popover sm:bottom-44 sm:right-6", isDemo ? "rounded-2xl border-border bg-card" : "border-[#294b55] bg-[#fbf7ee]")}
         >
-          <div className="flex items-center justify-between bg-primary px-4 py-3 text-primary-foreground">
+          <div className={cn("flex items-center justify-between px-4 py-3", isDemo ? "bg-primary text-primary-foreground" : "bg-[#0b2a36] text-white")}>
             <div className="flex items-center gap-2">
               <Bot className="h-5 w-5" aria-hidden />
-              <span className="font-heading text-sm font-semibold">Asistente GreenGo</span>
+              <span className="font-heading text-sm font-semibold">{isDemo ? "Asistente GreenGo" : locale === "es" ? "Concierge Marea" : "Marea Concierge"}</span>
             </div>
             <button
               ref={closeButtonRef}
@@ -87,11 +91,11 @@ export function ChatbotWidget() {
                 className={cn(
                   "max-w-[85%] rounded-xl px-3 py-2 text-sm",
                   m.from === "bot"
-                    ? "mr-auto bg-secondary text-foreground"
-                    : "ml-auto bg-primary text-primary-foreground",
+                    ? isDemo ? "mr-auto bg-secondary text-foreground" : "mr-auto bg-[#e7dccb] text-[#173842]"
+                    : isDemo ? "ml-auto bg-primary text-primary-foreground" : "ml-auto bg-[#326f73] text-white",
                 )}
               >
-                {m.text}
+                {isDemo ? m.text : locale === "es" ? m.text.replace("¡Hola! Soy el asistente virtual de GreenGo Traslados. ¿En qué te puedo ayudar?", "Hola, soy el concierge virtual de Marea. ¿Cómo puedo ayudarte con tu viaje?") : m.text.replace("¡Hola! Soy el asistente virtual de GreenGo Traslados. ¿En qué te puedo ayudar?", "Hello, I’m Marea’s virtual concierge. How can I help with your trip?")}
               </div>
             ))}
             {isTyping && (
@@ -108,7 +112,7 @@ export function ChatbotWidget() {
                   key={option.id}
                   type="button"
                   onClick={() => handleOption(option)}
-                  className="min-h-[44px] rounded-full border border-primary/30 bg-primary-soft px-3 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className={cn("min-h-[44px] px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2", isDemo ? "rounded-full border border-primary/30 bg-primary-soft text-primary hover:bg-primary hover:text-primary-foreground focus-visible:ring-ring" : "border border-[#326f73]/35 bg-[#e7dccb] text-[#173842] hover:bg-[#326f73] hover:text-white focus-visible:ring-[#b95f46]")}
                 >
                   {option.label}
                 </button>
@@ -123,7 +127,7 @@ export function ChatbotWidget() {
         onClick={toggleOpen}
         aria-label={isOpen ? "Cerrar asistente virtual" : "Abrir asistente virtual"}
         aria-expanded={isOpen}
-        className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-popover transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:bottom-6 sm:right-6"
+        className={cn("fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center shadow-popover transition-transform focus-visible:outline-none focus-visible:ring-2 sm:bottom-6 sm:right-6", isDemo ? "rounded-full bg-primary text-primary-foreground hover:scale-105 focus-visible:ring-ring focus-visible:ring-offset-2" : "bg-[#0b2a36] text-white duration-200 hover:-translate-y-1 focus-visible:ring-[#c4a162]")}
       >
         {isOpen ? <X className="h-6 w-6" aria-hidden /> : <MessageSquareText className="h-6 w-6" aria-hidden />}
       </button>

@@ -1,5 +1,8 @@
+ "use client";
+
 import { CreditCard, Landmark, QrCode } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePublicLocale } from "@/components/shared/public-locale";
 
 export type CheckoutMethod = "tarjeta" | "oxxo" | "spei";
 
@@ -16,6 +19,7 @@ export function PaymentMethodSelector({
   value: CheckoutMethod;
   onChange: (method: CheckoutMethod) => void;
 }) {
+  const { locale } = usePublicLocale();
   return (
     <div role="radiogroup" aria-label="Método de pago" className="grid grid-cols-3 gap-3">
       {METHODS.map(({ id, label, icon: Icon }) => {
@@ -35,7 +39,7 @@ export function PaymentMethodSelector({
             )}
           >
             <Icon className="h-5 w-5" aria-hidden />
-            {label}
+            {locale === "en" && id === "tarjeta" ? "Card" : label}
           </button>
         );
       })}

@@ -12,6 +12,7 @@ import { Step4Summary } from "./step4-summary";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/misc";
 import type { ServiceType } from "@/types";
+import { usePublicLocale } from "@/components/shared/public-locale";
 
 const VALID_SERVICE_TYPES: ServiceType[] = ["hotel_hotel", "aeropuerto", "transporte_abierto", "a_medida"];
 
@@ -23,6 +24,7 @@ const STEP_TITLES: Record<number, string> = {
 };
 
 export function ReservationWizard() {
+  const { locale } = usePublicLocale();
   const hydrated = useHydrated();
   const searchParams = useSearchParams();
   const step = useReservationStore((s) => s.step);
@@ -75,9 +77,9 @@ export function ReservationWizard() {
   }
 
   return (
-    <Card className="p-6 sm:p-8">
+    <Card className="marketing-panel rounded-none p-6 sm:p-10">
       <ReservationStepper current={step} />
-      <h1 className="mt-8 font-heading text-2xl font-bold text-foreground">{STEP_TITLES[step]}</h1>
+      <h2 className="mt-8 font-heading text-3xl font-medium text-foreground">{locale === "es" ? STEP_TITLES[step] : ({1:"Choose your service",2:"Trip details",3:"Contact details",4:"Confirm your booking"} as Record<number,string>)[step]}</h2>
       <div className="mt-6">
         {step === 1 && <Step1Service />}
         {step === 2 && <Step2Details />}

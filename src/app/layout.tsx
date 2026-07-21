@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Poppins, Inter } from "next/font/google";
+import { Poppins, Inter, Fraunces, Manrope } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { WhatsAppSticky } from "@/components/shared/whatsapp-sticky";
 import { ChatbotWidgetLazy } from "@/components/shared/chatbot-widget-lazy";
+import { PublicLocaleProvider } from "@/components/shared/public-locale";
 
 const fontHeading = Poppins({
   subsets: ["latin"],
@@ -18,31 +19,40 @@ const fontBody = Inter({
   display: "swap",
 });
 
+const fontMarketingDisplay = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-marketing-display",
+  display: "swap",
+});
+
+const fontMarketingBody = Manrope({
+  subsets: ["latin"],
+  variable: "--font-marketing-body",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL("http://localhost:3000"),
-  title: "GreenGo Traslados — DEMO",
+  title: "Marea — Traslados en Cancún y Riviera Maya",
   description:
     "DEMO frontend de gestión y monitoreo de traslados turísticos en Cancún. Datos simulados.",
-  icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
-  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#29876B",
+  themeColor: "#123B47",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={cn(fontHeading.variable, fontBody.variable)}>
+    <html lang="es" className={cn(fontHeading.variable, fontBody.variable, fontMarketingDisplay.variable, fontMarketingBody.variable)}>
       <body className="font-sans antialiased">
-        {children}
-        <WhatsAppSticky />
-        <ChatbotWidgetLazy />
+        <PublicLocaleProvider>
+          {children}
+          <WhatsAppSticky />
+          <ChatbotWidgetLazy />
+        </PublicLocaleProvider>
       </body>
     </html>
   );

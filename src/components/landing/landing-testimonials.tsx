@@ -1,58 +1,24 @@
+ "use client";
+
 import { Star } from "lucide-react";
-import { Card } from "@/components/ui/card";
 import { TESTIMONIALS } from "@/mocks/testimonials";
-import { SERVICE_TYPE_LABELS } from "@/constants";
+import { usePublicLocale } from "@/components/shared/public-locale";
+
+const QUOTES_EN = [
+  "Our driver met us in arrivals and took us straight to the Hotel Zone. Perfectly on time, and the vehicle was spotless.",
+  "We booked a driver for the full day between Tulum and nearby cenotes. Total comfort, and our driver knew the area incredibly well.",
+  "We coordinated a special wedding transfer and welcome pickup for our guests. Everything ran on time and without a hitch.",
+];
 
 export function LandingTestimonials() {
+  const { text, locale } = usePublicLocale();
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-      <div className="mx-auto max-w-2xl text-center">
-        <h2 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">
-          Lo que dicen nuestros pasajeros
-        </h2>
-        <p className="mt-3 text-base text-muted-foreground">Testimonios ilustrativos del DEMO.</p>
-      </div>
-
-      <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {TESTIMONIALS.map((t) => {
-          const initials = t.name
-            .split(" ")
-            .slice(0, 2)
-            .map((n) => n[0])
-            .join("");
-          return (
-            <Card key={t.id} className="flex flex-col p-6">
-              <div className="flex items-center gap-0.5" aria-label={`${t.rating} de 5 estrellas`}>
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className="h-4 w-4"
-                    aria-hidden
-                    fill={i < t.rating ? "currentColor" : "none"}
-                    strokeWidth={1.5}
-                    style={{ color: i < t.rating ? "#F68634" : "hsl(var(--border))" }}
-                  />
-                ))}
-              </div>
-              <p className="mt-4 flex-1 text-sm italic text-foreground">&ldquo;{t.quote}&rdquo;</p>
-              <div className="mt-5 flex items-center gap-3">
-                <span
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
-                  style={{ backgroundColor: t.avatarColor }}
-                  aria-hidden
-                >
-                  {initials}
-                </span>
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-foreground">{t.name}</p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    {t.origin} · {SERVICE_TYPE_LABELS[t.serviceType]}
-                  </p>
-                </div>
-              </div>
-            </Card>
-          );
-        })}
+    <section className="bg-[var(--mkt-surface)] px-5 py-24 sm:px-8 lg:px-12 lg:py-36">
+      <div className="mx-auto max-w-[1320px]">
+        <div data-reveal className="grid gap-8 lg:grid-cols-[.6fr_1.4fr]"><p className="mkt-eyebrow pt-3 text-[var(--mkt-coral)]">{text("Viajeros en calma", "Travelers at ease")}</p><h2 className="font-heading text-5xl font-medium leading-[.96] tracking-[-.045em] sm:text-7xl">{text("“Por primera vez, el trayecto no se sintió como una espera.”", "“For once, the ride did not feel like waiting.”")}</h2></div>
+        <div className="mt-16 grid border-t border-[var(--mkt-border)] md:grid-cols-3">
+          {TESTIMONIALS.slice(0,3).map((t, i) => <figure data-reveal key={t.id} className={`py-8 md:px-8 ${i ? "border-t border-[var(--mkt-border)] md:border-l md:border-t-0" : ""}`}><div className="flex gap-1 text-[var(--mkt-gold)]" aria-label={`${t.rating} ${text("de 5 estrellas", "out of 5 stars")}`}>{Array.from({length: t.rating}).map((_,j)=><Star key={j} className="h-3.5 w-3.5 fill-current" />)}</div><blockquote className="mt-7 font-heading text-2xl leading-snug">“{locale === "es" ? t.quote : QUOTES_EN[i]}”</blockquote><figcaption className="mt-8 text-xs uppercase tracking-[.12em] text-[var(--mkt-muted)]">{t.name} · {t.origin}</figcaption></figure>)}
+        </div>
       </div>
     </section>
   );

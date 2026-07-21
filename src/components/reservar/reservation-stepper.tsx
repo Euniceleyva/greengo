@@ -1,5 +1,8 @@
+ "use client";
+
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePublicLocale } from "@/components/shared/public-locale";
 
 const STEPS = [
   { n: 1, label: "Servicio" },
@@ -9,9 +12,11 @@ const STEPS = [
 ];
 
 export function ReservationStepper({ current }: { current: number }) {
+  const { locale } = usePublicLocale();
+  const labels = locale === "es" ? STEPS : [{n:1,label:"Service"},{n:2,label:"Details"},{n:3,label:"Contact"},{n:4,label:"Summary"}];
   return (
     <ol className="flex items-center" aria-label="Progreso de la reservación">
-      {STEPS.map((step, i) => {
+      {labels.map((step, i) => {
         const isDone = step.n < current;
         const isCurrent = step.n === current;
         return (
@@ -37,7 +42,7 @@ export function ReservationStepper({ current }: { current: number }) {
                 {step.label}
               </span>
             </div>
-            {i < STEPS.length - 1 && (
+            {i < labels.length - 1 && (
               <div className={cn("mx-2 h-0.5 flex-1 rounded-full sm:mx-3", isDone ? "bg-primary" : "bg-border")} />
             )}
           </li>

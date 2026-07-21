@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
+import { ArrowDownRight, ArrowRight, Plane, Search, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, Label } from "@/components/ui/input";
 import { Combobox } from "@/components/ui/combobox";
@@ -11,13 +11,12 @@ import { AIRPORTS } from "@/mocks/airports";
 import { TOUR_DESTINATIONS } from "@/mocks/tour-destinations";
 import {
   estimateHeroQuote,
-  formatUSD,
   heroDestinationLocationId,
   heroOriginLocationId,
   transferKindToServiceType,
 } from "@/mocks/hero-quote";
-import { formatMXN } from "@/lib/utils";
 import type { HeroQuoteEstimate, TourOrigin, TransferKind } from "@/types";
+import { usePublicLocale } from "@/components/shared/public-locale";
 
 const TRANSFER_KIND_LABELS: Record<TransferKind, string> = {
   hotel_hotel: "Hotel a hotel",
@@ -28,6 +27,7 @@ const TRANSFER_KIND_LABELS: Record<TransferKind, string> = {
 
 export function LandingHero() {
   const router = useRouter();
+  const { text, money } = usePublicLocale();
 
   const [transferKind, setTransferKind] = React.useState<TransferKind>("hotel_hotel");
   const [originHotelId, setOriginHotelId] = React.useState(HOTELS[0].id);
@@ -120,41 +120,49 @@ export function LandingHero() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-primary">
-      <video
-        src="/images/hero-cancun.mp4"
-        poster="/images/destinations/cancun.jpg"
-        autoPlay
-        muted
-        loop
-        playsInline
-        aria-hidden
-        className="absolute inset-0 h-full w-full object-cover opacity-30"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/80 to-background" aria-hidden />
+    <section className="relative min-h-[100svh] overflow-hidden bg-[var(--mkt-night)] text-white">
+      <div data-hero-media className="absolute inset-0 will-change-transform">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-hidden
+          poster="/images/images/400.jpg"
+          className="absolute inset-0 h-full w-full object-cover"
+        >
+          <source src="/images/hero-cancun.webm" type="video/webm" />
+          <source src="/images/hero-cancun-optimizado.mp4" type="video/mp4" />
+        </video>
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,31,43,.82)_0%,rgba(8,31,43,.42)_48%,rgba(8,31,43,.08)_75%),linear-gradient(0deg,rgba(8,31,43,.68)_0%,transparent_55%)]" aria-hidden />
+      </div>
 
-      <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 pb-16 pt-20 text-center sm:px-6 sm:pb-24 sm:pt-28 lg:px-8">
-        <h1 className="font-heading text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-          Traslados turísticos en Cancún, sin complicaciones
-        </h1>
-        <p className="mt-5 max-w-2xl text-lg text-white/90 sm:text-xl">
-          Del aeropuerto a tu hotel, entre destinos o por el tiempo que necesites — con conductores
-          profesionales y unidades listas para tu viaje.
+      <div className="relative mx-auto flex min-h-[100svh] max-w-[1480px] flex-col justify-end px-5 pb-8 pt-28 sm:px-8 lg:px-12 lg:pb-10">
+        <div className="mb-12 max-w-[820px] lg:mb-16">
+        <p data-hero-beat className="mkt-eyebrow mb-5 flex items-center gap-3 text-white/75"><span className="h-px w-10 bg-[var(--mkt-gold)]" />Cancún · Riviera Maya</p>
+        <h1 data-hero-beat className="max-w-[800px] font-heading text-[clamp(3.4rem,7vw,7.5rem)] font-medium leading-[.86] tracking-[-.055em] text-white">{text("Llegar también puede sentirse como vacaciones.", "Arriving can feel like a vacation, too.")}</h1>
+        <p data-hero-beat className="mt-7 max-w-xl text-base leading-7 text-white/76 sm:text-lg">
+          {text("Del aeropuerto al mar con calma, privacidad y todo resuelto. Después, la Riviera es tuya: playa, mesa, música y noche.", "From the airport to the sea with calm, privacy, and every detail handled. Then the Riviera is yours: beach, dining, music, and nights out.")}
         </p>
-        <div className="mt-8">
-          <Button size="lg" onClick={() => router.push("/reservar")} className="shadow-card">
-            Reservar ahora
-          </Button>
+        <div data-hero-beat className="mt-8 flex flex-wrap items-center gap-6">
+          <Button size="lg" onClick={() => router.push("/reservar")} className="rounded-none bg-[var(--mkt-coral)] px-7 hover:bg-[#9f4e39]">{text("Comenzar mi viaje", "Start my trip")} <ArrowRight /></Button>
+          <a href="#destinos" className="mkt-link text-sm text-white/85">{text("Descubrir la costa", "Discover the coast")} <ArrowDownRight className="h-4 w-4" /></a>
         </div>
+        <div data-hero-beat className="mt-8 flex flex-wrap gap-x-7 gap-y-2 text-[11px] uppercase tracking-[.12em] text-white/55"><span className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[var(--mkt-gold)]" />{text("Conductores verificados", "Verified drivers")}</span><span className="flex items-center gap-2"><Plane className="h-4 w-4 text-[var(--mkt-gold)]" />{text("Seguimiento de vuelo", "Flight tracking")}</span></div>
+        </div>
+
+        <div data-horizon className="h-px w-full bg-gradient-to-r from-[var(--mkt-gold)] via-white/45 to-transparent" />
 
         <form
           onSubmit={onSubmit}
-          className="mt-10 w-full max-w-3xl rounded-2xl bg-card p-4 text-left shadow-popover sm:p-6"
+          data-quote-panel
+          className="w-full border-b border-white/20 bg-[rgba(8,31,43,.76)] p-5 text-left backdrop-blur-md sm:p-6 lg:px-8"
           aria-label="Cotización rápida de traslado"
         >
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mb-4 flex items-end justify-between"><div><p className="mkt-eyebrow text-[var(--mkt-gold)]">{text("Tu llegada", "Your arrival")}</p><h2 className="mt-1 font-heading text-2xl font-medium text-white">{text("Cotiza sin prisa", "Get a relaxed quote")}</h2></div><p className="hidden text-xs text-white/45 lg:block">{text("Estimación inmediata · reserva en minutos", "Instant estimate · book in minutes")}</p></div>
+          <div className="grid gap-4 text-white sm:grid-cols-2 lg:grid-cols-4 [&_label]:text-white/65 [&_legend]:text-white/65 [&_input]:border-white/20 [&_input]:bg-white/10 [&_input]:text-white [&_select]:border-white/20 [&_select]:bg-[#173b46] [&_select]:text-white [&_[role=combobox]]:border-white/20 [&_[role=combobox]]:bg-white/10 [&_[role=combobox]]:text-white">
             <div className="sm:col-span-2 lg:col-span-4">
-              <Label htmlFor="hero-transfer-kind">Tipo de traslado</Label>
+              <Label htmlFor="hero-transfer-kind">{text("Tipo de traslado", "Transfer type")}</Label>
               <Select
                 id="hero-transfer-kind"
                 value={transferKind}
@@ -163,7 +171,7 @@ export function LandingHero() {
               >
                 {(Object.keys(TRANSFER_KIND_LABELS) as TransferKind[]).map((kind) => (
                   <option key={kind} value={kind}>
-                    {TRANSFER_KIND_LABELS[kind]}
+                    {text(TRANSFER_KIND_LABELS[kind], kind === "hotel_hotel" ? "Hotel to hotel" : kind === "hotel_aeropuerto" ? "Hotel to airport" : kind === "aeropuerto_hotel" ? "Airport to hotel" : "Tour")}
                   </option>
                 ))}
               </Select>
@@ -172,30 +180,30 @@ export function LandingHero() {
             {transferKind === "hotel_hotel" && (
               <>
                 <div>
-                  <Label htmlFor="hero-origin-hotel">Hotel de origen</Label>
+                  <Label htmlFor="hero-origin-hotel">{text("Hotel de origen", "Pickup hotel")}</Label>
                   <Combobox
                     id="hero-origin-hotel"
                     className="mt-1"
                     options={HOTELS}
                     value={originHotelId}
                     onChange={setOriginHotelId}
-                    placeholder="Selecciona un hotel"
-                    searchPlaceholder="Buscar hotel..."
+                    placeholder={text("Selecciona un hotel", "Select a hotel")}
+                    searchPlaceholder={text("Buscar hotel...", "Search hotels...")}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="hero-destination-hotel">Hotel de destino</Label>
+                  <Label htmlFor="hero-destination-hotel">{text("Hotel de destino", "Destination hotel")}</Label>
                   <Combobox
                     id="hero-destination-hotel"
                     className="mt-1"
                     options={HOTELS}
                     value={destinationHotelId}
                     onChange={setDestinationHotelId}
-                    placeholder="Selecciona un hotel"
-                    searchPlaceholder="Buscar hotel..."
+                    placeholder={text("Selecciona un hotel", "Select a hotel")}
+                    searchPlaceholder={text("Buscar hotel...", "Search hotels...")}
                   />
                   {sameHotelError && (
-                    <p className="mt-1 text-xs text-destructive">El hotel de origen y destino deben ser distintos.</p>
+                    <p className="mt-1 text-xs text-destructive">{text("El hotel de origen y destino deben ser distintos.", "Pickup and destination hotels must be different.")}</p>
                   )}
                 </div>
               </>
@@ -211,12 +219,12 @@ export function LandingHero() {
                     options={HOTELS}
                     value={hotelId}
                     onChange={setHotelId}
-                    placeholder="Selecciona un hotel"
-                    searchPlaceholder="Buscar hotel..."
+                    placeholder={text("Selecciona un hotel", "Select a hotel")}
+                    searchPlaceholder={text("Buscar hotel...", "Search hotels...")}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="hero-airport">Aeropuerto</Label>
+                  <Label htmlFor="hero-airport">{text("Aeropuerto", "Airport")}</Label>
                   <Select id="hero-airport" value={airportId} onChange={(e) => setAirportId(e.target.value)} className="mt-1">
                     {AIRPORTS.map((a) => (
                       <option key={a.id} value={a.id}>
@@ -231,7 +239,7 @@ export function LandingHero() {
             {transferKind === "aeropuerto_hotel" && (
               <>
                 <div>
-                  <Label htmlFor="hero-airport">Aeropuerto</Label>
+                  <Label htmlFor="hero-airport">{text("Aeropuerto", "Airport")}</Label>
                   <Select id="hero-airport" value={airportId} onChange={(e) => setAirportId(e.target.value)} className="mt-1">
                     {AIRPORTS.map((a) => (
                       <option key={a.id} value={a.id}>
@@ -248,8 +256,8 @@ export function LandingHero() {
                     options={HOTELS}
                     value={hotelId}
                     onChange={setHotelId}
-                    placeholder="Selecciona un hotel"
-                    searchPlaceholder="Buscar hotel..."
+                    placeholder={text("Selecciona un hotel", "Select a hotel")}
+                    searchPlaceholder={text("Buscar hotel...", "Search hotels...")}
                   />
                 </div>
               </>
@@ -258,7 +266,7 @@ export function LandingHero() {
             {transferKind === "tour" && (
               <>
                 <fieldset className="sm:col-span-2 lg:col-span-4">
-                  <legend className="text-sm font-medium text-foreground">Salida desde</legend>
+                  <legend className="text-sm font-medium text-foreground">{text("Salida desde", "Pickup from")}</legend>
                   <div className="mt-1.5 flex gap-4">
                     <label className="flex min-h-[44px] items-center gap-2 text-sm text-foreground">
                       <input
@@ -267,7 +275,7 @@ export function LandingHero() {
                         checked={tourOrigin === "aeropuerto"}
                         onChange={() => setTourOrigin("aeropuerto")}
                       />
-                      Aeropuerto
+                      {text("Aeropuerto", "Airport")}
                     </label>
                     <label className="flex min-h-[44px] items-center gap-2 text-sm text-foreground">
                       <input
@@ -284,7 +292,7 @@ export function LandingHero() {
                 <div>
                   {tourOrigin === "aeropuerto" ? (
                     <>
-                      <Label htmlFor="hero-airport">Aeropuerto</Label>
+                      <Label htmlFor="hero-airport">{text("Aeropuerto", "Airport")}</Label>
                       <Select
                         id="hero-airport"
                         value={airportId}
@@ -307,15 +315,15 @@ export function LandingHero() {
                         options={HOTELS}
                         value={hotelId}
                         onChange={setHotelId}
-                        placeholder="Selecciona un hotel"
-                        searchPlaceholder="Buscar hotel..."
+                        placeholder={text("Selecciona un hotel", "Select a hotel")}
+                        searchPlaceholder={text("Buscar hotel...", "Search hotels...")}
                       />
                     </>
                   )}
                 </div>
 
                 <div>
-                  <Label htmlFor="hero-tour-destination">Destino</Label>
+                  <Label htmlFor="hero-tour-destination">{text("Destino", "Destination")}</Label>
                   <Select
                     id="hero-tour-destination"
                     value={tourDestinationId}
@@ -333,7 +341,7 @@ export function LandingHero() {
             )}
 
             <div>
-              <Label htmlFor="hero-date">Fecha</Label>
+              <Label htmlFor="hero-date">{text("Fecha", "Date")}</Label>
               <input
                 id="hero-date"
                 type="date"
@@ -343,7 +351,7 @@ export function LandingHero() {
               />
             </div>
             <div>
-              <Label htmlFor="hero-time">Horario</Label>
+              <Label htmlFor="hero-time">{text("Horario", "Time")}</Label>
               <input
                 id="hero-time"
                 type="time"
@@ -353,7 +361,7 @@ export function LandingHero() {
               />
             </div>
             <div>
-              <Label htmlFor="hero-passengers">Pasajeros</Label>
+              <Label htmlFor="hero-passengers">{text("Pasajeros", "Passengers")}</Label>
               <input
                 id="hero-passengers"
                 type="number"
@@ -366,21 +374,21 @@ export function LandingHero() {
             </div>
           </div>
 
-          <Button type="submit" className="mt-4 w-full sm:w-auto">
-            <Search /> Cotizar traslado
+          <Button type="submit" className="mt-5 w-full rounded-none bg-[var(--mkt-coral)] sm:w-auto">
+            <Search /> {text("Cotizar traslado", "Get quote")}
           </Button>
 
           {estimate && (
-            <div className="mt-4 rounded-xl border border-border bg-surface-soft p-4">
-              <p className="text-sm text-muted-foreground">{estimate.label}</p>
-              <p className="mt-1 font-heading text-2xl font-bold text-primary">
-                {estimate.currency === "MXN" ? formatMXN(estimate.total) : formatUSD(estimate.total)}
+            <div className="mt-4 flex flex-col justify-between gap-4 border-t border-white/20 pt-4 text-white sm:flex-row sm:items-end">
+              <div><p className="text-sm text-white/55">{estimate.label}</p>
+              <p className="mt-1 font-heading text-3xl font-medium text-white">
+                {money(estimate.total, estimate.currency)}
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Estimado ilustrativo, sujeto a confirmación en tu reservación.
-              </p>
-              <Button type="button" onClick={onContinue} className="mt-3 w-full sm:w-auto">
-                Continuar con mi reserva
+              <p className="mt-1 text-xs text-white/45">
+                {text("Estimado ilustrativo, sujeto a confirmación en tu reservación.", "Illustrative estimate, subject to confirmation when booking.")}
+              </p></div>
+              <Button type="button" onClick={onContinue} className="w-full rounded-none bg-white text-[var(--mkt-ink)] hover:bg-[var(--mkt-bg)] sm:w-auto">
+                {text("Continuar con mi reserva", "Continue booking")}
               </Button>
             </div>
           )}

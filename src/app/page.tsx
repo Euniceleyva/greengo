@@ -8,16 +8,17 @@ import { LandingHowItWorks } from "@/components/landing/landing-how-it-works";
 import { LandingTestimonials } from "@/components/landing/landing-testimonials";
 import { LandingFaq } from "@/components/landing/landing-faq";
 import { LandingFooter } from "@/components/landing/landing-footer";
+import { LandingMotion } from "@/components/landing/landing-motion";
 
 export const metadata: Metadata = {
-  title: "GreenGo Traslados — Transporte turístico en Cancún",
+  title: "Marea — Tu llegada al Caribe, en calma",
   description:
     "Traslados turísticos en Cancún y la Riviera Maya: aeropuerto, hotel a hotel, transporte abierto y soluciones a medida. Cotiza y reserva en minutos.",
   openGraph: {
-    title: "GreenGo Traslados — Transporte turístico en Cancún",
+    title: "Marea — Tu llegada al Caribe, en calma",
     description:
-      "Traslados turísticos en Cancún y la Riviera Maya: aeropuerto, hotel a hotel, transporte abierto y soluciones a medida.",
-    images: ["/images/destinations/cancun.jpg"],
+      "Traslados privados y experiencias en Cancún y la Riviera Maya.",
+    images: ["/images/destinations/cancun.webp"],
     locale: "es_MX",
     type: "website",
   },
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background">
+    <LandingMotion>
       <LandingHeader />
       <main>
         <LandingHero />
@@ -37,6 +38,6 @@ export default function HomePage() {
         <LandingFaq />
       </main>
       <LandingFooter />
-    </div>
+    </LandingMotion>
   );
 }

@@ -10,12 +10,13 @@ import { useHydrated } from "@/lib/hooks";
 import { LOCATIONS } from "@/mocks/locations";
 import { getFareBreakdown, CUSTOM_QUOTE_LABEL } from "@/mocks/pricing";
 import { SERVICE_TYPE_LABELS } from "@/constants";
-import { formatMXN } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/misc";
+import { usePublicLocale } from "@/components/shared/public-locale";
 
 export function ConfirmationClient() {
+  const { text, money, locale } = usePublicLocale();
   const hydrated = useHydrated();
   const router = useRouter();
 
@@ -84,9 +85,9 @@ export function ConfirmationClient() {
   if (!confirmedFolio && !hasDraft) {
     return (
       <Card className="p-6 text-center sm:p-8">
-        <p className="text-sm text-muted-foreground">No encontramos información de una reservación reciente.</p>
+        <p className="text-sm text-muted-foreground">{text("No encontramos información de una reservación reciente.", "We could not find a recent booking.")}</p>
         <Link href="/reservar" className="mt-4 inline-block">
-          <Button>Iniciar una reservación</Button>
+          <Button>{text("Iniciar una reservación", "Start a booking")}</Button>
         </Link>
       </Card>
     );
@@ -108,45 +109,45 @@ export function ConfirmationClient() {
 
   return (
     <div className="space-y-6">
-      <Card className="flex flex-col items-center p-8 text-center">
+      <Card className="marketing-panel flex flex-col items-center rounded-none p-8 text-center">
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-success-soft text-success">
           <CheckCircle2 className="h-8 w-8" aria-hidden />
         </div>
-        <h1 className="mt-4 font-heading text-2xl font-bold text-foreground">¡Reservación confirmada!</h1>
+        <h1 className="mt-4 font-heading text-2xl font-bold text-foreground">{text("¡Reservación confirmada!", "Booking confirmed!")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Te enviaremos la confirmación al correo proporcionado (simulado, sin envío real).
+          {text("Te enviaremos la confirmación al correo proporcionado (simulado, sin envío real).", "We will send confirmation to your email address (simulated; no email is sent).")}
         </p>
         <p className="mt-4 rounded-lg bg-surface-soft px-4 py-2 font-heading text-lg font-bold text-primary">
           {confirmedFolio}
         </p>
       </Card>
 
-      <Card className="p-6 sm:p-8">
-        <h2 className="font-heading text-lg font-semibold text-foreground">Resumen del viaje</h2>
+      <Card className="marketing-panel rounded-none p-6 sm:p-8">
+        <h2 className="font-heading text-lg font-semibold text-foreground">{text("Resumen del viaje", "Trip summary")}</h2>
         <dl className="mt-4 grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
-          <SummaryRow label="Servicio" value={SERVICE_TYPE_LABELS[serviceType]} />
-          <SummaryRow label="Sentido" value={draft.direction === "redondo" ? "Redondo" : "Sencillo"} />
-          <SummaryRow label="Origen" value={origin?.name ?? "—"} />
-          <SummaryRow label="Destino" value={destination?.name ?? "—"} />
-          <SummaryRow label="Fecha y hora" value={`${draft.date} · ${draft.time}`} />
-          <SummaryRow label="Pasajeros" value={String(draft.passengers)} />
-          <SummaryRow label="Contacto" value={draft.contactName} />
-          <SummaryRow label="Correo" value={draft.contactEmail} />
+          <SummaryRow label={text("Servicio", "Service")} value={locale === "es" ? SERVICE_TYPE_LABELS[serviceType] : ({hotel_hotel:"Hotel to hotel",aeropuerto:"Airport transfer",transporte_abierto:"Driver by the hour",a_medida:"Custom solution"} as Record<string,string>)[serviceType]} />
+          <SummaryRow label={text("Sentido", "Trip type")} value={draft.direction === "redondo" ? text("Redondo", "Round trip") : text("Sencillo", "One way")} />
+          <SummaryRow label={text("Origen", "Pickup")} value={origin?.name ?? "—"} />
+          <SummaryRow label={text("Destino", "Destination")} value={destination?.name ?? "—"} />
+          <SummaryRow label={text("Fecha y hora", "Date and time")} value={`${draft.date} · ${draft.time}`} />
+          <SummaryRow label={text("Pasajeros", "Passengers")} value={String(draft.passengers)} />
+          <SummaryRow label={text("Contacto", "Contact")} value={draft.contactName} />
+          <SummaryRow label={text("Correo", "Email")} value={draft.contactEmail} />
         </dl>
         <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
-          <span className="font-heading font-semibold text-foreground">Total pagado</span>
+          <span className="font-heading font-semibold text-foreground">{text("Total pagado", "Total paid")}</span>
           <span className="font-heading text-xl font-bold text-primary">
-            {fare.isCustomQuote ? CUSTOM_QUOTE_LABEL : formatMXN(fare.total)}
+            {fare.isCustomQuote ? text(CUSTOM_QUOTE_LABEL, "Custom quote") : money(fare.total)}
           </span>
         </div>
       </Card>
 
       <p className="text-center text-xs text-muted-foreground">
-        Esta reservación ya aparece en el panel administrativo del DEMO (Servicios / Viajes).
+        {text("Esta reservación ya aparece en el panel administrativo del DEMO (Servicios / Viajes).", "This booking now appears in the demo administration panel.")}
       </p>
 
       <div className="flex justify-center">
-        <Button onClick={onBackHome}>Volver al inicio</Button>
+        <Button onClick={onBackHome}>{text("Volver al inicio", "Back home")}</Button>
       </div>
     </div>
   );
