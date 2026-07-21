@@ -347,6 +347,54 @@
 .adventure-related-card--2 { grid-column: 5 / span 4; margin-top: 2rem; transform: rotate(1deg); }
 .adventure-related-card--3 { grid-column: 9 / span 4; transform: rotate(-.5deg); }
 
+.adventure-checkout { min-height: 100vh; background: var(--adventure-sand); }
+.adventure-checkout__header { border-bottom: 3px solid var(--adventure-night); background: var(--adventure-sun); }
+.adventure-checkout__secure { display: flex; align-items: center; gap: .45rem; font-size: .75rem; font-weight: 1000; text-transform: uppercase; }
+.adventure-checkout__secure svg { width: 1rem; }
+.adventure-checkout__intro { display: grid; grid-template-columns: 210px minmax(0,1fr) 100px; align-items: end; gap: 2rem; margin-bottom: 2.5rem; }
+.adventure-checkout__intro > div > p { margin-bottom: .55rem; font-size: .72rem; font-weight: 1000; letter-spacing: .035em; }
+.adventure-checkout__intro h1 { max-width: 760px; font-size: clamp(2.15rem,5vw,4.5rem); line-height: .98; }
+.adventure-checkout__back { display: inline-flex; align-items: center; gap: .45rem; padding-bottom: .25rem; font-size: .82rem; font-weight: 900; }
+.adventure-checkout__back svg { width: 1rem; transition: transform 160ms ease; }
+.adventure-checkout__back:hover svg { transform: translateX(-4px); }
+.adventure-checkout__layout { display: grid; grid-template-columns: minmax(280px,.72fr) minmax(0,1.28fr); grid-template-areas: "notice notice" "receipt payment"; align-items: start; gap: 1.5rem; }
+.adventure-demo-notice { grid-area: notice; display: flex; align-items: flex-start; gap: .75rem; border: 2px solid var(--adventure-night); background: var(--adventure-caribbean); padding: .9rem 1rem; color: var(--adventure-night); font-size: .85rem; box-shadow: 3px 3px 0 var(--adventure-night); }
+.adventure-checkout-receipt { grid-area: receipt; position: sticky; top: 1.5rem; overflow: visible !important; border: 3px solid var(--adventure-night) !important; border-radius: 4px !important; background: var(--adventure-sun) !important; box-shadow: 7px 8px 0 var(--adventure-night) !important; transform: rotate(-.6deg); }
+.adventure-checkout-receipt::before,
+.adventure-checkout-receipt::after { position: absolute; top: 102px; width: 23px; height: 23px; border: 3px solid var(--adventure-night); border-radius: 50%; background: var(--adventure-sand); content: ""; }
+.adventure-checkout-receipt::before { left: -14px; }
+.adventure-checkout-receipt::after { right: -14px; }
+.adventure-checkout-receipt__heading { display: flex; align-items: start; justify-content: space-between; gap: 1rem; border-bottom: 2px dashed var(--adventure-night); padding-bottom: 1.2rem; }
+.adventure-checkout-receipt__heading span,
+.adventure-payment-heading span { font-size: .68rem; font-weight: 1000; letter-spacing: .04em; }
+.adventure-checkout-receipt__heading h2,
+.adventure-payment-heading h2 { margin-top: .2rem; font-size: 1.55rem; }
+.adventure-checkout-receipt__heading strong { border: 2px solid var(--adventure-night); padding: .35rem; font-size: .66rem; }
+.adventure-checkout-summary { display: grid; gap: 1rem; }
+.adventure-checkout-summary > div { border-bottom: 1px solid color-mix(in srgb, var(--adventure-night) 30%, transparent); padding-bottom: .7rem; }
+.adventure-checkout-summary dt { color: color-mix(in srgb, var(--adventure-night) 72%, transparent); font-size: .7rem; font-weight: 900; text-transform: uppercase; }
+.adventure-checkout-summary dd { margin-top: .18rem; font-size: .9rem; font-weight: 900; line-height: 1.35; }
+.adventure-checkout-total { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-top: 1.4rem; border-top: 3px solid var(--adventure-night); padding-top: 1rem; }
+.adventure-checkout-total span { font-weight: 900; }
+.adventure-checkout-total strong { font-family: var(--font-adventure-display); font-size: 1.45rem; }
+.adventure-checkout-receipt__foot { margin-top: 1.5rem; text-align: center; font-size: .65rem; font-weight: 1000; text-transform: uppercase; }
+.adventure-checkout-panel { grid-area: payment; border: 3px solid var(--adventure-night) !important; border-radius: 8px !important; background: var(--adventure-foam) !important; box-shadow: 7px 8px 0 var(--adventure-night) !important; }
+.adventure-payment-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.adventure-payment-heading > svg { width: 2.6rem; height: 2.6rem; border: 2px solid var(--adventure-night); border-radius: 50%; padding: .55rem; background: var(--adventure-sun); }
+.adventure-payment-methods { display: grid; grid-template-columns: repeat(3,1fr); gap: .75rem; }
+.adventure-payment-method { display: flex; min-height: 74px; align-items: center; justify-content: center; gap: .55rem; border: 2px solid var(--adventure-night); border-radius: 4px; padding: .8rem; background: var(--adventure-foam); font-size: .82rem; font-weight: 900; box-shadow: 2px 2px 0 var(--adventure-night); transition: transform 160ms cubic-bezier(.22,1,.36,1), background 160ms ease, box-shadow 160ms ease; }
+.adventure-payment-method:hover { transform: translateY(-2px); box-shadow: 3px 4px 0 var(--adventure-night); }
+.adventure-payment-method:active { transform: translateY(1px); box-shadow: 1px 1px 0 var(--adventure-night); }
+.adventure-payment-method--selected { background: var(--adventure-caribbean); color: var(--adventure-night); }
+.adventure-payment-method svg { width: 1.15rem; }
+.adventure-checkout-panel input:not([type="checkbox"]) { border: 2px solid var(--adventure-night) !important; border-radius: 4px !important; background: white !important; box-shadow: 2px 2px 0 color-mix(in srgb, var(--adventure-night) 25%, transparent); font-weight: 750; }
+.adventure-checkout-panel input[type="checkbox"] { accent-color: var(--adventure-coral); }
+.adventure-payment-note { border: 2px dashed var(--adventure-night); background: var(--adventure-sand); padding: 1rem; color: var(--adventure-night); font-size: .88rem; font-weight: 700; }
+.adventure-payment-error { border: 2px solid hsl(var(--destructive)); background: hsl(var(--destructive-soft)); }
+.adventure-payment-action { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-top: 2px dashed var(--adventure-night); padding-top: 1.25rem; }
+.adventure-payment-action > p { display: flex; align-items: center; gap: .4rem; max-width: 30ch; color: hsl(var(--muted-foreground)); font-size: .72rem; font-weight: 750; }
+.adventure-payment-action > p svg { width: .9rem; flex: none; }
+
 @media (max-width: 900px) {
   .adventure-hero { min-height: 0; }
   .adventure-hero__layout { grid-template-columns: 1fr; grid-template-areas: "copy" "media" "quote"; gap: 2rem; }
@@ -364,6 +412,10 @@
   .adventure-testimonial-wall { grid-template-columns: 1fr 1fr; }
   .adventure-testimonial-note:nth-child(3) { grid-column: 1 / -1; width: 65%; justify-self: center; }
   .adventure-destination-story > div > div:first-child { grid-column: auto; }
+  .adventure-checkout__intro { grid-template-columns: 160px 1fr; }
+  .adventure-checkout__intro .adventure-stamp { display: none; }
+  .adventure-checkout__layout { grid-template-columns: 1fr; grid-template-areas: "notice" "receipt" "payment"; }
+  .adventure-checkout-receipt { position: static; transform: none; }
 }
 
 @media (max-width: 640px) {
@@ -404,6 +456,14 @@
   .adventure-destination-ticket::after { display: none; }
   .adventure-related__grid { display: flex; flex-direction: column; }
   .adventure-related-card { margin-top: 0; }
+  .adventure-checkout__secure { font-size: 0; }
+  .adventure-checkout__secure svg { width: 1.2rem; height: 1.2rem; }
+  .adventure-checkout__intro { grid-template-columns: 1fr; gap: 1.1rem; }
+  .adventure-checkout__back { order: 2; }
+  .adventure-payment-methods { grid-template-columns: 1fr; }
+  .adventure-payment-method { min-height: 54px; justify-content: flex-start; }
+  .adventure-payment-action { align-items: stretch; flex-direction: column; }
+  .adventure-payment-action button { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {

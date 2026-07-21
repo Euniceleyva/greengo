@@ -17,7 +17,7 @@ export function PaymentMethodSelector({
   onChange: (method: CheckoutMethod) => void;
 }) {
   return (
-    <div role="radiogroup" aria-label="Método de pago" className="grid grid-cols-3 gap-3">
+    <div role="radiogroup" aria-label="Método de pago" className="adventure-payment-methods">
       {METHODS.map(({ id, label, icon: Icon }) => {
         const selected = value === id;
         return (
@@ -28,10 +28,10 @@ export function PaymentMethodSelector({
             aria-checked={selected}
             onClick={() => onChange(id)}
             className={cn(
-              "flex min-h-[44px] flex-col items-center gap-2 rounded-xl border p-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              "adventure-payment-method",
               selected
-                ? "border-primary bg-primary-soft text-primary"
-                : "border-border bg-card text-foreground hover:bg-secondary",
+                ? "adventure-payment-method--selected"
+                : "text-foreground",
             )}
           >
             <Icon className="h-5 w-5" aria-hidden />
