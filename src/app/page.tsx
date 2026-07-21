@@ -12,14 +12,14 @@ import { LandingMotion } from "@/components/landing/landing-motion";
 import { PublicLanguageProvider } from "@/components/shared/public-language";
 
 export const metadata: Metadata = {
-  title: "Marea Club — Tu aventura comienza en el camino",
+  title: "GreenGo Transfers Cancún — Tu aventura comienza en el camino",
   description:
     "Traslados turísticos en Cancún y la Riviera Maya: aeropuerto, hotel a hotel, transporte abierto y soluciones a medida. Cotiza y reserva en minutos.",
   openGraph: {
-    title: "Marea Club — Traslados en Cancún y Riviera Maya",
+    title: "GreenGo Transfers Cancún — Traslados en Cancún y Riviera Maya",
     description:
       "Traslados turísticos en Cancún y la Riviera Maya: aeropuerto, hotel a hotel, transporte abierto y soluciones a medida.",
-    images: ["/images/destinations/cancun.jpg"],
+    images: ["/images/destinations/cancun.webp"],
     locale: "es_MX",
     type: "website",
   },

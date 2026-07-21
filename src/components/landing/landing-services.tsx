@@ -12,25 +12,25 @@ const SERVICES: {
     type: "hotel_hotel",
     icon: Building2,
     title: "Hotel a hotel",
-    description: "Traslados directos entre hoteles de Cancún y la Riviera Maya, sin escalas ni transbordos.",
+    description: "Cambia de hotel sin perder tiempo: te recogemos en la puerta y te dejamos directo en la siguiente, sin escalas ni transbordos.",
   },
   {
     type: "aeropuerto",
     icon: Plane,
     title: "Aeropuerto ↔ hotel",
-    description: "Recepción en el aeropuerto con seguimiento de tu vuelo, o traslado directo a tu próximo destino.",
+    description: "Seguimos tu vuelo en tiempo real: te esperamos en llegadas con letrero, o te llevamos al aeropuerto con margen de sobra.",
   },
   {
     type: "transporte_abierto",
     icon: Car,
     title: "Transporte abierto",
-    description: "Renta de vehículo con chofer por el tiempo que necesites, ideal para explorar a tu ritmo.",
+    description: "Un vehículo con chofer a tu disposición por horas o por el día completo, para ir de playa en playa a tu propio ritmo.",
   },
   {
     type: "a_medida",
     icon: Sparkles,
     title: "Soluciones a medida",
-    description: "Servicios personalizados, recepción especial y descuentos para grupos y ocasiones particulares.",
+    description: "Grupos grandes, bodas o recepciones especiales: armamos un plan de transporte hecho a la medida de tu ocasión.",
   },
 ];
 

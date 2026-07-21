@@ -180,7 +180,7 @@ export function LandingHero() {
           <div data-hero-sticker className="adventure-stamp adventure-stamp--sun">CUN · MX<br />365 días de sol</div>
           <p className="adventure-kicker">El traslado es el primer capítulo</p>
           <h1 className="adventure-hero__title" aria-label="Aterriza. Sube. Empieza la aventura.">
-            <span className="adventure-word-mask"><span data-hero-word>Aterriza.</span></span>
+            <span className="adventure-word-mask"><span data-hero-word className="normal-case">Aterriza.</span></span>
             <span className="adventure-word-mask"><span data-hero-word className="text-[var(--adventure-sun)]">Sube.</span></span>
             <span className="adventure-word-mask"><span data-hero-word>Empieza la</span></span>
             <span className="adventure-word-mask"><span data-hero-word className="adventure-title-stroke">aventura.</span></span>
@@ -195,15 +195,17 @@ export function LandingHero() {
 
         <div data-hero-media className="adventure-hero__media">
           <video
-            src="/images/hero-cancun.mp4"
-            poster="/images/destinations/cancun.jpg"
+            poster="/images/destinations/cancun.webp"
             autoPlay
             muted
             loop
             playsInline
             aria-label="Costa turquesa de Cancún vista desde el aire"
             className="h-full w-full object-cover"
-          />
+          >
+            <source src="/images/hero-cancun.webm" type="video/webm" />
+            <source src="/images/hero-cancun-optimizado.mp4" type="video/mp4" />
+          </video>
           <div className="adventure-hero__media-label"><MapPin aria-hidden /> Cancún → donde empiece tu plan</div>
           <div data-hero-sticker data-hero-float className="adventure-sticker adventure-sticker--coral">PLAYA<br />MODE</div>
         </div>

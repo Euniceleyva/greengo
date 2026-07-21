@@ -15,13 +15,13 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const destination = destinationBySlug(params.slug);
-  if (!destination) return { title: "Destino no encontrado — Marea Club" };
+  if (!destination) return { title: "Destino no encontrado — GreenGo Transfers Cancún" };
 
   return {
-    title: `${destination.name} — Marea Club`,
+    title: `${destination.name} — GreenGo Transfers Cancún`,
     description: destination.shortDescription,
     openGraph: {
-      title: `${destination.name} — Marea Club`,
+      title: `${destination.name} — GreenGo Transfers Cancún`,
       description: destination.shortDescription,
       images: [destination.image],
       locale: "es_MX",

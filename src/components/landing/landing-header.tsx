@@ -7,6 +7,7 @@ import { ArrowUpRight, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LanguageSwitch } from "@/components/shared/public-language";
+import { Logo } from "@/components/landing/ui/logo";
 
 const NAV_LINKS = [
   { href: "#servicios", label: "Servicios" },
@@ -37,9 +38,7 @@ export function LandingHeader() {
       )}
     >
       <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-10">
-        <Link href="/" className="adventure-wordmark" aria-label="Marea Club, inicio">
-          Marea<span>Club</span>
-        </Link>
+        <Logo variant="dark" priority imgClassName="h-11 w-auto sm:h-12" />
 
         <nav className="hidden items-center gap-8 md:flex" aria-label="Navegación principal">
           {NAV_LINKS.map((link) => (

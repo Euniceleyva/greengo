@@ -108,12 +108,12 @@
 
 /* Public experience: isolated from admin and driver surfaces. */
 .adventure-theme {
-  --adventure-caribbean: #05b8c8;
-  --adventure-sun: #ffd83d;
-  --adventure-coral: #ff675d;
-  --adventure-night: #102a43;
-  --adventure-sand: #f3e5c2;
-  --adventure-foam: #fffdf7;
+  --adventure-caribbean: #93d9d9;
+  --adventure-sun: #9cc52c;
+  --adventure-coral: #eaa33d;
+  --adventure-night: #222222;
+  --adventure-sand: #faefdd;
+  --adventure-foam: #fefcf9;
   --background: 43 65% 86%;
   --foreground: 209 61% 16%;
   --card: 48 100% 98%;
@@ -148,8 +148,8 @@
 .adventure-theme h1,
 .adventure-theme h2,
 .adventure-theme h3 {
-  font-family: var(--font-adventure-display), Impact, sans-serif;
-  font-weight: 400;
+  font-family: var(--font-adventure-display), sans-serif;
+  font-weight: 600;
   letter-spacing: -0.015em;
   text-wrap: balance;
 }
@@ -169,7 +169,17 @@
 }
 .adventure-wordmark span { display: inline-block; margin-left: .2rem; color: var(--adventure-coral); transform: rotate(-3deg); }
 .adventure-header { margin-bottom: -72px; color: var(--adventure-night); }
-.adventure-header--scrolled { background: color-mix(in srgb, var(--adventure-sand) 92%, transparent); box-shadow: 0 2px 0 var(--adventure-night); backdrop-filter: blur(10px); }
+.adventure-header--scrolled { background: var(--adventure-sand); box-shadow: 0 2px 0 var(--adventure-night); backdrop-filter: blur(10px); }
+
+/* Compensa la altura del header sticky (72px) para que los títulos de las
+   secciones ancladas por el menú no queden ocultos/superpuestos debajo de él
+   al navegar por anclas (#servicios, #destinos, #como-funciona, #contacto). */
+#servicios,
+#destinos,
+#como-funciona,
+#contacto {
+  scroll-margin-top: 96px;
+}
 .adventure-nav-link { position: relative; color: var(--adventure-night); font-size: .83rem; font-weight: 900; }
 .adventure-nav-link::after { content: ""; position: absolute; inset: auto 0 -.35rem; height: 3px; background: var(--adventure-coral); transform: scaleX(0); transform-origin: right; transition: transform 180ms cubic-bezier(.22,1,.36,1); }
 .adventure-nav-link:hover::after { transform: scaleX(1); transform-origin: left; }
@@ -215,7 +225,7 @@
 .adventure-stamp { display: inline-grid; place-items: center; border: 3px double currentColor; padding: .7rem .9rem; font-size: .72rem; font-weight: 1000; line-height: 1.12; text-align: center; text-transform: uppercase; transform: rotate(-5deg); }
 .adventure-stamp--sun { position: absolute; top: 0; right: 1rem; color: var(--adventure-night); background: var(--adventure-sun); }
 .adventure-stamp--passport { color: var(--adventure-coral); border-radius: 50%; padding: 1.1rem .8rem; }
-.adventure-hero__route { position: absolute; top: 400px; left: 25%; z-index: 4; width: 50%; overflow: visible; pointer-events: none; }
+.adventure-hero__route { position: absolute; top: 400px; left: 43%; z-index: 4; width: 54%; overflow: visible; pointer-events: none; }
 .adventure-hero__route path { stroke: var(--adventure-sun); stroke-width: 7; stroke-linecap: round; stroke-dasharray: 14 13; filter: drop-shadow(2px 2px 0 var(--adventure-night)); }
 .adventure-hero__route circle { fill: var(--adventure-coral); stroke: var(--adventure-night); stroke-width: 4; }
 .adventure-quote { grid-area: quote; position: relative; z-index: 5; width: min(980px, 92%); margin: -2.5rem auto 0; background: var(--adventure-foam); border: 3px solid var(--adventure-night); box-shadow: 9px 10px 0 var(--adventure-night); transform: rotate(-.35deg); will-change: transform, opacity; }
@@ -249,10 +259,22 @@
 .adventure-destination-story > div > div:first-child h2 { font-size: clamp(2.3rem, 5vw, 4.9rem); line-height: .98; }
 .adventure-section-heading p { max-width: 52ch; margin-top: 1rem; font-size: 1.08rem; font-weight: 700; }
 .adventure-margin-note { align-self: center; border-top: 2px solid var(--adventure-night); padding-top: .8rem; font-size: .82rem !important; font-weight: 900 !important; }
-.adventure-carousel-frame { position: relative; border: 12px solid var(--adventure-foam); border-bottom-width: 46px; box-shadow: 7px 8px 0 var(--adventure-night); transform: rotate(-.7deg); }
+.adventure-gallery-split { display: grid; grid-template-columns: minmax(0,1.05fr) minmax(260px,.8fr); align-items: center; gap: 3.5rem 3rem; }
+.adventure-carousel-frame { position: relative; width: 100%; border: 8px solid var(--adventure-foam); border-bottom-width: 32px; box-shadow: 6px 7px 0 var(--adventure-night); transform: rotate(-.7deg); }
 .adventure-carousel-frame [class*="rounded"] { border-radius: 0 !important; }
 .adventure-photo-caption { position: absolute; bottom: -35px; left: 1rem; font-size: .78rem; font-weight: 1000; }
 .adventure-tape { position: absolute; top: -28px; left: 50%; z-index: 5; width: 130px; height: 34px; background: rgba(255,216,61,.78); transform: translateX(-50%) rotate(2deg); }
+
+.adventure-reasons__kicker { margin-bottom: 1.1rem; font-weight: 1000; letter-spacing: .03em; text-transform: uppercase; color: var(--adventure-coral); font-size: .82rem; }
+.adventure-reason-list { display: flex; flex-direction: column; gap: .9rem; }
+.adventure-reason { display: flex; align-items: center; gap: .85rem; border: 2px solid var(--adventure-night); background: var(--adventure-foam); padding: .85rem 1.1rem; font-weight: 800; font-size: .95rem; box-shadow: 3px 3px 0 var(--adventure-night); transition: transform 160ms cubic-bezier(.22,1,.36,1), box-shadow 160ms ease; }
+.adventure-reason:nth-child(even) { transform: rotate(-.6deg); }
+.adventure-reason:nth-child(odd) { transform: rotate(.6deg); }
+.adventure-reason:hover { transform: translate(-2px,-2px) rotate(0deg); box-shadow: 5px 5px 0 var(--adventure-night); }
+.adventure-reason__icon { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; flex-shrink: 0; border-radius: 50%; color: white; }
+.adventure-reason__icon svg { width: 16px; height: 16px; stroke-width: 3; }
+.adventure-reason__icon--green { background: var(--adventure-sun); }
+.adventure-reason__icon--blue { background: var(--adventure-caribbean); }
 
 .adventure-services { background: var(--adventure-night); color: var(--adventure-foam); }
 .adventure-services__intro { display: grid; grid-template-columns: minmax(0,1.3fr) minmax(280px,.7fr); align-items: end; gap: 3rem; }
@@ -458,6 +480,7 @@
   .adventure-margin-note,
   .adventure-itinerary__heading > p { grid-column: 2; }
   .adventure-destination-grid { gap: 1.4rem; }
+  .adventure-gallery-split { grid-template-columns: 1fr; gap: 2.5rem; }
   .adventure-itinerary__steps { grid-template-columns: 1fr 1fr; gap: 2rem; }
   .adventure-itinerary__steps::before { display: none; }
   .adventure-testimonial-wall { grid-template-columns: 1fr 1fr; }

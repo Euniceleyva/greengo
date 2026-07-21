@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bungee, Inter, Nunito_Sans, Poppins } from "next/font/google";
+import { Fredoka, Inter, Lexend, Poppins } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { WhatsAppSticky } from "@/components/shared/whatsapp-sticky";
@@ -18,15 +18,18 @@ const fontBody = Inter({
   display: "swap",
 });
 
-const adventureDisplay = Bungee({
+// Tipografía del sitio público (Landing / Reservar / Pago / Destinos).
+// Fredoka para titulares y acentos; Lexend para texto funcional/formularios.
+const adventureDisplay = Fredoka({
   subsets: ["latin"],
-  weight: "400",
+  weight: ["500", "600", "700"],
   variable: "--font-adventure-display",
   display: "swap",
 });
 
-const adventureBody = Nunito_Sans({
+const adventureBody = Lexend({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
   variable: "--font-adventure-body",
   display: "swap",
 });

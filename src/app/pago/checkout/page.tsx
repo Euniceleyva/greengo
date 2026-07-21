@@ -3,9 +3,10 @@ import Link from "next/link";
 import { ArrowLeft, LockKeyhole } from "lucide-react";
 import { CheckoutClient } from "@/components/pago/checkout-client";
 import { LanguageSwitch, PublicLanguageProvider } from "@/components/shared/public-language";
+import { Logo } from "@/components/landing/ui/logo";
 
 export const metadata: Metadata = {
-  title: "Pago seguro — Marea Club",
+  title: "Pago seguro — GreenGo Transfers Cancún",
   description: "Pasarela de pago simulada del DEMO. No se procesa ningún pago real.",
 };
 
@@ -15,9 +16,7 @@ export default function CheckoutPage() {
     <div className="adventure-theme adventure-checkout min-h-screen bg-surface-soft">
       <header className="adventure-checkout__header">
         <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-4 sm:px-6">
-          <Link href="/" className="adventure-wordmark" aria-label="Marea Club, inicio">
-            Marea<span>Club</span>
-          </Link>
+          <Logo imgClassName="h-8 w-auto sm:h-9" />
           <div className="flex items-center gap-3">
             <LanguageSwitch compact />
             <div className="adventure-checkout__secure"><LockKeyhole aria-hidden /> Pago protegido</div>
