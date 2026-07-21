@@ -2,98 +2,85 @@
 
 import * as React from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { usePathname } from "next/navigation";
+import { ArrowUpRight, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
-  { href: "#servicios", label: "Servicios" },
-  { href: "#destinos", label: "Destinos" },
-  { href: "#como-funciona", label: "Cómo funciona" },
-  { href: "#contacto", label: "Contacto" },
+  { href: "/#servicios", label: "Servicios" },
+  { href: "/#destinos", label: "Destinos" },
+  { href: "/#como-funciona", label: "El viaje" },
+  { href: "/#contacto", label: "Contacto" },
 ];
 
 export function LandingHeader() {
-  const router = useRouter();
+  const pathname = usePathname();
   const [scrolled, setScrolled] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   React.useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  React.useEffect(() => setMobileOpen(false), [pathname]);
+
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-40 w-full transition-colors duration-200",
-        scrolled || mobileOpen
-          ? "bg-background/95 shadow-soft backdrop-blur supports-[backdrop-filter]:bg-background/80"
-          : "bg-transparent",
-      )}
-    >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2">
-          <Image src="/logo.png" alt="GreenGo Traslados" width={36} height={30} className="h-8 w-auto" priority />
-          <span className="font-heading text-lg font-bold text-foreground">GreenGo</span>
+    <header className="fixed inset-x-0 top-0 z-40 px-3 pt-3 sm:px-5 sm:pt-5">
+      <div
+        className={cn(
+          "mx-auto flex h-16 max-w-[88rem] items-center justify-between border px-4 transition-all duration-300 sm:px-6",
+          scrolled || mobileOpen
+            ? "border-[hsl(var(--marketing-line))] bg-[hsl(var(--marketing-paper)/.94)] text-[hsl(var(--marketing-ink))] shadow-[0_14px_50px_hsl(var(--marketing-shadow)/.12)] backdrop-blur-xl"
+            : "border-[hsl(var(--marketing-paper)/.2)] bg-[hsl(var(--marketing-ink)/.24)] text-[hsl(var(--marketing-paper))] backdrop-blur-md",
+        )}
+      >
+        <Link href="/" aria-label="Atria Transfers, inicio" className="flex items-baseline gap-2">
+          <span className="text-lg font-bold tracking-[-0.04em]">ATRIA</span>
+          <span className="text-[0.65rem] font-medium uppercase tracking-[0.22em] opacity-65">Cancún</span>
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex" aria-label="Navegación principal">
+        <nav className="hidden items-center gap-7 lg:flex" aria-label="Navegación principal">
           {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary"
-            >
+            <Link key={link.href} href={link.href} className="text-xs font-medium tracking-wide opacity-75 transition-opacity hover:opacity-100">
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
-        <div className="hidden md:block">
-          <Button size="md" onClick={() => router.push("/reservar")}>
-            Reservar ahora
-          </Button>
-        </div>
+        <Link
+          href="/reservar"
+          className={cn(
+            "hidden min-h-11 items-center gap-2 px-5 text-sm font-medium transition duration-200 hover:-translate-y-0.5 active:translate-y-0 sm:flex",
+            scrolled ? "bg-[hsl(var(--marketing-ink))] text-[hsl(var(--marketing-paper))]" : "bg-[hsl(var(--marketing-paper))] text-[hsl(var(--marketing-ink))]",
+          )}
+        >
+          Reservar <ArrowUpRight className="h-4 w-4" aria-hidden />
+        </Link>
 
         <button
           type="button"
-          className="flex h-11 w-11 items-center justify-center rounded-md text-foreground md:hidden"
+          className="flex h-11 w-11 items-center justify-center lg:hidden"
           aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
           aria-expanded={mobileOpen}
           aria-controls="mobile-nav"
-          onClick={() => setMobileOpen((v) => !v)}
+          onClick={() => setMobileOpen((value) => !value)}
         >
-          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
 
       {mobileOpen && (
-        <nav
-          id="mobile-nav"
-          aria-label="Navegación móvil"
-          className="flex flex-col gap-1 border-t border-border bg-background px-4 pb-4 pt-2 md:hidden"
-        >
+        <nav id="mobile-nav" aria-label="Navegación móvil" className="mx-auto max-w-[88rem] border-x border-b border-[hsl(var(--marketing-line))] bg-[hsl(var(--marketing-paper))] p-4 text-[hsl(var(--marketing-ink))] lg:hidden">
           {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileOpen(false)}
-              className="flex min-h-[44px] items-center rounded-md px-2 text-sm font-medium text-foreground/80 hover:bg-secondary hover:text-primary"
-            >
+            <Link key={link.href} href={link.href} className="flex min-h-12 items-center border-b border-[hsl(var(--marketing-line))] text-base">
               {link.label}
-            </a>
+            </Link>
           ))}
-          <Link
-            href="/reservar"
-            onClick={() => setMobileOpen(false)}
-            className="mt-2 flex min-h-[44px] items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
-          >
-            Reservar ahora
+          <Link href="/reservar" className="mt-4 flex min-h-12 items-center justify-between bg-[hsl(var(--marketing-ink))] px-4 text-[hsl(var(--marketing-paper))]">
+            Reservar traslado <ArrowUpRight className="h-4 w-4" aria-hidden />
           </Link>
         </nav>
       )}

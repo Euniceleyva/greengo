@@ -46,7 +46,7 @@ export function ChatbotWidget() {
     }
     if (option.action.kind === "whatsapp") {
       recordChoice(option.label);
-      const message = "Hola, quiero hablar con un asesor de GreenGo Traslados.";
+      const message = "Hola, quiero hablar con un asesor de Atria Transfers.";
       window.open(`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
       return;
     }
@@ -61,13 +61,13 @@ export function ChatbotWidget() {
       {isOpen && (
         <div
           role="dialog"
-          aria-label="Asistente virtual de GreenGo"
-          className="fixed bottom-40 right-5 z-40 flex h-[28rem] w-[calc(100vw-2.5rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-popover sm:bottom-44 sm:right-6"
+          aria-label="Asistente virtual de Atria"
+          className="marketing-widget fixed bottom-40 right-5 z-40 flex h-[28rem] w-[calc(100vw-2.5rem)] max-w-sm flex-col overflow-hidden rounded-none border border-border bg-card shadow-popover sm:bottom-44 sm:right-6"
         >
           <div className="flex items-center justify-between bg-primary px-4 py-3 text-primary-foreground">
             <div className="flex items-center gap-2">
               <Bot className="h-5 w-5" aria-hidden />
-              <span className="font-heading text-sm font-semibold">Asistente GreenGo</span>
+              <span className="text-sm font-semibold">Asistente Atria</span>
             </div>
             <button
               ref={closeButtonRef}
@@ -123,7 +123,7 @@ export function ChatbotWidget() {
         onClick={toggleOpen}
         aria-label={isOpen ? "Cerrar asistente virtual" : "Abrir asistente virtual"}
         aria-expanded={isOpen}
-        className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-popover transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:bottom-6 sm:right-6"
+        className="marketing-widget fixed bottom-3 right-3 z-40 flex h-12 w-12 items-center justify-center rounded-none bg-[hsl(var(--marketing-ink))] text-[hsl(var(--marketing-paper))] shadow-popover transition-transform hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"
       >
         {isOpen ? <X className="h-6 w-6" aria-hidden /> : <MessageSquareText className="h-6 w-6" aria-hidden />}
       </button>

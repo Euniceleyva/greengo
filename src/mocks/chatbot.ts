@@ -5,7 +5,7 @@ import type { ChatbotNode } from "@/types";
 export const CHATBOT_NODES: Record<string, ChatbotNode> = {
   start: {
     id: "start",
-    message: "¡Hola! Soy el asistente virtual de GreenGo Traslados. ¿En qué te puedo ayudar?",
+    message: "Hola. Soy el asistente virtual de Atria Transfers. ¿En qué te puedo ayudar?",
     options: [
       { id: "opt-cotizar", label: "Cotizar un traslado", action: { kind: "node", nodeId: "cotizar" } },
       { id: "opt-destinos", label: "Ver destinos", action: { kind: "node", nodeId: "destinos" } },

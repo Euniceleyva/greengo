@@ -120,7 +120,7 @@ export function LandingHero() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-primary">
+    <section className="marketing-grain relative flex min-h-[100dvh] flex-col overflow-hidden bg-[hsl(var(--marketing-ink))] text-[hsl(var(--marketing-paper))]">
       <video
         src="/images/hero-cancun.mp4"
         poster="/images/destinations/cancun.jpg"
@@ -129,30 +129,35 @@ export function LandingHero() {
         loop
         playsInline
         aria-hidden
-        className="absolute inset-0 h-full w-full object-cover opacity-30"
+        className="absolute inset-0 h-full w-full object-cover opacity-65 contrast-125 saturate-[.72]"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/80 to-background" aria-hidden />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_34%,transparent_0%,hsl(var(--marketing-ink)/.2)_38%,hsl(var(--marketing-ink)/.92)_100%)]" aria-hidden />
+      <div className="absolute inset-0 bg-gradient-to-b from-[hsl(var(--marketing-ink)/.16)] via-transparent to-[hsl(var(--marketing-ink)/.96)]" aria-hidden />
 
-      <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 pb-16 pt-20 text-center sm:px-6 sm:pb-24 sm:pt-28 lg:px-8">
-        <h1 className="font-heading text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-          Traslados turísticos en Cancún, sin complicaciones
+      <div className="relative mx-auto flex w-full max-w-[88rem] flex-1 flex-col items-center px-4 pb-10 pt-40 text-center sm:px-6 sm:pb-14 sm:pt-48 lg:px-8 lg:pt-52">
+        <p className="text-xs font-medium uppercase tracking-[0.24em] text-[hsl(var(--marketing-paper)/.72)]">Traslados privados · Cancún y Riviera Maya</p>
+        <h1 className="marketing-display mt-6 w-full max-w-6xl text-balance text-[clamp(3.25rem,7.2vw,7.6rem)] font-medium leading-[0.84] tracking-[-0.055em] text-[hsl(var(--marketing-paper))]">
+          La llegada ya forma parte del viaje.
         </h1>
-        <p className="mt-5 max-w-2xl text-lg text-white/90 sm:text-xl">
-          Del aeropuerto a tu hotel, entre destinos o por el tiempo que necesites — con conductores
-          profesionales y unidades listas para tu viaje.
+        <p className="mt-7 max-w-xl text-pretty text-base leading-7 text-[hsl(var(--marketing-paper)/.76)] sm:text-lg">
+          Traslados privados con conductores profesionales, seguimiento de vuelo y atención clara desde el primer minuto.
         </p>
-        <div className="mt-8">
-          <Button size="lg" onClick={() => router.push("/reservar")} className="shadow-card">
-            Reservar ahora
-          </Button>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <a href="#cotizar" className="flex min-h-12 items-center justify-center bg-[hsl(var(--marketing-paper))] px-7 text-sm font-semibold text-[hsl(var(--marketing-ink))] transition-transform hover:-translate-y-0.5 active:translate-y-0">Cotizar aquí</a>
+          <button type="button" onClick={() => router.push("/reservar")} className="min-h-12 border border-[hsl(var(--marketing-paper)/.45)] px-7 text-sm font-semibold text-[hsl(var(--marketing-paper))] transition-colors hover:bg-[hsl(var(--marketing-paper))] hover:text-[hsl(var(--marketing-ink))]">Reservar ahora</button>
         </div>
 
         <form
+          id="cotizar"
           onSubmit={onSubmit}
-          className="mt-10 w-full max-w-3xl rounded-2xl bg-card p-4 text-left shadow-popover sm:p-6"
+          className="quote-console mt-16 w-full scroll-mt-28 border border-[hsl(var(--marketing-paper)/.18)] bg-[hsl(var(--marketing-paper)/.96)] p-5 text-left text-[hsl(var(--marketing-ink))] shadow-[0_28px_80px_hsl(var(--marketing-shadow)/.35)] backdrop-blur-xl sm:p-7 lg:mt-24 lg:p-8"
           aria-label="Cotización rápida de traslado"
         >
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mb-7 flex flex-col justify-between gap-2 border-b border-[hsl(var(--marketing-line))] pb-5 sm:flex-row sm:items-end">
+            <div><p className="text-xs uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">Diseña tu llegada</p><h2 className="marketing-display mt-1 text-3xl leading-none sm:text-4xl">Cotización inmediata</h2></div>
+            <p className="max-w-xs text-xs leading-5 text-[hsl(var(--muted-foreground))]">Completa solo los datos de tu trayecto. Puedes terminar la reserva después.</p>
+          </div>
+          <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="sm:col-span-2 lg:col-span-4">
               <Label htmlFor="hero-transfer-kind">Tipo de traslado</Label>
               <Select
@@ -366,20 +371,20 @@ export function LandingHero() {
             </div>
           </div>
 
-          <Button type="submit" className="mt-4 w-full sm:w-auto">
+          <Button type="submit" className="mt-6 w-full rounded-none bg-[hsl(var(--marketing-ink))] px-6 text-[hsl(var(--marketing-paper))] transition-transform hover:-translate-y-0.5 sm:w-auto">
             <Search /> Cotizar traslado
           </Button>
 
           {estimate && (
-            <div className="mt-4 rounded-xl border border-border bg-surface-soft p-4">
+            <div className="mt-6 border-l-2 border-[hsl(var(--marketing-brass))] bg-[hsl(var(--marketing-canvas))] p-5">
               <p className="text-sm text-muted-foreground">{estimate.label}</p>
-              <p className="mt-1 font-heading text-2xl font-bold text-primary">
+              <p className="marketing-display mt-1 text-4xl font-medium text-[hsl(var(--marketing-ink))]">
                 {estimate.currency === "MXN" ? formatMXN(estimate.total) : formatUSD(estimate.total)}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 Estimado ilustrativo, sujeto a confirmación en tu reservación.
               </p>
-              <Button type="button" onClick={onContinue} className="mt-3 w-full sm:w-auto">
+              <Button type="button" onClick={onContinue} className="mt-4 w-full rounded-none bg-[hsl(var(--marketing-ink))] text-[hsl(var(--marketing-paper))] sm:w-auto">
                 Continuar con mi reserva
               </Button>
             </div>

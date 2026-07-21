@@ -1,3 +1,6 @@
+@import url("https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -58,6 +61,131 @@
 
     /* Sombras */
     --shadow-color: 163 39% 12%;
+  }
+}
+
+/* La identidad de marketing se aísla de los productos /admin y /driver. */
+.marketing-theme,
+.marketing-widget {
+  --marketing-canvas: 42 27% 92%;
+  --marketing-ink: 185 19% 8%;
+  --marketing-brass: 36 33% 56%;
+  --marketing-mist: 140 5% 74%;
+  --marketing-clay: 19 18% 39%;
+  --marketing-paper: 42 28% 95%;
+  --marketing-line: 42 13% 76%;
+  --marketing-danger: 2 58% 43%;
+  --marketing-shadow: 185 24% 6%;
+
+  --background: var(--marketing-canvas);
+  --foreground: var(--marketing-ink);
+  --card: var(--marketing-paper);
+  --card-foreground: var(--marketing-ink);
+  --popover: var(--marketing-paper);
+  --popover-foreground: var(--marketing-ink);
+  --surface-soft: 40 18% 87%;
+  --border: var(--marketing-line);
+  --input: 40 12% 68%;
+  --muted: 40 17% 86%;
+  --muted-foreground: 180 7% 34%;
+  --primary: var(--marketing-ink);
+  --primary-foreground: var(--marketing-paper);
+  --primary-soft: 38 23% 83%;
+  --secondary: 38 18% 86%;
+  --secondary-foreground: var(--marketing-ink);
+  --accent: var(--marketing-brass);
+  --accent-foreground: var(--marketing-ink);
+  --success: var(--marketing-brass);
+  --success-foreground: var(--marketing-ink);
+  --warning: var(--marketing-clay);
+  --warning-foreground: var(--marketing-paper);
+  --warning-soft: 22 22% 87%;
+  --destructive: var(--marketing-danger);
+  --ring: var(--marketing-brass);
+  --shadow-color: var(--marketing-shadow);
+  --radius: 0.2rem;
+
+  color: hsl(var(--marketing-ink));
+  font-family: "Satoshi", sans-serif;
+}
+
+.marketing-theme .font-heading,
+.marketing-widget .font-heading,
+.marketing-display {
+  font-family: "Cormorant Garamond", serif;
+}
+
+.marketing-theme {
+  min-height: 100dvh;
+  background-color: hsl(var(--marketing-canvas));
+  overflow-x: hidden;
+}
+
+.marketing-theme ::selection,
+.marketing-widget ::selection {
+  color: hsl(var(--marketing-ink));
+  background: hsl(var(--marketing-brass));
+}
+
+.marketing-grain::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  opacity: 0.16;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.28'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+}
+
+.marketing-field {
+  border-color: hsl(var(--marketing-line));
+  border-radius: 0;
+  background: transparent;
+}
+
+.quote-console input,
+.quote-console select,
+.quote-console button[aria-haspopup="listbox"] {
+  border-radius: 0;
+}
+
+.quote-console input[type="radio"] {
+  accent-color: hsl(var(--marketing-clay));
+}
+
+.marketing-theme :focus-visible,
+.marketing-widget :focus-visible {
+  outline: 2px solid hsl(var(--marketing-brass));
+  outline-offset: 3px;
+}
+
+.marketing-theme [data-motion-image] {
+  will-change: transform, opacity, filter;
+}
+
+.marketing-skip {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 60;
+  transform: translateY(-180%);
+  background: hsl(var(--marketing-paper));
+  color: hsl(var(--marketing-ink));
+  padding: 0.75rem 1rem;
+  transition: transform 180ms ease;
+}
+
+.marketing-skip:focus {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing-theme *,
+  .marketing-widget * {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

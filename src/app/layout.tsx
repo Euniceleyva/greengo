@@ -24,16 +24,16 @@ export const metadata: Metadata = {
   description:
     "DEMO frontend de gestión y monitoreo de traslados turísticos en Cancún. Datos simulados.",
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
   },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#29876B",
+  themeColor: "#111819",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

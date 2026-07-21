@@ -42,9 +42,9 @@ export function WhatsAppSticky() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Escribir por WhatsApp"
-      className="fixed bottom-24 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-success text-success-foreground shadow-popover transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:bottom-28 sm:right-6"
+      className="marketing-widget fixed bottom-20 right-3 z-40 flex h-12 w-12 items-center justify-center rounded-none bg-[hsl(var(--marketing-brass))] text-[hsl(var(--marketing-ink))] shadow-popover transition-transform hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:bottom-28 sm:right-6 sm:h-14 sm:w-14"
     >
-      <MessageCircle className="h-7 w-7" aria-hidden />
+      <MessageCircle className="h-6 w-6 sm:h-7 sm:w-7" aria-hidden />
     </a>
   );
 }

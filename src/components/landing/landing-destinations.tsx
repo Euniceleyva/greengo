@@ -1,52 +1,37 @@
-import Link from "next/link";
 import Image from "next/image";
-import { Clock, ArrowRight } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { DESTINATIONS } from "@/mocks/destinations";
 import { formatMXN } from "@/lib/utils";
 
 export function LandingDestinations() {
+  const stickyOffsets = ["top-24", "top-[7.125rem]", "top-[8.25rem]", "top-[9.375rem]"];
   return (
-    <section id="destinos" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-      <div className="mx-auto max-w-2xl text-center">
-        <h2 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">Destinos populares</h2>
-        <p className="mt-3 text-base text-muted-foreground">
-          Los lugares a los que más viajan nuestros pasajeros.
-        </p>
-      </div>
+    <section id="destinos" className="bg-[hsl(var(--marketing-paper))] px-4 py-32 sm:px-6 md:py-48 lg:px-8">
+      <div className="mx-auto max-w-[88rem]">
+        <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
+          <div className="lg:col-span-7"><h2 className="marketing-display text-balance text-[clamp(3.4rem,6.5vw,7rem)] font-medium leading-[0.86] tracking-[-0.05em]">El Caribe cambia en cada parada.</h2></div>
+          <p className="max-w-sm text-sm leading-6 text-[hsl(var(--muted-foreground))] lg:col-span-5 lg:justify-self-end">Explora las rutas más solicitadas desde el aeropuerto. El precio mostrado es una referencia inicial.</p>
+        </div>
 
-      <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {DESTINATIONS.map((destination) => (
-          <Link key={destination.slug} href={`/destinos/${destination.slug}`} className="group">
-            <Card className="h-full overflow-hidden transition-shadow group-hover:shadow-card group-focus-visible:ring-2 group-focus-visible:ring-ring">
-              <div className="relative aspect-[4/3] w-full">
-                <Image
-                  src={destination.image}
-                  alt={destination.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-              </div>
-              <div className="p-5">
-                <h3 className="font-heading text-lg font-semibold text-foreground">{destination.name}</h3>
-                <p className="mt-1.5 text-sm text-muted-foreground">{destination.shortDescription}</p>
-                <div className="mt-4 flex items-center justify-between gap-2 text-sm">
-                  <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-                    <Clock className="h-4 w-4" aria-hidden />
-                    {destination.airportMinutes} min desde el aeropuerto
-                  </span>
-                  <span className="font-semibold text-primary">
-                    Desde {formatMXN(destination.priceFrom)}
-                  </span>
+        <div className="mt-20 space-y-10 lg:space-y-0">
+          {DESTINATIONS.slice(0, 4).map((destination, index) => (
+            <article key={destination.slug} data-stack-card className={`sticky ${stickyOffsets[index]} border-t border-[hsl(var(--marketing-line))] bg-[hsl(var(--marketing-paper))] py-7 lg:py-10`}>
+              <Link href={`/destinos/${destination.slug}`} className="group grid gap-6 lg:grid-cols-12 lg:items-center">
+                <div className="relative aspect-[16/9] overflow-hidden lg:col-span-5 lg:aspect-[16/8]"><Image data-motion-image src={destination.image} alt={destination.name} fill sizes="(max-width: 1024px) 100vw, 42vw" className="object-cover transition-transform duration-700 ease-out group-hover:scale-105" /></div>
+                <div className="lg:col-span-5 lg:px-8">
+                  <p className="text-xs tabular-nums text-[hsl(var(--marketing-clay))]">0{index + 1} · {destination.airportMinutes} min desde el aeropuerto</p>
+                  <h3 className="marketing-display mt-3 text-4xl leading-none sm:text-5xl">{destination.name}</h3>
+                  <p className="mt-4 max-w-md text-sm leading-6 text-[hsl(var(--muted-foreground))]">{destination.shortDescription}</p>
                 </div>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary">
-                  Ver destino <ArrowRight className="h-4 w-4" aria-hidden />
-                </span>
-              </div>
-            </Card>
-          </Link>
-        ))}
+                <div className="flex items-center justify-between lg:col-span-2 lg:block lg:text-right">
+                  <p className="text-sm">Desde <span className="font-bold tabular-nums">{formatMXN(destination.priceFrom)}</span></p>
+                  <ArrowUpRight className="mt-4 inline h-6 w-6 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" aria-hidden />
+                </div>
+              </Link>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );
