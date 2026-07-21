@@ -25,24 +25,28 @@ const STEPS = [
 
 export function LandingHowItWorks() {
   return (
-    <section id="como-funciona" className="bg-surface-soft py-16 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">Cómo funciona</h2>
-          <p className="mt-3 text-base text-muted-foreground">Reservar tu traslado toma solo unos minutos.</p>
+    <section id="como-funciona" data-adventure-reveal className="adventure-itinerary py-20 sm:py-28">
+      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-10">
+        <div className="adventure-itinerary__heading">
+          <div data-reveal-item className="adventure-sticker adventure-sticker--sun">FÁCIL<br />FÁCIL</div>
+          <div data-reveal-item>
+            <p className="adventure-kicker">Tu itinerario</p>
+            <h2>De “ya aterricé” a “ya llegué”.</h2>
+          </div>
+          <p data-reveal-item>Cuatro paradas claras, cero vueltas innecesarias.</p>
         </div>
 
-        <ol className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="adventure-itinerary__steps mt-14">
           {STEPS.map((step, i) => (
-            <li key={step.title} className="relative flex flex-col items-center text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-card">
+            <li key={step.title} data-reveal-item>
+              <div className="adventure-itinerary__marker">
+                <span>{i + 1}</span>
                 <step.icon className="h-6 w-6" aria-hidden />
               </div>
-              <span className="mt-4 font-heading text-sm font-bold uppercase tracking-wide text-primary">
-                Paso {i + 1}
-              </span>
-              <h3 className="mt-1 font-heading text-lg font-semibold text-foreground">{step.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{step.description}</p>
+              <div>
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </div>
             </li>
           ))}
         </ol>

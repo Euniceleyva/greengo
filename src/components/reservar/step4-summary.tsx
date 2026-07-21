@@ -7,10 +7,11 @@ import { getFareBreakdown, CUSTOM_QUOTE_LABEL } from "@/mocks/pricing";
 import { SERVICE_TYPE_LABELS } from "@/constants";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/misc";
-import { formatMXN } from "@/lib/utils";
+import { LocalizedCurrency, usePublicCurrency } from "@/components/shared/public-language";
 
 export function Step4Summary() {
   const router = useRouter();
+  const formatCurrency = usePublicCurrency();
   const draft = useReservationStore((s) => s.draft);
   const setStep = useReservationStore((s) => s.setStep);
 
@@ -68,7 +69,7 @@ export function Step4Summary() {
             <tbody>
               {fare.hourlyRate ? (
                 <FareRow
-                  label={`Renta por hora (${fare.hours} h × ${formatMXN(fare.hourlyRate)})`}
+                  label={`Renta por hora (${fare.hours} h × ${formatCurrency(fare.hourlyRate)})`}
                   value={fare.base}
                 />
               ) : (
@@ -76,7 +77,7 @@ export function Step4Summary() {
               )}
               {fare.extraPassengers > 0 && (
                 <FareRow
-                  label={`Pasajeros adicionales (${fare.extraPassengers} × ${formatMXN(fare.extraPassengerFee)})`}
+                  label={`Pasajeros adicionales (${fare.extraPassengers} × ${formatCurrency(fare.extraPassengerFee)})`}
                   value={fare.extraPassengerCost}
                 />
               )}
@@ -93,7 +94,7 @@ export function Step4Summary() {
         <div className="flex items-center justify-between">
           <span className="font-heading text-base font-semibold text-foreground">Total estimado</span>
           <span className="font-heading text-xl font-bold text-primary">
-            {fare.isCustomQuote ? CUSTOM_QUOTE_LABEL : formatMXN(fare.total)}
+            {fare.isCustomQuote ? CUSTOM_QUOTE_LABEL : <LocalizedCurrency amount={fare.total} />}
           </span>
         </div>
       </div>
@@ -123,7 +124,7 @@ function FareRow({ label, value }: { label: string; value: number }) {
   return (
     <tr>
       <td className="py-1 text-muted-foreground">{label}</td>
-      <td className="py-1 text-right font-medium text-foreground">{formatMXN(value)}</td>
+      <td className="py-1 text-right font-medium text-foreground"><LocalizedCurrency amount={value} /></td>
     </tr>
   );
 }

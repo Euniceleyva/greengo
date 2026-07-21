@@ -1,32 +1,41 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import Link from "next/link";
-import Image from "next/image";
 import { ReservationWizard } from "@/components/reservar/reservation-wizard";
 import { Skeleton } from "@/components/ui/misc";
+import { LanguageSwitch, PublicLanguageProvider } from "@/components/shared/public-language";
+import { Logo } from "@/components/landing/ui/logo";
 
 export const metadata: Metadata = {
-  title: "Reservar traslado — GreenGo Traslados",
+  title: "Reserva tu ruta — GreenGo Transfers Cancún",
   description: "Cotiza y reserva tu traslado turístico en Cancún y la Riviera Maya en unos minutos.",
 };
 
 export default function ReservarPage() {
   return (
-    <div className="min-h-screen bg-surface-soft">
-      <header className="border-b border-border bg-card">
-        <div className="mx-auto flex h-16 max-w-3xl items-center px-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="GreenGo Traslados" width={32} height={27} className="h-7 w-auto" priority />
-            <span className="font-heading text-base font-bold text-foreground">GreenGo</span>
-          </Link>
+    <PublicLanguageProvider>
+    <div className="adventure-theme adventure-reservation min-h-screen bg-surface-soft">
+      <header className="adventure-reservation__header">
+        <div className="mx-auto flex h-[72px] max-w-5xl items-center justify-between px-4 sm:px-6">
+          <Logo imgClassName="h-8 w-auto sm:h-9" />
+          <div className="flex items-center gap-3">
+            <LanguageSwitch compact />
+            <span className="adventure-reservation__route">CUN → TU AVENTURA</span>
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl px-4 py-10 pb-32 sm:px-6 sm:py-14 sm:pb-32">
+      <main className="mx-auto grid max-w-5xl gap-8 px-4 py-10 pb-32 sm:px-6 sm:py-14 sm:pb-32 lg:grid-cols-[260px_1fr]">
+        <aside className="adventure-reservation__aside">
+          <span>BOARDING PASS</span>
+          <h1>Tu próximo plan empieza aquí.</h1>
+          <p>Completa la ruta a tu ritmo. Guardamos los detalles mientras avanzas.</p>
+          <div className="adventure-stamp adventure-stamp--sun">CUN<br />READY</div>
+        </aside>
         <Suspense fallback={<Skeleton className="h-96 w-full rounded-xl" />}>
           <ReservationWizard />
         </Suspense>
       </main>
     </div>
+    </PublicLanguageProvider>
   );
 }

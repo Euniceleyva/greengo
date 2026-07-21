@@ -67,7 +67,7 @@ export function ReservationWizard() {
 
   if (!hydrated || !paramsApplied) {
     return (
-      <Card className="p-6 sm:p-8">
+      <Card className="adventure-wizard p-6 sm:p-8">
         <Skeleton className="h-8 w-full" />
         <Skeleton className="mt-8 h-64 w-full" />
       </Card>
@@ -75,7 +75,7 @@ export function ReservationWizard() {
   }
 
   return (
-    <Card className="p-6 sm:p-8">
+    <Card className="adventure-wizard p-6 sm:p-8">
       <ReservationStepper current={step} />
       <h1 className="mt-8 font-heading text-2xl font-bold text-foreground">{STEP_TITLES[step]}</h1>
       <div className="mt-6">

@@ -8,16 +8,18 @@ import { LandingHowItWorks } from "@/components/landing/landing-how-it-works";
 import { LandingTestimonials } from "@/components/landing/landing-testimonials";
 import { LandingFaq } from "@/components/landing/landing-faq";
 import { LandingFooter } from "@/components/landing/landing-footer";
+import { LandingMotion } from "@/components/landing/landing-motion";
+import { PublicLanguageProvider } from "@/components/shared/public-language";
 
 export const metadata: Metadata = {
-  title: "GreenGo Traslados — Transporte turístico en Cancún",
+  title: "GreenGo Transfers Cancún — Tu aventura comienza en el camino",
   description:
     "Traslados turísticos en Cancún y la Riviera Maya: aeropuerto, hotel a hotel, transporte abierto y soluciones a medida. Cotiza y reserva en minutos.",
   openGraph: {
-    title: "GreenGo Traslados — Transporte turístico en Cancún",
+    title: "GreenGo Transfers Cancún — Traslados en Cancún y Riviera Maya",
     description:
       "Traslados turísticos en Cancún y la Riviera Maya: aeropuerto, hotel a hotel, transporte abierto y soluciones a medida.",
-    images: ["/images/destinations/cancun.jpg"],
+    images: ["/images/destinations/cancun.webp"],
     locale: "es_MX",
     type: "website",
   },
@@ -25,18 +27,22 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background">
-      <LandingHeader />
-      <main>
-        <LandingHero />
-        <LandingGalleryLazy />
-        <LandingServices />
-        <LandingDestinations />
-        <LandingHowItWorks />
-        <LandingTestimonials />
-        <LandingFaq />
-      </main>
-      <LandingFooter />
+    <PublicLanguageProvider>
+    <div className="adventure-theme min-h-screen bg-background">
+      <LandingMotion>
+        <LandingHeader />
+        <main>
+          <LandingHero />
+          <LandingGalleryLazy />
+          <LandingServices />
+          <LandingDestinations />
+          <LandingHowItWorks />
+          <LandingTestimonials />
+          <LandingFaq />
+        </main>
+        <LandingFooter />
+      </LandingMotion>
     </div>
+    </PublicLanguageProvider>
   );
 }

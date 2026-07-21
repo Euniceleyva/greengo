@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Poppins, Inter } from "next/font/google";
+import { Fredoka, Inter, Lexend, Poppins } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { WhatsAppSticky } from "@/components/shared/whatsapp-sticky";
@@ -15,6 +15,22 @@ const fontHeading = Poppins({
 const fontBody = Inter({
   subsets: ["latin"],
   variable: "--font-body",
+  display: "swap",
+});
+
+// Tipografía del sitio público (Landing / Reservar / Pago / Destinos).
+// Fredoka para titulares y acentos; Lexend para texto funcional/formularios.
+const adventureDisplay = Fredoka({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-adventure-display",
+  display: "swap",
+});
+
+const adventureBody = Lexend({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-adventure-body",
   display: "swap",
 });
 
@@ -38,7 +54,15 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={cn(fontHeading.variable, fontBody.variable)}>
+    <html
+      lang="es"
+      className={cn(
+        fontHeading.variable,
+        fontBody.variable,
+        adventureDisplay.variable,
+        adventureBody.variable,
+      )}
+    >
       <body className="font-sans antialiased">
         {children}
         <WhatsAppSticky />

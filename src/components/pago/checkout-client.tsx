@@ -3,13 +3,13 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Loader2, ShieldAlert } from "lucide-react";
+import { AlertTriangle, Loader2, LockKeyhole, ShieldAlert } from "lucide-react";
 import { useReservationStore } from "@/stores/reservation-store";
 import { useHydrated } from "@/lib/hooks";
 import { LOCATIONS } from "@/mocks/locations";
 import { getFareBreakdown, CUSTOM_QUOTE_LABEL } from "@/mocks/pricing";
 import { SERVICE_TYPE_LABELS } from "@/constants";
-import { formatMXN } from "@/lib/utils";
+import { LocalizedCurrency, usePublicCurrency } from "@/components/shared/public-language";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/misc";
@@ -22,6 +22,7 @@ const SIMULATED_DELAY_MS = 2000;
 export function CheckoutClient() {
   const hydrated = useHydrated();
   const router = useRouter();
+  const formatCurrency = usePublicCurrency();
   const draft = useReservationStore((s) => s.draft);
 
   const [method, setMethod] = React.useState<CheckoutMethod>("tarjeta");
@@ -31,7 +32,7 @@ export function CheckoutClient() {
 
   if (!hydrated) {
     return (
-      <Card className="p-6 sm:p-8">
+      <Card className="adventure-checkout-panel p-6 sm:p-8">
         <Skeleton className="h-8 w-2/3" />
         <Skeleton className="mt-6 h-48 w-full" />
       </Card>
@@ -42,10 +43,10 @@ export function CheckoutClient() {
 
   if (!hasDraft) {
     return (
-      <Card className="p-6 text-center sm:p-8">
-        <p className="text-sm text-muted-foreground">No hay ninguna reservación en curso.</p>
+      <Card className="adventure-checkout-panel p-6 text-center sm:p-8">
+        <p className="font-bold text-muted-foreground">Todavía no hay una ruta lista para pagar.</p>
         <Link href="/reservar" className="mt-4 inline-block">
-          <Button>Iniciar una reservación</Button>
+          <Button className="adventure-cta">Armar mi ruta</Button>
         </Link>
       </Card>
     );
@@ -83,33 +84,50 @@ export function CheckoutClient() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start gap-3 rounded-xl border border-warning/30 bg-warning-soft p-4 text-sm text-warning">
+    <div className="adventure-checkout__layout">
+      <div className="adventure-demo-notice">
         <ShieldAlert className="h-5 w-5 shrink-0" aria-hidden />
         <p>
-          <span className="font-semibold">Modo demostración —</span> no se procesa ningún pago real. Esta pasarela
-          es una simulación visual para la presentación del DEMO.
+          <span className="font-extrabold">Modo demostración:</span> no se procesa ningún pago real. Esta pasarela
+          simula la experiencia final.
         </p>
       </div>
 
-      <Card className="p-6 sm:p-8">
-        <h2 className="font-heading text-lg font-semibold text-foreground">Resumen de la reserva</h2>
-        <dl className="mt-4 grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
+      <Card className="adventure-checkout-receipt p-6 sm:p-7">
+        <div className="adventure-checkout-receipt__heading">
+          <div>
+            <span>RECIBO DE RUTA</span>
+            <h2>Tu reserva</h2>
+          </div>
+          <strong>CUN / 001</strong>
+        </div>
+        <dl className="adventure-checkout-summary mt-6">
           <SummaryRow label="Servicio" value={SERVICE_TYPE_LABELS[serviceType]} />
           <SummaryRow label="Ruta" value={`${origin?.name ?? "—"} → ${destination?.name ?? "—"}`} />
           <SummaryRow label="Fecha y hora" value={`${draft.date} · ${draft.time}`} />
           <SummaryRow label="Pasajeros" value={String(draft.passengers)} />
         </dl>
-        <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
-          <span className="font-heading font-semibold text-foreground">Total a pagar</span>
-          <span className="font-heading text-xl font-bold text-primary">
-            {fare.isCustomQuote ? CUSTOM_QUOTE_LABEL : formatMXN(fare.total)}
-          </span>
+        <div className="adventure-checkout-total">
+          <span>Total a pagar</span>
+          <strong>
+            {fare.isCustomQuote ? CUSTOM_QUOTE_LABEL : <LocalizedCurrency amount={fare.total} />}
+          </strong>
         </div>
+        <p className="adventure-checkout-receipt__foot">
+          Traslado · Caribe Mexicano · Buen viaje
+          <br />
+          Tasa demo: 1 USD = 17 MXN
+        </p>
       </Card>
 
-      <Card className="p-6 sm:p-8">
-        <h2 className="font-heading text-lg font-semibold text-foreground">Método de pago</h2>
+      <Card className="adventure-checkout-panel p-6 sm:p-8">
+        <div className="adventure-payment-heading">
+          <div>
+            <span>PAGO SEGURO</span>
+            <h2>¿Cómo quieres pagar?</h2>
+          </div>
+          <LockKeyhole className="h-6 w-6" aria-hidden />
+        </div>
         <div className="mt-4">
           <PaymentMethodSelector value={method} onChange={setMethod} />
         </div>
@@ -117,12 +135,12 @@ export function CheckoutClient() {
         <div className="mt-6">
           {method === "tarjeta" && <CardForm ref={cardFormRef} />}
           {method === "oxxo" && (
-            <p className="rounded-lg bg-surface-soft p-4 text-sm text-muted-foreground">
+            <p className="adventure-payment-note">
               Al confirmar, generaremos una referencia de pago para liquidar en cualquier tienda OXXO (simulado).
             </p>
           )}
           {method === "spei" && (
-            <p className="rounded-lg bg-surface-soft p-4 text-sm text-muted-foreground">
+            <p className="adventure-payment-note">
               Al confirmar, generaremos una CLABE interbancaria para realizar tu transferencia SPEI (simulado).
             </p>
           )}
@@ -139,7 +157,7 @@ export function CheckoutClient() {
         </label>
 
         {status === "rejected" && (
-          <div className="mt-4 flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive-soft p-4 text-sm text-destructive">
+          <div className="adventure-payment-error mt-4 flex items-start gap-3 p-4 text-sm text-destructive">
             <AlertTriangle className="h-5 w-5 shrink-0" aria-hidden />
             <div>
               <p className="font-semibold">Tu pago fue rechazado.</p>
@@ -148,14 +166,15 @@ export function CheckoutClient() {
           </div>
         )}
 
-        <div className="mt-6 flex justify-end">
-          <Button onClick={onPay} disabled={status === "loading"} className="min-w-[140px]">
+        <div className="adventure-payment-action mt-7">
+          <p><LockKeyhole aria-hidden /> Tus datos se usan solo para esta simulación.</p>
+          <Button onClick={onPay} disabled={status === "loading"} className="adventure-cta min-w-[168px]">
             {status === "loading" ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Procesando…
               </>
             ) : (
-              "Pagar"
+              `Pagar ${fare.isCustomQuote ? "" : formatCurrency(fare.total)}`
             )}
           </Button>
         </div>
@@ -166,9 +185,9 @@ export function CheckoutClient() {
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between gap-2 sm:block">
-      <dt className="text-muted-foreground">{label}</dt>
-      <dd className="font-medium text-foreground">{value}</dd>
+    <div>
+      <dt>{label}</dt>
+      <dd>{value}</dd>
     </div>
   );
 }
