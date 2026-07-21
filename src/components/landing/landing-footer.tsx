@@ -1,49 +1,48 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Facebook, Instagram, Mail, Phone } from "lucide-react";
 import { WHATSAPP_DISPLAY } from "@/constants";
 
 export function LandingFooter() {
   return (
-    <footer id="contacto" className="border-t border-border bg-card">
-      <div className="mx-auto max-w-7xl px-4 pb-28 pt-12 sm:px-6 sm:pb-12 lg:px-8">
+    <footer id="contacto" className="adventure-footer">
+      <div className="mx-auto max-w-[1280px] px-4 pb-28 pt-16 sm:px-6 sm:pb-12 lg:px-10">
+        <div className="adventure-footer__marquee">NOS VEMOS EN EL CARIBE · NOS VEMOS EN EL CARIBE ·</div>
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <Link href="/" className="flex items-center gap-2">
-              <Image src="/logo.png" alt="GreenGo Traslados" width={32} height={27} className="h-7 w-auto" />
-              <span className="font-heading text-base font-bold text-foreground">GreenGo</span>
+            <Link href="/" className="adventure-wordmark adventure-wordmark--footer">
+              Marea<span>Club</span>
             </Link>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Traslados turísticos en Cancún y la Riviera Maya.
+            <p className="mt-3 text-sm text-white/70">
+              El primer tramo de una gran historia en Cancún y la Riviera Maya.
             </p>
           </div>
 
           <div>
-            <h3 className="font-heading text-sm font-semibold text-foreground">Contacto</h3>
-            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+            <h3>Contacto</h3>
+            <ul className="mt-3 space-y-2 text-sm text-white/70">
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4 shrink-0" aria-hidden /> {WHATSAPP_DISPLAY}
               </li>
               <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 shrink-0" aria-hidden /> contacto@greengo.demo
+                <Mail className="h-4 w-4 shrink-0" aria-hidden /> hola@mareaclub.demo
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-heading text-sm font-semibold text-foreground">Síguenos</h3>
+            <h3>Síguenos</h3>
             <div className="mt-3 flex items-center gap-3">
               <a
                 href="#"
-                aria-label="Facebook de GreenGo Traslados"
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-foreground/70 transition-colors hover:bg-primary-soft hover:text-primary"
+                aria-label="Facebook de Marea Club"
+                className="adventure-social"
               >
                 <Facebook className="h-5 w-5" aria-hidden />
               </a>
               <a
                 href="#"
-                aria-label="Instagram de GreenGo Traslados"
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-foreground/70 transition-colors hover:bg-primary-soft hover:text-primary"
+                aria-label="Instagram de Marea Club"
+                className="adventure-social"
               >
                 <Instagram className="h-5 w-5" aria-hidden />
               </a>
@@ -51,8 +50,8 @@ export function LandingFooter() {
           </div>
 
           <div>
-            <h3 className="font-heading text-sm font-semibold text-foreground">Enlaces</h3>
-            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+            <h3>Enlaces</h3>
+            <ul className="mt-3 space-y-2 text-sm text-white/70">
               <li>
                 <a href="#servicios" className="hover:text-primary">Servicios</a>
               </li>
@@ -60,7 +59,7 @@ export function LandingFooter() {
                 <a href="#destinos" className="hover:text-primary">Destinos</a>
               </li>
               <li>
-                <Link href="/demo" className="text-muted-foreground/60 hover:text-primary">
+                <Link href="/demo" className="text-white/50 hover:text-[var(--adventure-sun)]">
                   Acceso al panel (demo)
                 </Link>
               </li>
@@ -68,11 +67,11 @@ export function LandingFooter() {
           </div>
         </div>
 
-        <div className="mt-10 border-t border-border pt-6 text-center text-xs text-muted-foreground">
+        <div className="mt-10 border-t border-white/20 pt-6 text-center text-xs text-white/55">
           <p>
             Sitio demostrativo — datos, precios y disponibilidad son simulados con fines de presentación.
           </p>
-          <p className="mt-1">© {new Date().getFullYear()} GreenGo Traslados. Todos los derechos reservados.</p>
+          <p className="mt-1">© {new Date().getFullYear()} Marea Club. Wordmark temporal.</p>
         </div>
       </div>
     </footer>

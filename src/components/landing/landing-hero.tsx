@@ -2,7 +2,9 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
+import { ArrowRight, MapPin, Search } from "lucide-react";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
 import { Button } from "@/components/ui/button";
 import { Select, Label } from "@/components/ui/input";
 import { Combobox } from "@/components/ui/combobox";
@@ -19,6 +21,8 @@ import {
 import { formatMXN } from "@/lib/utils";
 import type { HeroQuoteEstimate, TourOrigin, TransferKind } from "@/types";
 
+gsap.registerPlugin(useGSAP);
+
 const TRANSFER_KIND_LABELS: Record<TransferKind, string> = {
   hotel_hotel: "Hotel a hotel",
   hotel_aeropuerto: "Hotel a aeropuerto",
@@ -28,6 +32,7 @@ const TRANSFER_KIND_LABELS: Record<TransferKind, string> = {
 
 export function LandingHero() {
   const router = useRouter();
+  const heroRef = React.useRef<HTMLElement>(null);
 
   const [transferKind, setTransferKind] = React.useState<TransferKind>("hotel_hotel");
   const [originHotelId, setOriginHotelId] = React.useState(HOTELS[0].id);
@@ -119,40 +124,111 @@ export function LandingHero() {
     router.push(`/reservar?${params.toString()}`);
   };
 
-  return (
-    <section className="relative overflow-hidden bg-primary">
-      <video
-        src="/images/hero-cancun.mp4"
-        poster="/images/destinations/cancun.jpg"
-        autoPlay
-        muted
-        loop
-        playsInline
-        aria-hidden
-        className="absolute inset-0 h-full w-full object-cover opacity-30"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/80 to-background" aria-hidden />
+  useGSAP(
+    () => {
+      const route = heroRef.current?.querySelector<SVGPathElement>("[data-hero-route]");
+      const routeLength = route?.getTotalLength() ?? 0;
+      const mm = gsap.matchMedia();
 
-      <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 pb-16 pt-20 text-center sm:px-6 sm:pb-24 sm:pt-28 lg:px-8">
-        <h1 className="font-heading text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-          Traslados turísticos en Cancún, sin complicaciones
-        </h1>
-        <p className="mt-5 max-w-2xl text-lg text-white/90 sm:text-xl">
-          Del aeropuerto a tu hotel, entre destinos o por el tiempo que necesites — con conductores
-          profesionales y unidades listas para tu viaje.
-        </p>
-        <div className="mt-8">
-          <Button size="lg" onClick={() => router.push("/reservar")} className="shadow-card">
-            Reservar ahora
-          </Button>
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        if (route) gsap.set(route, { strokeDasharray: routeLength, strokeDashoffset: routeLength });
+
+        const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
+        intro
+          .fromTo(
+            "[data-hero-media]",
+            { clipPath: "polygon(0 0, 0 0, 0 100%, 0 100%)", scale: 1.06 },
+            { clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)", scale: 1, duration: 1.05 },
+          )
+          .from("[data-hero-word]", { yPercent: 115, rotation: 2, stagger: 0.09, duration: 0.72 }, "-=0.48");
+
+        if (route) {
+          intro.to(route, { strokeDashoffset: 0, duration: 0.9, ease: "power2.inOut" }, "-=0.36");
+        }
+
+        intro
+          .from("[data-hero-sticker]", { scale: 0.55, rotation: -18, autoAlpha: 0, stagger: 0.08, duration: 0.52 }, "-=0.42")
+          .from("[data-hero-quote]", { y: 32, rotation: 1.5, autoAlpha: 0, duration: 0.68 }, "-=0.22");
+
+        gsap.to("[data-hero-float]", {
+          y: -8,
+          rotation: 2,
+          duration: 2.8,
+          yoyo: true,
+          repeat: -1,
+          ease: "sine.inOut",
+        });
+      });
+
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.set("[data-hero-media], [data-hero-word], [data-hero-sticker], [data-hero-quote]", {
+          clearProps: "all",
+          autoAlpha: 1,
+        });
+        if (route) gsap.set(route, { strokeDashoffset: 0 });
+      });
+
+      return () => mm.revert();
+    },
+    { scope: heroRef },
+  );
+
+  return (
+    <section ref={heroRef} className="adventure-hero relative overflow-hidden">
+      <div className="adventure-hero__grain" aria-hidden />
+      <div className="adventure-hero__layout mx-auto max-w-[1440px] px-4 pb-16 pt-8 sm:px-6 lg:px-10 lg:pb-24 lg:pt-10">
+        <div className="adventure-hero__copy relative z-10">
+          <div data-hero-sticker className="adventure-stamp adventure-stamp--sun">CUN · MX<br />365 días de sol</div>
+          <p className="adventure-kicker">El traslado es el primer capítulo</p>
+          <h1 className="adventure-hero__title" aria-label="Aterriza. Sube. Empieza la aventura.">
+            <span className="adventure-word-mask"><span data-hero-word>Aterriza.</span></span>
+            <span className="adventure-word-mask"><span data-hero-word className="text-[var(--adventure-sun)]">Sube.</span></span>
+            <span className="adventure-word-mask"><span data-hero-word>Empieza la</span></span>
+            <span className="adventure-word-mask"><span data-hero-word className="adventure-title-stroke">aventura.</span></span>
+          </h1>
+          <p className="adventure-hero__lede">
+            Del avión al Caribe, sin perder el ritmo. Traslados privados para moverte por Cancún y la Riviera Maya.
+          </p>
+          <button type="button" onClick={() => router.push("/reservar")} className="adventure-text-link">
+            Armar mi ruta <ArrowRight aria-hidden />
+          </button>
         </div>
+
+        <div data-hero-media className="adventure-hero__media">
+          <video
+            src="/images/hero-cancun.mp4"
+            poster="/images/destinations/cancun.jpg"
+            autoPlay
+            muted
+            loop
+            playsInline
+            aria-label="Costa turquesa de Cancún vista desde el aire"
+            className="h-full w-full object-cover"
+          />
+          <div className="adventure-hero__media-label"><MapPin aria-hidden /> Cancún → donde empiece tu plan</div>
+          <div data-hero-sticker data-hero-float className="adventure-sticker adventure-sticker--coral">PLAYA<br />MODE</div>
+        </div>
+
+        <svg className="adventure-hero__route" viewBox="0 0 660 240" fill="none" aria-hidden>
+          <path data-hero-route d="M24 188C120 80 207 238 302 129C387 31 459 170 628 48" />
+          <circle cx="24" cy="188" r="7" />
+          <circle cx="628" cy="48" r="7" />
+        </svg>
 
         <form
           onSubmit={onSubmit}
-          className="mt-10 w-full max-w-3xl rounded-2xl bg-card p-4 text-left shadow-popover sm:p-6"
+          data-hero-quote
+          className="adventure-quote text-left"
           aria-label="Cotización rápida de traslado"
         >
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="adventure-quote__header">
+            <div>
+              <span>Salida inmediata</span>
+              <h2>Traza tu primera ruta</h2>
+            </div>
+            <span className="adventure-quote__code">CUN / 001</span>
+          </div>
+          <div className="grid gap-4 p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-4">
             <div className="sm:col-span-2 lg:col-span-4">
               <Label htmlFor="hero-transfer-kind">Tipo de traslado</Label>
               <Select
@@ -366,12 +442,13 @@ export function LandingHero() {
             </div>
           </div>
 
-          <Button type="submit" className="mt-4 w-full sm:w-auto">
-            <Search /> Cotizar traslado
-          </Button>
+          <div className="px-4 pb-4 sm:px-5 sm:pb-5">
+            <Button type="submit" className="adventure-cta w-full sm:w-auto">
+              <Search /> Ver precio de mi ruta
+            </Button>
 
           {estimate && (
-            <div className="mt-4 rounded-xl border border-border bg-surface-soft p-4">
+            <div className="adventure-estimate mt-4 p-4">
               <p className="text-sm text-muted-foreground">{estimate.label}</p>
               <p className="mt-1 font-heading text-2xl font-bold text-primary">
                 {estimate.currency === "MXN" ? formatMXN(estimate.total) : formatUSD(estimate.total)}
@@ -380,10 +457,11 @@ export function LandingHero() {
                 Estimado ilustrativo, sujeto a confirmación en tu reservación.
               </p>
               <Button type="button" onClick={onContinue} className="mt-3 w-full sm:w-auto">
-                Continuar con mi reserva
+                Continuar a reservar <ArrowRight aria-hidden />
               </Button>
             </div>
           )}
+          </div>
         </form>
       </div>
     </section>

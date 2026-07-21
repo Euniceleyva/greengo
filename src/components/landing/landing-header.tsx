@@ -2,9 +2,8 @@
 
 import * as React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { ArrowUpRight, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -30,16 +29,15 @@ export function LandingHeader() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 w-full transition-colors duration-200",
+        "adventure-header sticky top-0 z-40 w-full transition-colors duration-200",
         scrolled || mobileOpen
-          ? "bg-background/95 shadow-soft backdrop-blur supports-[backdrop-filter]:bg-background/80"
+          ? "adventure-header--scrolled"
           : "bg-transparent",
       )}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2">
-          <Image src="/logo.png" alt="GreenGo Traslados" width={36} height={30} className="h-8 w-auto" priority />
-          <span className="font-heading text-lg font-bold text-foreground">GreenGo</span>
+      <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-10">
+        <Link href="/" className="adventure-wordmark" aria-label="Marea Club, inicio">
+          Marea<span>Club</span>
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex" aria-label="Navegación principal">
@@ -47,7 +45,7 @@ export function LandingHeader() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary"
+              className="adventure-nav-link"
             >
               {link.label}
             </a>
@@ -55,14 +53,14 @@ export function LandingHeader() {
         </nav>
 
         <div className="hidden md:block">
-          <Button size="md" onClick={() => router.push("/reservar")}>
-            Reservar ahora
+          <Button size="md" onClick={() => router.push("/reservar")} className="adventure-header-cta">
+            Reservar <ArrowUpRight aria-hidden />
           </Button>
         </div>
 
         <button
           type="button"
-          className="flex h-11 w-11 items-center justify-center rounded-md text-foreground md:hidden"
+          className="flex h-11 w-11 items-center justify-center text-foreground md:hidden"
           aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
           aria-expanded={mobileOpen}
           aria-controls="mobile-nav"
@@ -76,14 +74,14 @@ export function LandingHeader() {
         <nav
           id="mobile-nav"
           aria-label="Navegación móvil"
-          className="flex flex-col gap-1 border-t border-border bg-background px-4 pb-4 pt-2 md:hidden"
+          className="adventure-mobile-nav flex flex-col gap-1 px-4 pb-4 pt-2 md:hidden"
         >
           {NAV_LINKS.map((link) => (
             <a
               key={link.href}
               href={link.href}
               onClick={() => setMobileOpen(false)}
-              className="flex min-h-[44px] items-center rounded-md px-2 text-sm font-medium text-foreground/80 hover:bg-secondary hover:text-primary"
+              className="flex min-h-[44px] items-center px-2 text-sm font-extrabold text-foreground/80 hover:text-primary"
             >
               {link.label}
             </a>
@@ -91,7 +89,7 @@ export function LandingHeader() {
           <Link
             href="/reservar"
             onClick={() => setMobileOpen(false)}
-            className="mt-2 flex min-h-[44px] items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
+            className="adventure-cta mt-2 flex min-h-[44px] items-center justify-center px-4 text-sm font-extrabold"
           >
             Reservar ahora
           </Link>
