@@ -62,12 +62,12 @@ export function ChatbotWidget() {
         <div
           role="dialog"
           aria-label="Asistente virtual de GreenGo"
-          className="fixed bottom-40 right-5 z-40 flex h-[28rem] w-[calc(100vw-2.5rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-popover sm:bottom-44 sm:right-6"
+          className="fixed bottom-40 right-5 z-40 flex h-[28rem] w-[calc(100vw-2.5rem)] max-w-sm flex-col overflow-hidden rounded-[24px] border-2 border-tropical-border bg-tropical-card shadow-sketch sm:bottom-44 sm:right-6"
         >
-          <div className="flex items-center justify-between bg-primary px-4 py-3 text-primary-foreground">
+          <div className="flex items-center justify-between bg-gradient-tropical px-4 py-3 text-white">
             <div className="flex items-center gap-2">
               <Bot className="h-5 w-5" aria-hidden />
-              <span className="font-heading text-sm font-semibold">Asistente GreenGo</span>
+              <span className="font-urbanist text-sm font-bold">Asistente GreenGo</span>
             </div>
             <button
               ref={closeButtonRef}
@@ -87,28 +87,28 @@ export function ChatbotWidget() {
                 className={cn(
                   "max-w-[85%] rounded-xl px-3 py-2 text-sm",
                   m.from === "bot"
-                    ? "mr-auto bg-secondary text-foreground"
-                    : "ml-auto bg-primary text-primary-foreground",
+                    ? "mr-auto bg-tropical-surface text-tropical-text"
+                    : "ml-auto bg-tropical-primary text-white",
                 )}
               >
                 {m.text}
               </div>
             ))}
             {isTyping && (
-              <div className="mr-auto flex items-center gap-1 rounded-xl bg-secondary px-3 py-2 text-sm text-muted-foreground">
+              <div className="mr-auto flex items-center gap-1 rounded-xl bg-tropical-surface px-3 py-2 text-sm text-tropical-muted">
                 <span className="animate-pulse">Escribiendo…</span>
               </div>
             )}
           </div>
 
           {!isTyping && (
-            <div className="flex flex-wrap gap-2 border-t border-border p-3">
+            <div className="flex flex-wrap gap-2 border-t-2 border-dashed border-tropical-border p-3">
               {node.options.map((option) => (
                 <button
                   key={option.id}
                   type="button"
                   onClick={() => handleOption(option)}
-                  className="min-h-[44px] rounded-full border border-primary/30 bg-primary-soft px-3 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="min-h-[44px] rounded-full border-2 border-tropical-primary/30 bg-tropical-primary/10 px-3 text-sm font-semibold text-tropical-primary transition-colors hover:bg-tropical-primary hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tropical-secondary"
                 >
                   {option.label}
                 </button>
@@ -123,7 +123,7 @@ export function ChatbotWidget() {
         onClick={toggleOpen}
         aria-label={isOpen ? "Cerrar asistente virtual" : "Abrir asistente virtual"}
         aria-expanded={isOpen}
-        className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-popover transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:bottom-6 sm:right-6"
+        className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-tropical text-white shadow-sketch transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tropical-secondary focus-visible:ring-offset-2 sm:bottom-6 sm:right-6"
       >
         {isOpen ? <X className="h-6 w-6" aria-hidden /> : <MessageSquareText className="h-6 w-6" aria-hidden />}
       </button>

@@ -6,8 +6,7 @@ import { reservationStep1Schema, type ReservationStep1Values } from "@/lib/schem
 import { useReservationStore } from "@/stores/reservation-store";
 import { LOCATIONS } from "@/mocks/locations";
 import { SERVICE_TYPE_LABELS } from "@/constants";
-import { Button } from "@/components/ui/button";
-import { Select, Label } from "@/components/ui/input";
+import { Button, Select, Label, FieldError } from "@/components/landing/ui/public-controls";
 import type { ServiceType } from "@/types";
 
 const SERVICE_TYPES = Object.keys(SERVICE_TYPE_LABELS) as ServiceType[];
@@ -50,9 +49,7 @@ export function Step1Service() {
               </option>
             ))}
           </Select>
-          {errors.serviceType && (
-            <p className="mt-1.5 text-xs text-destructive">{errors.serviceType.message}</p>
-          )}
+          <FieldError>{errors.serviceType?.message}</FieldError>
         </div>
 
         <div>
@@ -64,9 +61,7 @@ export function Step1Service() {
               </option>
             ))}
           </Select>
-          {errors.originLocationId && (
-            <p className="mt-1.5 text-xs text-destructive">{errors.originLocationId.message}</p>
-          )}
+          <FieldError>{errors.originLocationId?.message}</FieldError>
         </div>
 
         <div>
@@ -78,20 +73,18 @@ export function Step1Service() {
               </option>
             ))}
           </Select>
-          {errors.destinationLocationId && (
-            <p className="mt-1.5 text-xs text-destructive">{errors.destinationLocationId.message}</p>
-          )}
+          <FieldError>{errors.destinationLocationId?.message}</FieldError>
         </div>
 
         <fieldset className="sm:col-span-2">
-          <legend className="text-sm font-medium text-foreground">Sentido</legend>
+          <legend className="font-urbanist text-sm font-semibold text-tropical-text">Sentido</legend>
           <div className="mt-1.5 flex gap-4">
-            <label className="flex min-h-[44px] items-center gap-2 text-sm text-foreground">
-              <input type="radio" value="sencillo" className="h-4 w-4" {...register("direction")} />
+            <label className="flex min-h-[44px] items-center gap-2 text-sm text-tropical-text">
+              <input type="radio" value="sencillo" className="h-4 w-4 accent-tropical-primary" {...register("direction")} />
               Sencillo
             </label>
-            <label className="flex min-h-[44px] items-center gap-2 text-sm text-foreground">
-              <input type="radio" value="redondo" className="h-4 w-4" {...register("direction")} />
+            <label className="flex min-h-[44px] items-center gap-2 text-sm text-tropical-text">
+              <input type="radio" value="redondo" className="h-4 w-4 accent-tropical-primary" {...register("direction")} />
               Redondo
             </label>
           </div>

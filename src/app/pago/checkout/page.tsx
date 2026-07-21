@@ -10,12 +10,11 @@ export const metadata: Metadata = {
 
 export default function CheckoutPage() {
   return (
-    <div className="min-h-screen bg-surface-soft">
-      <header className="border-b border-border bg-card">
+    <div className="min-h-screen bg-tropical-surface font-urbanist paper-texture">
+      <header className="border-b-2 border-dashed border-tropical-border bg-tropical-background">
         <div className="mx-auto flex h-16 max-w-2xl items-center px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="GreenGo Traslados" width={32} height={27} className="h-7 w-auto" priority />
-            <span className="font-heading text-base font-bold text-foreground">GreenGo</span>
+            <Image src="/logo.png" alt="GreenGo Transfers Cancún" width={40} height={34} className="h-9 w-auto" priority />
           </Link>
         </div>
       </header>

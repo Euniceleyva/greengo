@@ -1,11 +1,13 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
+// Nota: este componente NO se usa en /admin ni /driver (verificado); su estilo
+// pertenece al sistema visual público "Tropical Travel Sketchbook".
 export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
-        "rounded-xl border border-border bg-card text-card-foreground shadow-soft",
+        "rounded-2xl border-2 border-tropical-border bg-tropical-card text-tropical-text shadow-sketch",
         className,
       )}
       {...props}
@@ -19,7 +21,7 @@ export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDiv
 
 export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h3 className={cn("font-heading text-base font-semibold leading-tight", className)} {...props} />
+    <h3 className={cn("font-urbanist text-base font-semibold leading-tight text-tropical-text", className)} {...props} />
   );
 }
 
@@ -27,7 +29,7 @@ export function CardDescription({
   className,
   ...props
 }: React.HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={cn("text-sm text-muted-foreground", className)} {...props} />;
+  return <p className={cn("text-sm text-tropical-muted", className)} {...props} />;
 }
 
 export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {

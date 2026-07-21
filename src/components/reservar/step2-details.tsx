@@ -4,8 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { reservationStep2Schema, type ReservationStep2Values } from "@/lib/schemas";
 import { useReservationStore } from "@/stores/reservation-store";
-import { Button } from "@/components/ui/button";
-import { Input, Textarea, Label } from "@/components/ui/input";
+import { Button, Input, Textarea, Label, FieldError } from "@/components/landing/ui/public-controls";
 
 export function Step2Details() {
   const draft = useReservationStore((s) => s.draft);
@@ -43,22 +42,22 @@ export function Step2Details() {
         <div>
           <Label htmlFor="date">Fecha</Label>
           <Input id="date" type="date" className="mt-1.5" {...register("date")} />
-          {errors.date && <p className="mt-1.5 text-xs text-destructive">{errors.date.message}</p>}
+          <FieldError>{errors.date?.message}</FieldError>
         </div>
         <div>
           <Label htmlFor="time">Hora</Label>
           <Input id="time" type="time" className="mt-1.5" {...register("time")} />
-          {errors.time && <p className="mt-1.5 text-xs text-destructive">{errors.time.message}</p>}
+          <FieldError>{errors.time?.message}</FieldError>
         </div>
         <div>
           <Label htmlFor="passengers">Pasajeros</Label>
           <Input id="passengers" type="number" min={1} max={60} className="mt-1.5" {...register("passengers")} />
-          {errors.passengers && <p className="mt-1.5 text-xs text-destructive">{errors.passengers.message}</p>}
+          <FieldError>{errors.passengers?.message}</FieldError>
         </div>
         <div>
           <Label htmlFor="bags">Maletas</Label>
           <Input id="bags" type="number" min={0} max={60} className="mt-1.5" {...register("bags")} />
-          {errors.bags && <p className="mt-1.5 text-xs text-destructive">{errors.bags.message}</p>}
+          <FieldError>{errors.bags?.message}</FieldError>
         </div>
         <div>
           <Label htmlFor="flightNumber">Número de vuelo (opcional)</Label>

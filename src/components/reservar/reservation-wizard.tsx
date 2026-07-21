@@ -77,7 +77,7 @@ export function ReservationWizard() {
   return (
     <Card className="p-6 sm:p-8">
       <ReservationStepper current={step} />
-      <h1 className="mt-8 font-heading text-2xl font-bold text-foreground">{STEP_TITLES[step]}</h1>
+      <h1 className="mt-8 font-urbanist text-2xl font-extrabold text-tropical-text">{STEP_TITLES[step]}</h1>
       <div className="mt-6">
         {step === 1 && <Step1Service />}
         {step === 2 && <Step2Details />}

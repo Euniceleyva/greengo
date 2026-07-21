@@ -58,6 +58,31 @@
 
     /* Sombras */
     --shadow-color: 163 39% 12%;
+
+    /* ============================================================
+       Sistema visual PÚBLICO — "Tropical Travel Sketchbook"
+       Usado únicamente por: Landing (/), /reservar, /pago/*, /destinos/*.
+       NO se usa en /admin, /driver ni /demo (tokens independientes,
+       no se reemplaza --primary/--background/etc. de arriba).
+       ============================================================ */
+    --brand-primary: 96 38% 34%;        /* verde tropical profundo — CTAs, texto de marca */
+    --brand-primary-light: 87 45% 54%;  /* verde lima claro — acentos, hover, gradientes */
+    --brand-secondary: 181 85% 30%;     /* turquesa Caribe — links, iconos, info */
+    --brand-secondary-light: 181 68% 46%; /* turquesa claro — gradientes, badges */
+    --brand-accent: 33 94% 56%;         /* naranja solar — acento cálido, detalle pequeño */
+    --brand-dark: 193 78% 15%;          /* azul petróleo — headers oscuros, footer */
+    --brand-deep: 194 88% 11%;          /* azul profundo — overlay hero, fondo nocturno */
+    --brand-surface: 96 32% 95%;        /* verde menta muy claro — fondos de sección */
+    --brand-background: 40 45% 97%;     /* blanco cálido tipo papel — fondo general público */
+    --brand-text: 194 42% 12%;          /* texto principal cálido oscuro */
+    --brand-muted: 194 14% 40%;         /* texto secundario */
+    --brand-border: 96 22% 86%;         /* bordes suaves verdosos */
+    --brand-card: 40 60% 99%;           /* superficie de tarjetas, casi blanco cálido */
+
+    --brand-gradient-tropical: linear-gradient(135deg, hsl(var(--brand-primary-light)), hsl(var(--brand-primary)));
+    --brand-gradient-caribe: linear-gradient(135deg, hsl(var(--brand-secondary-light)), hsl(var(--brand-secondary)));
+    --brand-gradient-deep: linear-gradient(160deg, hsl(var(--brand-dark)), hsl(var(--brand-deep)));
+    --brand-gradient-sun: linear-gradient(120deg, hsl(var(--brand-accent)), hsl(33 94% 64%));
   }
 }
 
@@ -104,4 +129,72 @@
 .route-pattern {
   background-image: radial-gradient(hsl(var(--primary) / 0.12) 1.5px, transparent 1.5px);
   background-size: 28px 28px;
+}
+
+/* ============================================================
+   Sistema visual público — "Tropical Travel Sketchbook"
+   ============================================================ */
+
+/* Textura de papel muy sutil, sólo para el sitio público */
+.paper-texture {
+  background-image:
+    radial-gradient(hsl(var(--brand-primary) / 0.05) 1px, transparent 1px),
+    radial-gradient(hsl(var(--brand-secondary) / 0.04) 1px, transparent 1px);
+  background-size: 26px 26px, 34px 34px;
+  background-position: 0 0, 13px 17px;
+}
+
+/* Subrayado dibujado a mano bajo palabras clave */
+.hand-underline {
+  position: relative;
+  display: inline-block;
+}
+.hand-underline::after {
+  content: "";
+  position: absolute;
+  left: -0.15em;
+  right: -0.15em;
+  bottom: -0.08em;
+  height: 0.32em;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 20' preserveAspectRatio='none'%3E%3Cpath d='M2 14 C 40 4, 80 18, 120 8 S 180 4, 198 12' fill='none' stroke='%23F89924' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  z-index: -1;
+}
+
+/* Rotaciones sutiles tipo sticker/postal, controladas por elemento */
+.sketch-tilt-left { transform: rotate(-2.5deg); }
+.sketch-tilt-right { transform: rotate(2deg); }
+
+.shadow-sketch {
+  box-shadow: 0 2px 0 hsl(var(--brand-dark) / 0.08), 0 12px 24px -12px hsl(var(--brand-dark) / 0.25);
+}
+
+/* Flotación casi imperceptible para decoraciones (sol, palmeras, stickers) */
+@keyframes float-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.animate-float-soft {
+  animation: float-soft 6s ease-in-out infinite;
+}
+
+@keyframes float-soft-slow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+}
+.animate-float-soft-slow {
+  animation: float-soft-slow 8s ease-in-out infinite;
+}
+
+/* Accesibilidad: respeta prefers-reduced-motion en todo el sitio */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

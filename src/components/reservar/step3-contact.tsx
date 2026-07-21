@@ -4,8 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { reservationStep3Schema, type ReservationStep3Values } from "@/lib/schemas";
 import { useReservationStore } from "@/stores/reservation-store";
-import { Button } from "@/components/ui/button";
-import { Input, Label } from "@/components/ui/input";
+import { Button, Input, Label, FieldError } from "@/components/landing/ui/public-controls";
 
 export function Step3Contact() {
   const draft = useReservationStore((s) => s.draft);
@@ -37,17 +36,17 @@ export function Step3Contact() {
         <div className="sm:col-span-2">
           <Label htmlFor="contactName">Nombre completo</Label>
           <Input id="contactName" className="mt-1.5" {...register("contactName")} />
-          {errors.contactName && <p className="mt-1.5 text-xs text-destructive">{errors.contactName.message}</p>}
+          <FieldError>{errors.contactName?.message}</FieldError>
         </div>
         <div>
           <Label htmlFor="contactEmail">Correo electrónico</Label>
           <Input id="contactEmail" type="email" className="mt-1.5" {...register("contactEmail")} />
-          {errors.contactEmail && <p className="mt-1.5 text-xs text-destructive">{errors.contactEmail.message}</p>}
+          <FieldError>{errors.contactEmail?.message}</FieldError>
         </div>
         <div>
           <Label htmlFor="contactPhone">Teléfono (10 dígitos)</Label>
           <Input id="contactPhone" type="tel" inputMode="numeric" className="mt-1.5" {...register("contactPhone")} />
-          {errors.contactPhone && <p className="mt-1.5 text-xs text-destructive">{errors.contactPhone.message}</p>}
+          <FieldError>{errors.contactPhone?.message}</FieldError>
         </div>
         <div className="sm:col-span-2">
           <Label htmlFor="hotel">Hotel (opcional)</Label>

@@ -27,7 +27,7 @@ export function Accordion({
 
   return (
     <AccordionContext.Provider value={{ openId, toggle }}>
-      <div className={cn("divide-y divide-border rounded-xl border border-border bg-card", className)}>
+      <div className={cn("divide-y-2 divide-dashed divide-tropical-border rounded-2xl border-2 border-tropical-border bg-tropical-card", className)}>
         {children}
       </div>
     </AccordionContext.Provider>
@@ -50,12 +50,12 @@ export function AccordionItem({ id, question, answer }: { id: string; question: 
           aria-expanded={isOpen}
           aria-controls={panelId}
           onClick={() => ctx.toggle(id)}
-          className="flex w-full min-h-[44px] items-center justify-between gap-4 px-5 py-4 text-left font-heading text-sm font-semibold text-foreground transition-colors hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset sm:text-base"
+          className="flex w-full min-h-[44px] items-center justify-between gap-4 px-5 py-4 text-left font-urbanist text-sm font-bold text-tropical-text transition-colors hover:bg-tropical-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tropical-secondary focus-visible:ring-inset sm:text-base"
         >
           {question}
           <ChevronDown
             aria-hidden
-            className={cn("h-5 w-5 shrink-0 text-muted-foreground transition-transform", isOpen && "rotate-180")}
+            className={cn("h-5 w-5 shrink-0 text-tropical-accent transition-transform", isOpen && "rotate-180")}
           />
         </button>
       </h3>
@@ -64,7 +64,7 @@ export function AccordionItem({ id, question, answer }: { id: string; question: 
         role="region"
         aria-labelledby={buttonId}
         hidden={!isOpen}
-        className="px-5 pb-4 text-sm text-muted-foreground"
+        className="px-5 pb-4 text-sm text-tropical-muted"
       >
         {answer}
       </div>

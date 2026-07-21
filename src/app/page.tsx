@@ -7,6 +7,7 @@ import { LandingDestinations } from "@/components/landing/landing-destinations";
 import { LandingHowItWorks } from "@/components/landing/landing-how-it-works";
 import { LandingTestimonials } from "@/components/landing/landing-testimonials";
 import { LandingFaq } from "@/components/landing/landing-faq";
+import { LandingCtaFinal } from "@/components/landing/landing-cta-final";
 import { LandingFooter } from "@/components/landing/landing-footer";
 
 export const metadata: Metadata = {
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-tropical-background font-urbanist text-tropical-text">
       <LandingHeader />
       <main>
         <LandingHero />
@@ -35,6 +36,7 @@ export default function HomePage() {
         <LandingHowItWorks />
         <LandingTestimonials />
         <LandingFaq />
+        <LandingCtaFinal />
       </main>
       <LandingFooter />
     </div>

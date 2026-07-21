@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Check, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STEPS = [
@@ -20,25 +20,36 @@ export function ReservationStepper({ current }: { current: number }) {
               <span
                 aria-current={isCurrent ? "step" : undefined}
                 className={cn(
-                  "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold transition-colors",
-                  isDone && "bg-primary text-primary-foreground",
-                  isCurrent && "bg-primary text-primary-foreground ring-4 ring-primary-soft",
-                  !isDone && !isCurrent && "bg-muted text-muted-foreground",
+                  "relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-urbanist text-sm font-bold transition-all",
+                  isDone && "bg-tropical-primary text-white",
+                  isCurrent && "scale-110 bg-tropical-accent text-white shadow-sketch ring-4 ring-tropical-accent/25",
+                  !isDone && !isCurrent && "border-2 border-dashed border-tropical-border bg-tropical-card text-tropical-muted",
                 )}
               >
-                {isDone ? <Check className="h-4 w-4" aria-hidden /> : step.n}
+                {isDone ? (
+                  <Check className="h-4 w-4" aria-hidden />
+                ) : isCurrent ? (
+                  <MapPin className="h-4 w-4" aria-hidden />
+                ) : (
+                  step.n
+                )}
               </span>
               <span
                 className={cn(
-                  "text-[11px] font-medium sm:text-xs",
-                  isCurrent ? "text-foreground" : "text-muted-foreground",
+                  "font-urbanist text-[11px] font-semibold sm:text-xs",
+                  isCurrent ? "text-tropical-text" : "text-tropical-muted",
                 )}
               >
                 {step.label}
               </span>
             </div>
             {i < STEPS.length - 1 && (
-              <div className={cn("mx-2 h-0.5 flex-1 rounded-full sm:mx-3", isDone ? "bg-primary" : "bg-border")} />
+              <div
+                className={cn(
+                  "mx-2 h-0.5 flex-1 rounded-full sm:mx-3",
+                  isDone ? "bg-tropical-primary" : "border-t-2 border-dashed border-tropical-border bg-transparent",
+                )}
+              />
             )}
           </li>
         );

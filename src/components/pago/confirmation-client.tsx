@@ -12,7 +12,7 @@ import { getFareBreakdown, CUSTOM_QUOTE_LABEL } from "@/mocks/pricing";
 import { SERVICE_TYPE_LABELS } from "@/constants";
 import { formatMXN } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/landing/ui/public-controls";
 import { Skeleton } from "@/components/ui/misc";
 
 export function ConfirmationClient() {
@@ -84,7 +84,7 @@ export function ConfirmationClient() {
   if (!confirmedFolio && !hasDraft) {
     return (
       <Card className="p-6 text-center sm:p-8">
-        <p className="text-sm text-muted-foreground">No encontramos información de una reservación reciente.</p>
+        <p className="text-sm text-tropical-muted">No encontramos información de una reservación reciente.</p>
         <Link href="/reservar" className="mt-4 inline-block">
           <Button>Iniciar una reservación</Button>
         </Link>
@@ -109,20 +109,20 @@ export function ConfirmationClient() {
   return (
     <div className="space-y-6">
       <Card className="flex flex-col items-center p-8 text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-success-soft text-success">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-tropical-primary/10 text-tropical-primary">
           <CheckCircle2 className="h-8 w-8" aria-hidden />
         </div>
-        <h1 className="mt-4 font-heading text-2xl font-bold text-foreground">¡Reservación confirmada!</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <h1 className="mt-4 font-urbanist text-2xl font-bold text-tropical-text">¡Reservación confirmada!</h1>
+        <p className="mt-2 text-sm text-tropical-muted">
           Te enviaremos la confirmación al correo proporcionado (simulado, sin envío real).
         </p>
-        <p className="mt-4 rounded-lg bg-surface-soft px-4 py-2 font-heading text-lg font-bold text-primary">
+        <p className="mt-4 rounded-lg bg-tropical-surface px-4 py-2 font-urbanist text-lg font-bold text-tropical-primary">
           {confirmedFolio}
         </p>
       </Card>
 
       <Card className="p-6 sm:p-8">
-        <h2 className="font-heading text-lg font-semibold text-foreground">Resumen del viaje</h2>
+        <h2 className="font-urbanist text-lg font-semibold text-tropical-text">Resumen del viaje</h2>
         <dl className="mt-4 grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
           <SummaryRow label="Servicio" value={SERVICE_TYPE_LABELS[serviceType]} />
           <SummaryRow label="Sentido" value={draft.direction === "redondo" ? "Redondo" : "Sencillo"} />
@@ -133,15 +133,15 @@ export function ConfirmationClient() {
           <SummaryRow label="Contacto" value={draft.contactName} />
           <SummaryRow label="Correo" value={draft.contactEmail} />
         </dl>
-        <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
-          <span className="font-heading font-semibold text-foreground">Total pagado</span>
-          <span className="font-heading text-xl font-bold text-primary">
+        <div className="mt-4 flex items-center justify-between border-t border-tropical-border pt-4">
+          <span className="font-urbanist font-semibold text-tropical-text">Total pagado</span>
+          <span className="font-urbanist text-xl font-bold text-tropical-primary">
             {fare.isCustomQuote ? CUSTOM_QUOTE_LABEL : formatMXN(fare.total)}
           </span>
         </div>
       </Card>
 
-      <p className="text-center text-xs text-muted-foreground">
+      <p className="text-center text-xs text-tropical-muted">
         Esta reservación ya aparece en el panel administrativo del DEMO (Servicios / Viajes).
       </p>
 
@@ -155,8 +155,8 @@ export function ConfirmationClient() {
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-2 sm:block">
-      <dt className="text-muted-foreground">{label}</dt>
-      <dd className="font-medium text-foreground">{value || "—"}</dd>
+      <dt className="text-tropical-muted">{label}</dt>
+      <dd className="font-medium text-tropical-text">{value || "—"}</dd>
     </div>
   );
 }

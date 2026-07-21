@@ -28,10 +28,10 @@ export function PaymentMethodSelector({
             aria-checked={selected}
             onClick={() => onChange(id)}
             className={cn(
-              "flex min-h-[44px] flex-col items-center gap-2 rounded-xl border p-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              "flex min-h-[44px] flex-col items-center gap-2 rounded-2xl border-2 p-4 text-sm font-urbanist font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tropical-secondary",
               selected
-                ? "border-primary bg-primary-soft text-primary"
-                : "border-border bg-card text-foreground hover:bg-secondary",
+                ? "border-tropical-primary bg-tropical-primary/10 text-tropical-primary"
+                : "border-tropical-border bg-tropical-card text-tropical-text hover:bg-tropical-primary/5",
             )}
           >
             <Icon className="h-5 w-5" aria-hidden />

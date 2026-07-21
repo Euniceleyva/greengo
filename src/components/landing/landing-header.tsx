@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/landing/ui/public-controls";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
@@ -30,16 +30,15 @@ export function LandingHeader() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 w-full transition-colors duration-200",
+        "sticky top-0 z-40 w-full font-urbanist transition-colors duration-300",
         scrolled || mobileOpen
-          ? "bg-background/95 shadow-soft backdrop-blur supports-[backdrop-filter]:bg-background/80"
+          ? "bg-tropical-background/95 shadow-sketch backdrop-blur supports-[backdrop-filter]:bg-tropical-background/85"
           : "bg-transparent",
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2">
-          <Image src="/logo.png" alt="GreenGo Traslados" width={36} height={30} className="h-8 w-auto" priority />
-          <span className="font-heading text-lg font-bold text-foreground">GreenGo</span>
+          <Image src="/logo.png" alt="GreenGo Transfers Cancún" width={44} height={37} className="h-10 w-auto" priority />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex" aria-label="Navegación principal">
@@ -47,7 +46,7 @@ export function LandingHeader() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary"
+              className="relative text-sm font-semibold text-tropical-text/80 transition-colors hover:text-tropical-primary"
             >
               {link.label}
             </a>
@@ -62,7 +61,7 @@ export function LandingHeader() {
 
         <button
           type="button"
-          className="flex h-11 w-11 items-center justify-center rounded-md text-foreground md:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-full text-tropical-text md:hidden"
           aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
           aria-expanded={mobileOpen}
           aria-controls="mobile-nav"
@@ -76,14 +75,14 @@ export function LandingHeader() {
         <nav
           id="mobile-nav"
           aria-label="Navegación móvil"
-          className="flex flex-col gap-1 border-t border-border bg-background px-4 pb-4 pt-2 md:hidden"
+          className="flex flex-col gap-1 border-t-2 border-dashed border-tropical-border bg-tropical-background px-4 pb-4 pt-2 md:hidden"
         >
           {NAV_LINKS.map((link) => (
             <a
               key={link.href}
               href={link.href}
               onClick={() => setMobileOpen(false)}
-              className="flex min-h-[44px] items-center rounded-md px-2 text-sm font-medium text-foreground/80 hover:bg-secondary hover:text-primary"
+              className="flex min-h-[44px] items-center rounded-xl px-2 text-sm font-semibold text-tropical-text/80 hover:bg-tropical-primary/10 hover:text-tropical-primary"
             >
               {link.label}
             </a>
@@ -91,7 +90,7 @@ export function LandingHeader() {
           <Link
             href="/reservar"
             onClick={() => setMobileOpen(false)}
-            className="mt-2 flex min-h-[44px] items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
+            className="mt-2 flex min-h-[44px] items-center justify-center rounded-full bg-gradient-tropical px-4 text-sm font-bold text-white shadow-sketch"
           >
             Reservar ahora
           </Link>

@@ -11,7 +11,7 @@ import { getFareBreakdown, CUSTOM_QUOTE_LABEL } from "@/mocks/pricing";
 import { SERVICE_TYPE_LABELS } from "@/constants";
 import { formatMXN } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/landing/ui/public-controls";
 import { Skeleton } from "@/components/ui/misc";
 import { PaymentMethodSelector, type CheckoutMethod } from "./payment-method-selector";
 import { CardForm, type CardFormHandle } from "./card-form";
@@ -43,7 +43,7 @@ export function CheckoutClient() {
   if (!hasDraft) {
     return (
       <Card className="p-6 text-center sm:p-8">
-        <p className="text-sm text-muted-foreground">No hay ninguna reservación en curso.</p>
+        <p className="text-sm text-tropical-muted">No hay ninguna reservación en curso.</p>
         <Link href="/reservar" className="mt-4 inline-block">
           <Button>Iniciar una reservación</Button>
         </Link>
@@ -93,23 +93,23 @@ export function CheckoutClient() {
       </div>
 
       <Card className="p-6 sm:p-8">
-        <h2 className="font-heading text-lg font-semibold text-foreground">Resumen de la reserva</h2>
+        <h2 className="font-urbanist text-lg font-semibold text-tropical-text">Resumen de la reserva</h2>
         <dl className="mt-4 grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
           <SummaryRow label="Servicio" value={SERVICE_TYPE_LABELS[serviceType]} />
           <SummaryRow label="Ruta" value={`${origin?.name ?? "—"} → ${destination?.name ?? "—"}`} />
           <SummaryRow label="Fecha y hora" value={`${draft.date} · ${draft.time}`} />
           <SummaryRow label="Pasajeros" value={String(draft.passengers)} />
         </dl>
-        <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
-          <span className="font-heading font-semibold text-foreground">Total a pagar</span>
-          <span className="font-heading text-xl font-bold text-primary">
+        <div className="mt-4 flex items-center justify-between border-t border-tropical-border pt-4">
+          <span className="font-urbanist font-semibold text-tropical-text">Total a pagar</span>
+          <span className="font-urbanist text-xl font-bold text-tropical-primary">
             {fare.isCustomQuote ? CUSTOM_QUOTE_LABEL : formatMXN(fare.total)}
           </span>
         </div>
       </Card>
 
       <Card className="p-6 sm:p-8">
-        <h2 className="font-heading text-lg font-semibold text-foreground">Método de pago</h2>
+        <h2 className="font-urbanist text-lg font-semibold text-tropical-text">Método de pago</h2>
         <div className="mt-4">
           <PaymentMethodSelector value={method} onChange={setMethod} />
         </div>
@@ -117,18 +117,18 @@ export function CheckoutClient() {
         <div className="mt-6">
           {method === "tarjeta" && <CardForm ref={cardFormRef} />}
           {method === "oxxo" && (
-            <p className="rounded-lg bg-surface-soft p-4 text-sm text-muted-foreground">
+            <p className="rounded-lg bg-tropical-surface p-4 text-sm text-tropical-muted">
               Al confirmar, generaremos una referencia de pago para liquidar en cualquier tienda OXXO (simulado).
             </p>
           )}
           {method === "spei" && (
-            <p className="rounded-lg bg-surface-soft p-4 text-sm text-muted-foreground">
+            <p className="rounded-lg bg-tropical-surface p-4 text-sm text-tropical-muted">
               Al confirmar, generaremos una CLABE interbancaria para realizar tu transferencia SPEI (simulado).
             </p>
           )}
         </div>
 
-        <label className="mt-6 flex min-h-[44px] items-center gap-2 text-sm text-muted-foreground">
+        <label className="mt-6 flex min-h-[44px] items-center gap-2 text-sm text-tropical-muted">
           <input
             type="checkbox"
             className="h-4 w-4"
@@ -167,8 +167,8 @@ export function CheckoutClient() {
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-2 sm:block">
-      <dt className="text-muted-foreground">{label}</dt>
-      <dd className="font-medium text-foreground">{value}</dd>
+      <dt className="text-tropical-muted">{label}</dt>
+      <dd className="font-medium text-tropical-text">{value}</dd>
     </div>
   );
 }

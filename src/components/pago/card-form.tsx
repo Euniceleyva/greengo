@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { cardPaymentSchema, type CardPaymentValues } from "@/lib/schemas";
 import { formatCardNumber, formatExpiry } from "@/lib/utils";
-import { Input, Label } from "@/components/ui/input";
+import { Input, Label, FieldError } from "@/components/landing/ui/public-controls";
 
 export interface CardFormHandle {
   submit: () => Promise<CardPaymentValues | null>;
@@ -50,13 +50,13 @@ export const CardForm = forwardRef<CardFormHandle>(function CardForm(_props, ref
             cardNumberReg.onChange(e);
           }}
         />
-        {errors.cardNumber && <p className="mt-1.5 text-xs text-destructive">{errors.cardNumber.message}</p>}
+        <FieldError>{errors.cardNumber?.message}</FieldError>
       </div>
 
       <div className="sm:col-span-2">
         <Label htmlFor="cardName">Nombre en la tarjeta</Label>
         <Input id="cardName" className="mt-1.5" {...register("cardName")} />
-        {errors.cardName && <p className="mt-1.5 text-xs text-destructive">{errors.cardName.message}</p>}
+        <FieldError>{errors.cardName?.message}</FieldError>
       </div>
 
       <div>
@@ -72,7 +72,7 @@ export const CardForm = forwardRef<CardFormHandle>(function CardForm(_props, ref
             expiryReg.onChange(e);
           }}
         />
-        {errors.expiry && <p className="mt-1.5 text-xs text-destructive">{errors.expiry.message}</p>}
+        <FieldError>{errors.expiry?.message}</FieldError>
       </div>
 
       <div>
@@ -88,7 +88,7 @@ export const CardForm = forwardRef<CardFormHandle>(function CardForm(_props, ref
             cvvReg.onChange(e);
           }}
         />
-        {errors.cvv && <p className="mt-1.5 text-xs text-destructive">{errors.cvv.message}</p>}
+        <FieldError>{errors.cvv?.message}</FieldError>
       </div>
     </form>
   );

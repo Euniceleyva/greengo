@@ -72,10 +72,35 @@ const config: Config = {
           blue: "hsl(var(--brand-blue))",
           lime: "hsl(var(--brand-lime))",
         },
+        /* Sistema visual público (Landing / Reservar / Pago / Destinos). No usado en /admin ni /driver. */
+        tropical: {
+          primary: "hsl(var(--brand-primary))",
+          "primary-light": "hsl(var(--brand-primary-light))",
+          secondary: "hsl(var(--brand-secondary))",
+          "secondary-light": "hsl(var(--brand-secondary-light))",
+          accent: "hsl(var(--brand-accent))",
+          dark: "hsl(var(--brand-dark))",
+          deep: "hsl(var(--brand-deep))",
+          surface: "hsl(var(--brand-surface))",
+          background: "hsl(var(--brand-background))",
+          text: "hsl(var(--brand-text))",
+          muted: "hsl(var(--brand-muted))",
+          border: "hsl(var(--brand-border))",
+          card: "hsl(var(--brand-card))",
+        },
       },
       fontFamily: {
         sans: ["var(--font-body)", "sans-serif"],
         heading: ["var(--font-heading)", "sans-serif"],
+        /* Tipografía del sistema público */
+        urbanist: ["var(--font-urbanist)", "sans-serif"],
+        hand: ["var(--font-hand)", "cursive"],
+      },
+      backgroundImage: {
+        "gradient-tropical": "var(--brand-gradient-tropical)",
+        "gradient-caribe": "var(--brand-gradient-caribe)",
+        "gradient-deep": "var(--brand-gradient-deep)",
+        "gradient-sun": "var(--brand-gradient-sun)",
       },
       borderRadius: {
         lg: "var(--radius)",
