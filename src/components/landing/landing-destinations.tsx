@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Clock, MapPin } from "lucide-react";
 import { DESTINATIONS } from "@/mocks/destinations";
-import { formatMXN } from "@/lib/utils";
+import { LocalizedCurrency } from "@/components/shared/public-language";
 
 export function LandingDestinations() {
   return (
@@ -36,7 +36,7 @@ export function LandingDestinations() {
                     <Clock className="h-4 w-4" aria-hidden />
                     {destination.airportMinutes} min
                   </span>
-                  <strong>Desde {formatMXN(destination.priceFrom)}</strong>
+                  <strong>Desde <LocalizedCurrency amount={destination.priceFrom} /></strong>
                 </div>
                 <span className="adventure-postcard__link">
                   Ver destino <ArrowRight className="h-4 w-4" aria-hidden />

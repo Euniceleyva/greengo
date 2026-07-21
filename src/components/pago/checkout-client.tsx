@@ -9,7 +9,7 @@ import { useHydrated } from "@/lib/hooks";
 import { LOCATIONS } from "@/mocks/locations";
 import { getFareBreakdown, CUSTOM_QUOTE_LABEL } from "@/mocks/pricing";
 import { SERVICE_TYPE_LABELS } from "@/constants";
-import { formatMXN } from "@/lib/utils";
+import { LocalizedCurrency, usePublicCurrency } from "@/components/shared/public-language";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/misc";
@@ -22,6 +22,7 @@ const SIMULATED_DELAY_MS = 2000;
 export function CheckoutClient() {
   const hydrated = useHydrated();
   const router = useRouter();
+  const formatCurrency = usePublicCurrency();
   const draft = useReservationStore((s) => s.draft);
 
   const [method, setMethod] = React.useState<CheckoutMethod>("tarjeta");
@@ -109,10 +110,14 @@ export function CheckoutClient() {
         <div className="adventure-checkout-total">
           <span>Total a pagar</span>
           <strong>
-            {fare.isCustomQuote ? CUSTOM_QUOTE_LABEL : formatMXN(fare.total)}
+            {fare.isCustomQuote ? CUSTOM_QUOTE_LABEL : <LocalizedCurrency amount={fare.total} />}
           </strong>
         </div>
-        <p className="adventure-checkout-receipt__foot">Traslado · Caribe Mexicano · Buen viaje</p>
+        <p className="adventure-checkout-receipt__foot">
+          Traslado · Caribe Mexicano · Buen viaje
+          <br />
+          Tasa demo: 1 USD = 17 MXN
+        </p>
       </Card>
 
       <Card className="adventure-checkout-panel p-6 sm:p-8">
@@ -169,7 +174,7 @@ export function CheckoutClient() {
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Procesando…
               </>
             ) : (
-              `Pagar ${fare.isCustomQuote ? "" : formatMXN(fare.total)}`
+              `Pagar ${fare.isCustomQuote ? "" : formatCurrency(fare.total)}`
             )}
           </Button>
         </div>

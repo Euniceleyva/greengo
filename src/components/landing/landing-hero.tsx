@@ -13,12 +13,11 @@ import { AIRPORTS } from "@/mocks/airports";
 import { TOUR_DESTINATIONS } from "@/mocks/tour-destinations";
 import {
   estimateHeroQuote,
-  formatUSD,
   heroDestinationLocationId,
   heroOriginLocationId,
   transferKindToServiceType,
 } from "@/mocks/hero-quote";
-import { formatMXN } from "@/lib/utils";
+import { LocalizedCurrency } from "@/components/shared/public-language";
 import type { HeroQuoteEstimate, TourOrigin, TransferKind } from "@/types";
 
 gsap.registerPlugin(useGSAP);
@@ -451,7 +450,7 @@ export function LandingHero() {
             <div className="adventure-estimate mt-4 p-4">
               <p className="text-sm text-muted-foreground">{estimate.label}</p>
               <p className="mt-1 font-heading text-2xl font-bold text-primary">
-                {estimate.currency === "MXN" ? formatMXN(estimate.total) : formatUSD(estimate.total)}
+                <LocalizedCurrency amount={estimate.total} sourceCurrency={estimate.currency} />
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 Estimado ilustrativo, sujeto a confirmación en tu reservación.

@@ -7,8 +7,7 @@ import { DESTINATIONS, destinationBySlug } from "@/mocks/destinations";
 import { LandingHeader } from "@/components/landing/landing-header";
 import { LandingFooter } from "@/components/landing/landing-footer";
 import { Button } from "@/components/ui/button";
-import { formatMXN } from "@/lib/utils";
-import { PublicLanguageProvider } from "@/components/shared/public-language";
+import { LocalizedCurrency, PublicLanguageProvider } from "@/components/shared/public-language";
 
 export function generateStaticParams() {
   return DESTINATIONS.map((d) => ({ slug: d.slug }));
@@ -77,7 +76,7 @@ export default function DestinationPage({ params }: { params: { slug: string } }
                 </span>
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-warning-soft px-3 py-1.5 font-medium text-warning">
                   <Tag className="h-4 w-4" aria-hidden />
-                  Desde {formatMXN(destination.priceFrom)}
+                  Desde <LocalizedCurrency amount={destination.priceFrom} />
                 </span>
               </div>
 

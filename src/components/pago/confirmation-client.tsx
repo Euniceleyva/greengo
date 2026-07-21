@@ -12,7 +12,7 @@ import { useHydrated } from "@/lib/hooks";
 import { LOCATIONS } from "@/mocks/locations";
 import { getFareBreakdown, CUSTOM_QUOTE_LABEL } from "@/mocks/pricing";
 import { SERVICE_TYPE_LABELS } from "@/constants";
-import { formatMXN } from "@/lib/utils";
+import { LocalizedCurrency } from "@/components/shared/public-language";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/misc";
@@ -177,7 +177,7 @@ export function ConfirmationClient() {
           <div className="adventure-confirmation-total">
             <span>Total pagado</span>
             <strong>
-            {fare.isCustomQuote ? CUSTOM_QUOTE_LABEL : formatMXN(fare.total)}
+            {fare.isCustomQuote ? CUSTOM_QUOTE_LABEL : <LocalizedCurrency amount={fare.total} />}
             </strong>
           </div>
         </section>

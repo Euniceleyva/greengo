@@ -3,8 +3,10 @@
 import * as React from "react";
 
 export type PublicLanguage = "es" | "en";
+export type PublicCurrency = "MXN" | "USD";
 
 const STORAGE_KEY = "marea-public-language";
+export const DEMO_MXN_PER_USD = 17;
 
 const ES_TO_EN: Record<string, string> = {
   "Servicios": "Services",
@@ -29,6 +31,8 @@ const ES_TO_EN: Record<string, string> = {
   "Traza tu primera ruta": "Map your first route",
   "Tipo de traslado": "Transfer type",
   "Tipo de servicio": "Service type",
+  "Tasa demo: 1 USD = 17 MXN": "Demo rate: 1 USD = 17 MXN",
+  "Desde": "From",
   "Hotel de origen": "Pickup hotel",
   "Hotel de destino": "Destination hotel",
   "Hotel a hotel": "Hotel to hotel",
@@ -303,6 +307,40 @@ export function usePublicLanguage() {
   const context = React.useContext(LanguageContext);
   if (!context) throw new Error("usePublicLanguage must be used within PublicLanguageProvider");
   return context;
+}
+
+export function usePublicCurrency() {
+  const { language } = usePublicLanguage();
+
+  return React.useCallback(
+    (amount: number, sourceCurrency: PublicCurrency = "MXN") => {
+      const targetCurrency: PublicCurrency = language === "es" ? "MXN" : "USD";
+      let converted = amount;
+
+      if (sourceCurrency === "MXN" && targetCurrency === "USD") converted = amount / DEMO_MXN_PER_USD;
+      if (sourceCurrency === "USD" && targetCurrency === "MXN") converted = amount * DEMO_MXN_PER_USD;
+
+      const formatted = new Intl.NumberFormat(language === "es" ? "es-MX" : "en-US", {
+        style: "currency",
+        currency: targetCurrency,
+        maximumFractionDigits: 0,
+      }).format(converted);
+
+      return `${formatted} ${targetCurrency}`;
+    },
+    [language],
+  );
+}
+
+export function LocalizedCurrency({
+  amount,
+  sourceCurrency = "MXN",
+}: {
+  amount: number;
+  sourceCurrency?: PublicCurrency;
+}) {
+  const formatCurrency = usePublicCurrency();
+  return <>{formatCurrency(amount, sourceCurrency)}</>;
 }
 
 export function LanguageSwitch({ compact = false }: { compact?: boolean }) {
