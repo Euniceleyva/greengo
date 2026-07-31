@@ -16,7 +16,7 @@ export default function CheckoutPage() {
     <div className="adventure-theme adventure-checkout min-h-screen bg-surface-soft">
       <header className="adventure-checkout__header">
         <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-4 sm:px-6">
-          <Logo imgClassName="h-8 w-auto sm:h-9" />
+          <Logo variant="dark" imgClassName="h-8 w-auto sm:h-9" />
           <div className="flex items-center gap-3">
             <LanguageSwitch compact />
             <div className="adventure-checkout__secure"><LockKeyhole aria-hidden /> Pago protegido</div>

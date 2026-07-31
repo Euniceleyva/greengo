@@ -33,7 +33,7 @@ export function Step4Summary() {
 
   return (
     <div>
-      <div className="rounded-xl border border-border bg-surface-soft p-5">
+      <div className="adventure-summary-card rounded-xl border border-border bg-surface-soft p-5">
         <h3 className="font-heading text-sm font-semibold text-foreground">Resumen del viaje</h3>
         <dl className="mt-3 grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
           <SummaryRow label="Servicio" value={SERVICE_TYPE_LABELS[serviceType]} />
@@ -57,7 +57,7 @@ export function Step4Summary() {
         )}
       </div>
 
-      <div className="mt-6 rounded-xl border border-border p-5">
+      <div className="adventure-fare-card mt-6 rounded-xl border border-border p-5">
         <h3 className="font-heading text-sm font-semibold text-foreground">Desglose de tarifa (estimado)</h3>
 
         {fare.isCustomQuote ? (
@@ -91,7 +91,7 @@ export function Step4Summary() {
         )}
 
         <Separator className="my-4" />
-        <div className="flex items-center justify-between">
+        <div className="adventure-fare-total flex items-center justify-between">
           <span className="font-heading text-base font-semibold text-foreground">Total estimado</span>
           <span className="font-heading text-xl font-bold text-primary">
             {fare.isCustomQuote ? CUSTOM_QUOTE_LABEL : <LocalizedCurrency amount={fare.total} />}

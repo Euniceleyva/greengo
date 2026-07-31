@@ -16,7 +16,7 @@ export default function ReservarPage() {
     <div className="adventure-theme adventure-reservation min-h-screen bg-surface-soft">
       <header className="adventure-reservation__header">
         <div className="mx-auto flex h-[72px] max-w-5xl items-center justify-between px-4 sm:px-6">
-          <Logo imgClassName="h-8 w-auto sm:h-9" />
+          <Logo variant="dark" imgClassName="h-8 w-auto sm:h-9" />
           <div className="flex items-center gap-3">
             <LanguageSwitch compact />
             <span className="adventure-reservation__route">CUN → TU AVENTURA</span>

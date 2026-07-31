@@ -29,6 +29,8 @@ const TRANSFER_KIND_LABELS: Record<TransferKind, string> = {
   tour: "Tour",
 };
 
+const HERO_ROUTE_PATH = "M24 188C120 80 207 238 302 129C387 31 459 170 628 48";
+
 export function LandingHero() {
   const router = useRouter();
   const heroRef = React.useRef<HTMLElement>(null);
@@ -211,9 +213,34 @@ export function LandingHero() {
         </div>
 
         <svg className="adventure-hero__route" viewBox="0 0 660 240" fill="none" aria-hidden>
-          <path data-hero-route d="M24 188C120 80 207 238 302 129C387 31 459 170 628 48" />
-          <circle cx="24" cy="188" r="7" />
-          <circle cx="628" cy="48" r="7" />
+          <defs>
+            <g id="hero-route-van-shape">
+              <ellipse className="adventure-hero__van-shadow" cx="0" cy="11" rx="24" ry="6" />
+              <rect className="adventure-hero__van-body" x="-24" y="-13" width="47" height="22" rx="6" />
+              <rect className="adventure-hero__van-cabin" x="3" y="-17" width="18" height="17" rx="5" />
+              <rect className="adventure-hero__van-window" x="-16" y="-9" width="12" height="7" rx="2" />
+              <rect className="adventure-hero__van-window" x="-1" y="-9" width="11" height="7" rx="2" />
+              <rect className="adventure-hero__van-window" x="12" y="-10" width="7" height="8" rx="2" />
+              <rect className="adventure-hero__van-stripe" x="-19" y="1" width="31" height="4" rx="2" />
+              <circle className="adventure-hero__van-wheel" cx="-13" cy="10" r="5" />
+              <circle className="adventure-hero__van-wheel" cx="14" cy="10" r="5" />
+              <circle className="adventure-hero__van-hub" cx="-13" cy="10" r="1.6" />
+              <circle className="adventure-hero__van-hub" cx="14" cy="10" r="1.6" />
+            </g>
+          </defs>
+          <path className="adventure-hero__road-shadow" d={HERO_ROUTE_PATH} />
+          <path className="adventure-hero__road-border" d={HERO_ROUTE_PATH} />
+          <path data-hero-route className="adventure-hero__road-asphalt" d={HERO_ROUTE_PATH} />
+          <path className="adventure-hero__road-texture adventure-hero__road-texture--one" d={HERO_ROUTE_PATH} />
+          <path className="adventure-hero__road-texture adventure-hero__road-texture--two" d={HERO_ROUTE_PATH} />
+          <path className="adventure-hero__road-lane" d={HERO_ROUTE_PATH} />
+          <g className="adventure-hero__van adventure-hero__van--animated">
+            <use href="#hero-route-van-shape" />
+            <animateMotion dur="7.2s" repeatCount="indefinite" rotate="auto" begin="1.25s" path={HERO_ROUTE_PATH} />
+          </g>
+          <g className="adventure-hero__van adventure-hero__van--static" transform="translate(374 111) rotate(22)">
+            <use href="#hero-route-van-shape" />
+          </g>
         </svg>
 
         <form
