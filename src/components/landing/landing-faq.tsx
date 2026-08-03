@@ -7,8 +7,8 @@ export function LandingFaq() {
       <div className="mx-auto grid max-w-[1100px] gap-10 px-4 sm:px-6 lg:grid-cols-[.8fr_1.2fr] lg:px-10">
         <div data-reveal-item>
           <div className="adventure-stamp adventure-stamp--passport">NO TE<br />PIERDAS</div>
-          <h2>Antes de subir, despeja la ruta.</h2>
-          <p>Equipaje, vuelos, horarios y cambios: aquí están las respuestas rápidas.</p>
+          <h2>Preguntas frecuentes sobre traslados en Cancún.</h2>
+          <p>Equipaje, vuelos, horarios, pagos y cambios: aquí están las respuestas rápidas antes de reservar.</p>
         </div>
 
         <div data-reveal-item className="adventure-faq__accordion">

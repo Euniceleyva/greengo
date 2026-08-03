@@ -7,8 +7,8 @@ export function LandingTestimonials() {
     <section data-adventure-reveal className="adventure-testimonials px-4 py-20 sm:px-6 sm:py-28 lg:px-10">
       <div className="mx-auto max-w-[1280px]">
       <div className="adventure-testimonials__heading">
-        <h2 data-reveal-item>Mensajes que llegaron antes que la postal.</h2>
-        <p data-reveal-item>Historias ilustrativas de viajeros que ya hicieron la ruta.</p>
+        <h2 data-reveal-item>Viajeros que reservaron transporte privado con GreenGo.</h2>
+        <p data-reveal-item>Experiencias de rutas al aeropuerto, hoteles, parques y destinos de la Riviera Maya.</p>
       </div>
 
       <div className="adventure-testimonial-wall mt-12">

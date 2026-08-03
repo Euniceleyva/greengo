@@ -180,18 +180,18 @@ export function LandingHero() {
       <div className="adventure-hero__layout mx-auto max-w-[1440px] px-4 pb-16 pt-8 sm:px-6 lg:px-10 lg:pb-24 lg:pt-10">
         <div className="adventure-hero__copy relative z-10">
           <div data-hero-sticker className="adventure-stamp adventure-stamp--sun">CUN · MX<br />365 días de sol</div>
-          <p className="adventure-kicker">El traslado es el primer capítulo</p>
-          <h1 className="adventure-hero__title" aria-label="Aterriza. Sube. Empieza la aventura.">
-            <span className="adventure-word-mask"><span data-hero-word className="normal-case">Aterriza.</span></span>
-            <span className="adventure-word-mask"><span data-hero-word className="text-[var(--adventure-sun)]">Sube.</span></span>
-            <span className="adventure-word-mask"><span data-hero-word>Empieza la</span></span>
-            <span className="adventure-word-mask"><span data-hero-word className="adventure-title-stroke">aventura.</span></span>
+          <p className="adventure-kicker">Traslados privados en Cancún y Riviera Maya</p>
+          <h1 className="adventure-hero__title" aria-label="Traslados privados en Cancún, sin esperas ni sorpresas">
+            <span className="adventure-word-mask"><span data-hero-word className="normal-case">Traslados</span></span>
+            <span className="adventure-word-mask"><span data-hero-word className="text-[var(--adventure-sun)]">privados</span></span>
+            <span className="adventure-word-mask"><span data-hero-word>en Cancún,</span></span>
+            <span className="adventure-word-mask"><span data-hero-word className="adventure-title-stroke">sin sorpresas.</span></span>
           </h1>
           <p className="adventure-hero__lede">
-            Del avión al Caribe, sin perder el ritmo. Traslados privados para moverte por Cancún y la Riviera Maya.
+            Reserva transporte privado desde el Aeropuerto de Cancún hacia tu hotel, tour o destino en la Riviera Maya. Seguimos tu vuelo, cuidamos tu equipaje y te mostramos la tarifa antes de confirmar.
           </p>
           <button type="button" onClick={() => router.push("/reservar")} className="adventure-text-link">
-            Armar mi ruta <ArrowRight aria-hidden />
+            Ver tarifa de mi traslado <ArrowRight aria-hidden />
           </button>
         </div>
 
@@ -208,7 +208,7 @@ export function LandingHero() {
             <source src="/images/hero-cancun.webm" type="video/webm" />
             <source src="/images/hero-cancun-optimizado.mp4" type="video/mp4" />
           </video>
-          <div className="adventure-hero__media-label"><MapPin aria-hidden /> Cancún → donde empiece tu plan</div>
+          <div className="adventure-hero__media-label"><MapPin aria-hidden /> Aeropuerto de Cancún → hotel o destino</div>
           <div data-hero-sticker data-hero-float className="adventure-sticker adventure-sticker--coral">PLAYA<br />MODE</div>
         </div>
 
@@ -251,8 +251,8 @@ export function LandingHero() {
         >
           <div className="adventure-quote__header">
             <div>
-              <span>Salida inmediata</span>
-              <h2>Traza tu primera ruta</h2>
+              <span>Tarifa clara antes de confirmar</span>
+              <h2>Cotiza tu ruta en Cancún</h2>
             </div>
             <span className="adventure-quote__code">CUN / 001</span>
           </div>

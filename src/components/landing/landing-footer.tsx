@@ -7,12 +7,12 @@ export function LandingFooter() {
   return (
     <footer id="contacto" className="adventure-footer">
       <div className="mx-auto max-w-[1280px] px-4 pb-28 pt-16 sm:px-6 sm:pb-12 lg:px-10">
-        <div className="adventure-footer__marquee">NOS VEMOS EN EL CARIBE · NOS VEMOS EN EL CARIBE ·</div>
+        <div className="adventure-footer__marquee">TU VIAJE SEGURO COMIENZA AQUÍ · TU VIAJE SEGURO COMIENZA AQUÍ ·</div>
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <Logo variant="white" imgClassName="h-10 w-auto" />
             <p className="mt-3 text-sm text-white/70">
-              El primer tramo de una gran historia en Cancún y la Riviera Maya.
+              Traslados privados en Cancún y la Riviera Maya desde el aeropuerto hasta tu hotel, tour o evento.
             </p>
           </div>
 
@@ -23,7 +23,7 @@ export function LandingFooter() {
                 <Phone className="h-4 w-4 shrink-0" aria-hidden /> {WHATSAPP_DISPLAY}
               </li>
               <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 shrink-0" aria-hidden /> hola@greengotransfers.demo
+                <Mail className="h-4 w-4 shrink-0" aria-hidden /> hola@greengotransfers.com
               </li>
             </ul>
           </div>
@@ -68,7 +68,7 @@ export function LandingFooter() {
 
         <div className="mt-10 border-t border-white/20 pt-6 text-center text-xs text-white/55">
           <p>
-            Sitio demostrativo — datos, precios y disponibilidad son simulados con fines de presentación.
+            Servicio de traslados privados en Cancún, Playa del Carmen, Tulum, Isla Mujeres, Cozumel y Xcaret.
           </p>
           <p className="mt-1">© {new Date().getFullYear()} GreenGo Transfers Cancún.</p>
         </div>

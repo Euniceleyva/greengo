@@ -3,23 +3,23 @@ import { ClipboardList, CalendarCheck, CarFront, PartyPopper } from "lucide-reac
 const STEPS = [
   {
     icon: ClipboardList,
-    title: "Cotiza tu traslado",
-    description: "Indica origen, destino, fecha y número de pasajeros en el formulario de reserva.",
+    title: "Cotiza tu traslado privado",
+    description: "Indica origen, destino, fecha, horario, pasajeros y equipaje en el formulario de reserva.",
   },
   {
     icon: CalendarCheck,
     title: "Confirma tu reservación",
-    description: "Revisa el desglose de tarifa y confirma tus datos de contacto en minutos.",
+    description: "Revisa la tarifa antes de pagar, comparte tus datos de contacto y recibe los detalles del servicio.",
   },
   {
     icon: CarFront,
     title: "Te recogemos a tiempo",
-    description: "Un conductor asignado te espera en el punto acordado, con seguimiento de tu vuelo si aplica.",
+    description: "Tu conductor te espera en el punto acordado, con seguimiento de vuelo cuando aplica.",
   },
   {
     icon: PartyPopper,
-    title: "Disfruta tu viaje",
-    description: "Llega a tu destino con tranquilidad y sin preocuparte por el transporte.",
+    title: "Disfruta el trayecto",
+    description: "Sube, ponte cómodo y llega seguro a tu destino. Nosotros nos ocupamos del camino.",
   },
 ];
 
@@ -31,9 +31,9 @@ export function LandingHowItWorks() {
           <div data-reveal-item className="adventure-sticker adventure-sticker--sun">FÁCIL<br />FÁCIL</div>
           <div data-reveal-item>
             <p className="adventure-kicker">Tu itinerario</p>
-            <h2>De “ya aterricé” a “ya llegué”.</h2>
+            <h2>Reserva tu traslado privado en 4 pasos.</h2>
           </div>
-          <p data-reveal-item>Cuatro paradas claras, cero vueltas innecesarias.</p>
+          <p data-reveal-item>Un proceso claro para llegar del Aeropuerto de Cancún a tu hotel o destino con tarifa visible, conductor asignado y soporte por WhatsApp.</p>
         </div>
 
         <ol className="adventure-itinerary__steps mt-14">

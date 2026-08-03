@@ -35,10 +35,13 @@ const adventureBody = Lexend({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("http://localhost:3000"),
-  title: "GreenGo Traslados — DEMO",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://greengotransfers.com"),
+  title: {
+    default: "GreenGo Transfers Cancún | Traslados privados en Riviera Maya",
+    template: "%s | GreenGo Transfers Cancún",
+  },
   description:
-    "DEMO frontend de gestión y monitoreo de traslados turísticos en Cancún. Datos simulados.",
+    "Traslados privados desde el Aeropuerto de Cancún a hoteles, playas, parques y destinos de la Riviera Maya.",
   icons: {
     icon: "/logo.png",
     shortcut: "/logo.png",

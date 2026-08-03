@@ -1,16 +1,16 @@
 import type { Destination } from "@/types";
 
 // Destinos destacados para la Landing Page. Extienden (no duplican) los
-// lugares definidos en src/mocks/locations.ts — cada destino referencia su
-// `locationId` en LOCATIONS. Descripciones, tiempos y precios son ficticios.
+// lugares definidos en src/mocks/locations.ts; cada destino referencia su
+// `locationId` en LOCATIONS.
 export const DESTINATIONS: Destination[] = [
   {
     slug: "zona-hotelera",
     locationId: "loc-zona-hotelera",
     name: "Zona Hotelera de Cancún",
-    shortDescription: "Playas turquesa y la vida nocturna más animada del Caribe mexicano.",
+    shortDescription: "Traslado privado desde el Aeropuerto de Cancún a hoteles frente al Caribe mexicano.",
     description:
-      "La franja hotelera de Cancún concentra los resorts más reconocidos, playas de arena blanca y una oferta interminable de restaurantes, bares y vida nocturna. Ideal para quienes buscan comodidad y todo cerca.",
+      "Viaja del Aeropuerto Internacional de Cancún a la Zona Hotelera en una unidad privada, sin filas ni transbordos. Esta franja concentra resorts frente al mar, playas de arena blanca, restaurantes, centros comerciales y vida nocturna, por lo que es una de las rutas más solicitadas para iniciar vacaciones con comodidad.",
     image: "/images/destinations/cancun.webp",
     airportMinutes: 25,
     priceFrom: 850,
@@ -20,9 +20,9 @@ export const DESTINATIONS: Destination[] = [
     slug: "playa-del-carmen",
     locationId: "loc-playa-carmen",
     name: "Playa del Carmen",
-    shortDescription: "Ambiente bohemio, la Quinta Avenida y acceso a Cozumel en ferry.",
+    shortDescription: "Transporte privado desde Cancún a Playa del Carmen, Quinta Avenida y ferry a Cozumel.",
     description:
-      "A poco más de una hora de Cancún, Playa del Carmen combina playas relajadas con la energía de la Quinta Avenida, llena de tiendas, cafés y restaurantes. Punto de partida habitual para excursiones a Cozumel.",
+      "Reserva un traslado privado desde el Aeropuerto de Cancún o tu hotel hacia Playa del Carmen. La ruta conecta con resorts, la Quinta Avenida, restaurantes, beach clubs y la terminal de ferry a Cozumel, ideal para quienes quieren moverse por la Riviera Maya con horario propio.",
     image: "/images/destinations/playa.webp",
     airportMinutes: 60,
     priceFrom: 1450,
@@ -32,9 +32,9 @@ export const DESTINATIONS: Destination[] = [
     slug: "tulum",
     locationId: "loc-tulum",
     name: "Tulum",
-    shortDescription: "Ruinas frente al mar, cenotes y un estilo de vida bohemio-chic.",
+    shortDescription: "Traslado privado de Cancún a Tulum, zona hotelera, ruinas y cenotes.",
     description:
-      "Tulum es famoso por sus ruinas mayas con vista al Caribe, sus cenotes cercanos y una zona hotelera de diseño relajado. Uno de los destinos más solicitados de la Riviera Maya.",
+      "El traslado de Cancún a Tulum es una de las rutas largas más buscadas de la Riviera Maya. Con GreenGo puedes viajar en transporte privado hacia la zona hotelera, el centro, las ruinas mayas frente al Caribe o cenotes cercanos, con espacio para equipaje y salida ajustada a tu itinerario.",
     image: "/images/destinations/tulum.webp",
     airportMinutes: 120,
     priceFrom: 2200,
@@ -44,9 +44,9 @@ export const DESTINATIONS: Destination[] = [
     slug: "isla-mujeres",
     locationId: "loc-isla-mujeres",
     name: "Isla Mujeres",
-    shortDescription: "Una isla pequeña con playas tranquilas a un corto trayecto en ferry.",
+    shortDescription: "Transporte privado al ferry de Isla Mujeres desde aeropuerto, hotel o Zona Hotelera.",
     description:
-      "Frente a Cancún, Isla Mujeres ofrece playas tranquilas de aguas poco profundas, un pueblo colorido y paseos en golf cart. Traslado terrestre hasta el embarcadero, cruce en ferry no incluido.",
+      "Llegar a Isla Mujeres comienza con un traslado terrestre privado al embarcadero de Cancún. Te llevamos desde el aeropuerto o tu hotel hasta la terminal de ferry para que cruces hacia playas tranquilas, el centro de la isla y sus paseos en golf cart. El cruce marítimo se contrata por separado.",
     image: "/images/destinations/isla.webp",
     airportMinutes: 45,
     priceFrom: 1100,
@@ -56,9 +56,9 @@ export const DESTINATIONS: Destination[] = [
     slug: "cozumel",
     locationId: "loc-cozumel",
     name: "Cozumel",
-    shortDescription: "Uno de los mejores puntos de buceo y esnórquel del Caribe.",
+    shortDescription: "Traslado privado a la terminal de ferry a Cozumel desde Cancún o Riviera Maya.",
     description:
-      "Cozumel es reconocida mundialmente por sus arrecifes de coral, ideales para buceo y esnórquel. Traslado terrestre hasta el puerto de embarque; el cruce en ferry se contrata por separado.",
+      "Para viajar a Cozumel, coordinamos tu transporte privado hasta el puerto de embarque en Playa del Carmen. Es una ruta cómoda desde Cancún, hoteles de la Riviera Maya o el aeropuerto, pensada para conectar con el ferry hacia una isla famosa por arrecifes, buceo y esnórquel.",
     image: "/images/destinations/akumal.webp",
     airportMinutes: 90,
     priceFrom: 1800,
@@ -68,9 +68,9 @@ export const DESTINATIONS: Destination[] = [
     slug: "xcaret",
     locationId: "loc-xcaret",
     name: "Xcaret",
-    shortDescription: "Parque temático natural con ríos subterráneos y cultura mexicana.",
+    shortDescription: "Transporte privado a Xcaret desde Cancún, Playa del Carmen o tu hotel.",
     description:
-      "Xcaret combina naturaleza, ríos subterráneos, vida silvestre y espectáculos culturales en un solo parque. Una de las excursiones de un día más solicitadas desde Cancún.",
+      "Evita depender de horarios de tour y reserva transporte privado a Xcaret desde Cancún, Playa del Carmen o cualquier hotel de la Riviera Maya. Te llevamos al parque y podemos coordinar el regreso después de sus ríos subterráneos, actividades naturales y espectáculos culturales.",
     image: "/images/destinations/pventuras.webp",
     airportMinutes: 75,
     priceFrom: 1600,

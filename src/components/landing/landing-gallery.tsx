@@ -4,12 +4,12 @@ import { Carousel } from "@/components/ui/carousel";
 import { GALLERY_IMAGES } from "@/mocks/gallery";
 
 const REASONS: { text: string; tone: "green" | "blue" }[] = [
-  { text: "Llegamos cuando nos necesites", tone: "green" },
+  { text: "Seguimos tu vuelo en tiempo real", tone: "green" },
   { text: "Cuidamos tu equipaje como si fuera nuestro", tone: "blue" },
-  { text: "Conductores que conocen cada ruta", tone: "green" },
+  { text: "Conductores locales que conocen la ruta", tone: "green" },
   { text: "Unidades limpias y verificadas", tone: "blue" },
-  { text: "Tarifa clara, sin sorpresas", tone: "green" },
-  { text: "Soporte en español e inglés, siempre disponible", tone: "blue" },
+  { text: "Tarifa clara antes de confirmar", tone: "green" },
+  { text: "Atención por WhatsApp antes y durante tu viaje", tone: "blue" },
 ];
 
 export function LandingGallery() {
@@ -32,8 +32,8 @@ export function LandingGallery() {
         <div className="adventure-section-heading">
           <div data-reveal-item className="adventure-stamp adventure-stamp--passport">RIVIERA<br />MAYA</div>
           <div data-reveal-item>
-            <h2>La ventana ya es parte del viaje.</h2>
-            <p>Mar turquesa, selva y carretera. Estos son algunos de los paisajes que empiezan antes de llegar.</p>
+            <h2>Tu traslado empieza tranquilo desde el primer mensaje.</h2>
+            <p>Viaja en unidades privadas y espaciosas, con atención por WhatsApp desde que cotizas hasta que llegas a tu hotel, parque o destino.</p>
           </div>
           <p data-reveal-item className="adventure-margin-note">Vistas reales de nuestras rutas favoritas.</p>
         </div>

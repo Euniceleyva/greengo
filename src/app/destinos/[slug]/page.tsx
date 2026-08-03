@@ -16,13 +16,15 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const destination = destinationBySlug(params.slug);
   if (!destination) return { title: "Destino no encontrado — GreenGo Transfers Cancún" };
+  const title = `Traslado a ${destination.name} desde el Aeropuerto de Cancún`;
+  const description = `Reserva transporte privado a ${destination.name} desde el Aeropuerto de Cancún o tu hotel. ${destination.shortDescription}`;
 
   return {
-    title: `${destination.name} — GreenGo Transfers Cancún`,
-    description: destination.shortDescription,
+    title,
+    description,
     openGraph: {
-      title: `${destination.name} — GreenGo Transfers Cancún`,
-      description: destination.shortDescription,
+      title: `${title} | GreenGo Transfers`,
+      description,
       images: [destination.image],
       locale: "es_MX",
       type: "website",
@@ -92,12 +94,12 @@ export default function DestinationPage({ params }: { params: { slug: string } }
         <section className="adventure-destination-story mx-auto max-w-[1100px] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-[1.35fr_.65fr]">
             <div>
-              <h2>La historia detrás de la ventana</h2>
+              <h2>Traslado privado a {destination.name}</h2>
               <p className="mt-5 text-lg leading-relaxed text-muted-foreground">{destination.description}</p>
             </div>
 
             <div>
-              <h2 className="font-heading text-2xl text-foreground">Lo que vale la parada</h2>
+              <h2 className="font-heading text-2xl text-foreground">Por qué viajar a {destination.name}</h2>
               <ul className="adventure-highlight-list mt-5 space-y-2">
                 {destination.highlights.map((highlight) => (
                   <li
@@ -116,7 +118,7 @@ export default function DestinationPage({ params }: { params: { slug: string } }
         {related.length > 0 && (
           <section className="adventure-related py-16 sm:py-24">
             <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
-              <h2>Otros puntos en el mapa</h2>
+              <h2>Otros traslados en la Riviera Maya</h2>
               <div className="adventure-related__grid mt-8">
                 {related.map((d, index) => (
                   <Link key={d.slug} href={`/destinos/${d.slug}`} className={`adventure-related-card adventure-related-card--${index + 1} group`}>
