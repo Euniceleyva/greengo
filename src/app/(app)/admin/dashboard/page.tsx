@@ -175,7 +175,7 @@ export default function DashboardPage() {
             <CardDescription>Aproximación según nivel de combustible actual · unidad: litros</CardDescription>
           </CardHeader>
           <CardContent>
-            <SimpleBarChart data={consumptionData} color="#00AFEE" unit="L" />
+            <SimpleBarChart data={consumptionData} color="#94D9D9" unit="L" />
           </CardContent>
         </Card>
       </div>

@@ -101,10 +101,10 @@ function ActiveTripContent() {
     toast.success("Viaje finalizado y registrado.");
   };
 
-  const routes: MapRoute[] = [{ points: trip.plannedRoute, color: "#00AFEE" }];
+  const routes: MapRoute[] = [{ points: trip.plannedRoute, color: "#94D9D9" }];
   const markers: MapMarker[] = [
-    { id: "o", position: trip.originCoord, color: "#29876B", title: "Origen" },
-    { id: "d", position: trip.destinationCoord, color: "#dc2626", title: "Destino" },
+    { id: "o", position: trip.originCoord, color: "#9DC52D", title: "Origen" },
+    { id: "d", position: trip.destinationCoord, color: "#EAA33D", title: "Destino" },
   ];
 
   return (

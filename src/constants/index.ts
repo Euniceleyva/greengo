@@ -94,11 +94,11 @@ export const VEHICLE_STATUS_TONE: Record<VehicleStatus, BadgeTone> = {
 };
 
 export const VEHICLE_STATUS_COLOR: Record<VehicleStatus, string> = {
-  disponible: "#16a34a",
-  en_ruta: "#2563eb",
-  detenido: "#d97706",
-  mantenimiento: "#6b7280",
-  con_alerta: "#dc2626",
+  disponible: "#9DC52D",
+  en_ruta: "#94D9D9",
+  detenido: "#EAA33D",
+  mantenimiento: "#94D9D9",
+  con_alerta: "#EAA33D",
 };
 
 export const VEHICLE_TYPE_LABELS: Record<VehicleType, string> = {

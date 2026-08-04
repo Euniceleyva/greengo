@@ -51,7 +51,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       {/* Sidebar desktop */}
       <aside
         className={cn(
-          "hidden shrink-0 flex-col border-r border-border bg-card transition-[width] duration-200 lg:flex",
+          "hidden shrink-0 flex-col border-r border-border bg-card/95 shadow-soft transition-[width] duration-200 lg:flex",
           collapsed ? "w-[4.5rem]" : "w-64",
         )}
       >
@@ -74,7 +74,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Header */}
-        <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b border-border bg-card/90 px-4 backdrop-blur">
+        <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b border-border bg-card/95 px-4 shadow-soft backdrop-blur">
           <Button
             variant="ghost"
             size="icon"
@@ -105,11 +105,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <DropdownMenu
             trigger={
               <button
-                className="flex items-center gap-2 rounded-lg py-1 pl-1 pr-2 transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex items-center gap-2 rounded-lg border border-transparent py-1 pl-1 pr-2 transition-colors hover:border-border hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 aria-label="Menú de cuenta y configuración"
               >
                 <span
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold text-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold text-foreground ring-1 ring-border"
                   style={{ backgroundColor: user.avatarColor }}
                 >
                   {user.name.split(" ").slice(0, 2).map((n) => n[0]).join("")}
@@ -167,12 +167,21 @@ function SidebarContent({
   return (
     <>
       <div className={cn("flex h-16 items-center gap-2 border-b border-border px-5", collapsed && "justify-center px-2")}>
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white ring-1 ring-border">
-          <Image src="/logo.png" alt="GreenGo" width={28} height={23} className="h-6 w-auto" />
+        <div className={cn(
+          "flex shrink-0 items-center justify-center rounded-lg bg-white ring-1 ring-border",
+          collapsed ? "h-10 w-10" : "h-10 w-36 px-2",
+        )}>
+          <Image
+            src={collapsed ? "/images/logos/favicon_greengo.png" : "/images/logos/logo_color.png"}
+            alt="GreenGo Transfers Cancún"
+            width={collapsed ? 32 : 148}
+            height={collapsed ? 32 : 66}
+            className={cn(collapsed ? "h-7 w-7" : "h-8 w-auto")}
+            priority
+          />
         </div>
         {!collapsed && (
           <div className="min-w-0">
-            <p className="font-heading truncate text-sm font-bold leading-tight">GreenGo</p>
             <p className="truncate text-[10px] text-muted-foreground">Panel administrativo</p>
           </div>
         )}
@@ -201,14 +210,21 @@ function SidebarContent({
                     onClick={onNavigate}
                     title={collapsed ? item.label : undefined}
                     className={cn(
-                      "group/nav relative flex items-center gap-3 rounded-lg border-l-[3px] px-3 py-2.5 text-sm font-medium transition-colors",
+                      "group/nav relative flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-colors",
                       collapsed && "justify-center px-0",
                       active
-                        ? "border-primary bg-primary-soft text-primary font-semibold"
-                        : "border-transparent text-muted-foreground hover:bg-secondary hover:text-foreground",
+                        ? "border-primary/15 bg-primary-soft text-primary font-semibold shadow-soft"
+                        : "text-muted-foreground hover:border-border hover:bg-secondary hover:text-foreground",
                     )}
                   >
-                    <Icon className="h-[18px] w-[18px] shrink-0" />
+                    <span
+                      className={cn(
+                        "flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors",
+                        active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground group-hover/nav:bg-card group-hover/nav:text-primary",
+                      )}
+                    >
+                      <Icon className="h-[17px] w-[17px]" />
+                    </span>
                     {!collapsed && <span className="truncate">{item.label}</span>}
                     {collapsed && (
                       <span className="pointer-events-none absolute left-full z-50 ml-2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs font-medium text-background opacity-0 shadow-popover transition-opacity duration-150 group-hover/nav:opacity-100">

@@ -73,7 +73,7 @@ export default function ReportsPage() {
             .map((v) => ({
               label: v.code,
               value: Number(trips.filter((t) => t.vehicleId === v.id).reduce((s, t) => s + t.offRouteKm, 0).toFixed(1)),
-              color: "#d97706",
+              color: "#EAA33D",
             }))
             .filter((d) => d.value > 0),
         };
@@ -83,7 +83,7 @@ export default function ReportsPage() {
           data: vehicles.map((v) => ({
             label: v.code,
             value: fuel.filter((f) => f.vehicleId === v.id).reduce((s, f) => s + f.liters, 0),
-            color: "#059669",
+            color: "#9DC52D",
           })),
         };
       case "perf_vehicle":
@@ -92,7 +92,7 @@ export default function ReportsPage() {
           data: vehicles.map((v) => {
             const recs = fuel.filter((f) => f.vehicleId === v.id && f.performanceKmL);
             const avg = recs.reduce((s, f) => s + (f.performanceKmL ?? 0), 0) / (recs.length || 1);
-            return { label: v.code, value: Number(avg.toFixed(1)), color: avg < 6 ? "#dc2626" : "#059669" };
+            return { label: v.code, value: Number(avg.toFixed(1)), color: avg < 6 ? "#EAA33D" : "#9DC52D" };
           }),
         };
       case "services_type":
@@ -110,7 +110,7 @@ export default function ReportsPage() {
             .map((d) => ({
               label: d.name.split(" ")[0],
               value: incidents.filter((i) => i.driverId === d.id).length + d.incidents,
-              color: "#dc2626",
+              color: "#EAA33D",
             }))
             .filter((d) => d.value > 0),
         };
@@ -123,7 +123,7 @@ export default function ReportsPage() {
               .filter((t) => t.vehicleId === v.id && t.status === "completado")
               .reduce((s, t) => s + t.amount, 0);
             const fuelCost = fuel.filter((f) => f.vehicleId === v.id).reduce((s, f) => s + f.total, 0);
-            return { label: v.code, value: Math.round(income - fuelCost * 0.4), color: income - fuelCost > 0 ? "#059669" : "#dc2626" };
+            return { label: v.code, value: Math.round(income - fuelCost * 0.4), color: income - fuelCost > 0 ? "#9DC52D" : "#EAA33D" };
           }),
         };
     }

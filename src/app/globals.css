@@ -106,6 +106,68 @@
   background-size: 28px 28px;
 }
 
+/* Admin / conductor: identidad GreenGo sobria, sin estilo sketch de la landing. */
+.operations-theme {
+  --brand-green: 76 63% 47%;   /* #9DC52D */
+  --brand-blue: 180 48% 72%;   /* #94D9D9 */
+  --brand-orange: 35 80% 58%;  /* #EAA33D */
+  --brand-lime: 76 63% 47%;    /* #9DC52D */
+
+  --background: 166 38% 98%;
+  --foreground: 170 42% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 170 42% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 170 42% 11%;
+  --surface-soft: 170 45% 96%;
+  --border: 166 24% 86%;
+  --input: 166 24% 86%;
+  --muted: 168 30% 94%;
+  --muted-foreground: 168 13% 42%;
+
+  --primary: 76 63% 47%;
+  --primary-foreground: 170 42% 11%;
+  --primary-soft: 77 67% 92%;
+
+  --secondary: 172 32% 94%;
+  --secondary-foreground: 170 39% 14%;
+
+  --accent: 180 48% 72%;
+  --accent-foreground: 170 42% 11%;
+  --info: 180 48% 72%;
+  --info-foreground: 170 42% 11%;
+  --info-soft: 180 48% 93%;
+
+  --success: 76 63% 47%;
+  --success-foreground: 170 42% 11%;
+  --success-soft: 77 67% 92%;
+
+  --warning: 35 80% 58%;
+  --warning-foreground: 170 42% 11%;
+  --warning-soft: 35 100% 93%;
+
+  --destructive: 35 80% 58%;
+  --destructive-foreground: 170 42% 11%;
+  --destructive-soft: 35 100% 93%;
+
+  --ring: 76 63% 47%;
+  --shadow-color: 170 42% 11%;
+  color: hsl(var(--foreground));
+  font-family: var(--font-adventure-body), var(--font-body), sans-serif;
+}
+
+.operations-theme .font-heading,
+.operations-theme h1,
+.operations-theme h2,
+.operations-theme h3 {
+  font-family: var(--font-adventure-body), var(--font-heading), sans-serif;
+  letter-spacing: 0;
+}
+
+.operations-theme :focus-visible {
+  outline-color: hsl(var(--ring));
+}
+
 /* Public experience: isolated from admin and driver surfaces. */
 .adventure-theme {
   --adventure-caribbean: #93d9d9;

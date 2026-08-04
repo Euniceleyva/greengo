@@ -8,7 +8,7 @@ const toneClasses: Record<BadgeTone, string> = {
   warning: "bg-warning-soft text-warning ring-warning/15",
   danger: "bg-destructive-soft text-destructive ring-destructive/15",
   info: "bg-info-soft text-info ring-info/15",
-  purple: "bg-violet-50 text-violet-700 ring-violet-200",
+  purple: "bg-info-soft text-info ring-info/15",
 };
 
 const dotClasses: Record<BadgeTone, string> = {
@@ -17,7 +17,7 @@ const dotClasses: Record<BadgeTone, string> = {
   warning: "bg-warning",
   danger: "bg-destructive",
   info: "bg-info",
-  purple: "bg-violet-500",
+  purple: "bg-info",
 };
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {

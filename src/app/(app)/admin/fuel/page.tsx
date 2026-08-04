@@ -44,7 +44,7 @@ export default function FuelPage() {
   const perfByVehicle = vehicles.map((v) => {
     const recs = fuel.filter((f) => f.vehicleId === v.id && f.performanceKmL);
     const avg = recs.reduce((s, f) => s + (f.performanceKmL ?? 0), 0) / (recs.length || 1);
-    return { label: v.code, value: Number(avg.toFixed(1)), color: avg < 6 ? "#dc2626" : "#059669" };
+    return { label: v.code, value: Number(avg.toFixed(1)), color: avg < 6 ? "#EAA33D" : "#9DC52D" };
   });
 
   const columns: Column<FuelRecord>[] = [

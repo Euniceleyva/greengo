@@ -3,17 +3,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, ListChecks, Fuel, AlertTriangle, User, LogOut } from "lucide-react";
+import { ClipboardCheck, CircleUserRound, Fuel, House, LogOut, TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSessionStore } from "@/stores/session-store";
 import { useHydrated } from "@/lib/hooks";
 
 const NAV = [
-  { href: "/driver/home", label: "Inicio", icon: Home },
-  { href: "/driver/services", label: "Servicios", icon: ListChecks },
+  { href: "/driver/home", label: "Inicio", icon: House },
+  { href: "/driver/services", label: "Servicios", icon: ClipboardCheck },
   { href: "/driver/fuel", label: "Gasolina", icon: Fuel },
-  { href: "/driver/incidents", label: "Incidencia", icon: AlertTriangle },
-  { href: "/driver/profile", label: "Perfil", icon: User },
+  { href: "/driver/incidents", label: "Incidencia", icon: TriangleAlert },
+  { href: "/driver/profile", label: "Perfil", icon: CircleUserRound },
 ];
 
 export function DriverShell({ children }: { children: React.ReactNode }) {
@@ -26,15 +26,22 @@ export function DriverShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen justify-center bg-muted">
       {/* Contenedor tipo teléfono en pantallas grandes */}
-      <div className="relative flex min-h-screen w-full max-w-md flex-col bg-background shadow-xl">
-        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b border-black/10 bg-primary px-4 text-primary-foreground">
-          <div className="flex min-w-0 items-center gap-2">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white">
-              <Image src="/logo.png" alt="GreenGo" width={24} height={20} className="h-5 w-auto" />
+      <div className="relative flex min-h-screen w-full max-w-md flex-col bg-background shadow-xl ring-1 ring-border">
+        <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-primary/20 bg-primary px-4 text-primary-foreground">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-10 w-28 shrink-0 items-center justify-center rounded-lg bg-white px-2 ring-1 ring-black/10">
+              <Image
+                src="/images/logos/logo_color.png"
+                alt="GreenGo Transfers Cancún"
+                width={132}
+                height={58}
+                className="h-7 w-auto"
+                priority
+              />
             </div>
             <div className="min-w-0 leading-tight">
-              <p className="font-heading truncate text-sm font-semibold">GreenGo</p>
-              <p className="truncate text-[11px] text-primary-foreground/80">{driverName} · Conductor</p>
+              <p className="truncate text-[11px] font-medium uppercase tracking-wide text-primary-foreground/70">Conductor</p>
+              <p className="font-heading truncate text-sm font-semibold">{driverName}</p>
             </div>
           </div>
           <button
@@ -49,7 +56,7 @@ export function DriverShell({ children }: { children: React.ReactNode }) {
         <main className="flex-1 overflow-y-auto px-4 pb-28 pt-4">{children}</main>
 
         {/* Navegación inferior */}
-        <nav className="fixed bottom-0 z-30 w-full max-w-md border-t border-border bg-card pb-safe">
+        <nav className="fixed bottom-0 z-30 w-full max-w-md border-t border-border bg-card/95 pb-safe shadow-popover backdrop-blur">
           <div className="grid grid-cols-5">
             {NAV.map((item) => {
               const active = pathname.startsWith(item.href);
@@ -60,11 +67,16 @@ export function DriverShell({ children }: { children: React.ReactNode }) {
                   href={item.href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex min-h-[52px] flex-col items-center justify-center gap-1 py-2 text-[11px] font-medium transition-colors",
-                    active ? "text-primary" : "text-muted-foreground",
+                    "flex min-h-[58px] flex-col items-center justify-center gap-1 py-2 text-[11px] font-semibold transition-colors",
+                    active ? "text-primary" : "text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  <span className={cn("flex h-7 w-11 items-center justify-center rounded-full", active && "bg-primary-soft")}>
+                  <span
+                    className={cn(
+                      "flex h-8 w-12 items-center justify-center rounded-full transition-colors",
+                      active ? "bg-primary text-primary-foreground shadow-soft" : "bg-transparent",
+                    )}
+                  >
                     <Icon className="h-5 w-5" />
                   </span>
                   {item.label}

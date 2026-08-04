@@ -75,7 +75,7 @@ export default function MonitoringPage() {
     ),
   }));
 
-  const routes: MapRoute[] = running || step > 0 ? [{ points: SIM_PATH, color: "#0369a1" }] : [];
+  const routes: MapRoute[] = running || step > 0 ? [{ points: SIM_PATH, color: "#94D9D9" }] : [];
 
   const statusCounts = (Object.keys(VEHICLE_STATUS_LABELS) as VehicleStatus[]).map((s) => ({
     status: s,

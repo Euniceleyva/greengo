@@ -73,13 +73,13 @@ export default function TripDetailPage() {
   const diffKm = trip.realKm !== null ? trip.realKm - trip.plannedKm : null;
   const diffMin = trip.realMinutes !== null ? trip.realMinutes - trip.estimatedMinutes : null;
 
-  const routes: MapRoute[] = [{ points: trip.plannedRoute, color: "#00AFEE" }];
+  const routes: MapRoute[] = [{ points: trip.plannedRoute, color: "#94D9D9" }];
   if (trip.actualRoute.length > 1) {
-    routes.push({ points: trip.actualRoute, color: "#dc2626", dashed: true });
+    routes.push({ points: trip.actualRoute, color: "#EAA33D", dashed: true });
   }
   const markers: MapMarker[] = [
-    { id: "o", position: trip.originCoord, color: "#29876B", title: "Origen", popup: <span className="text-xs">Origen: {trip.origin}</span> },
-    { id: "d", position: trip.destinationCoord, color: "#dc2626", title: "Destino", popup: <span className="text-xs">Destino: {trip.destination}</span> },
+    { id: "o", position: trip.originCoord, color: "#9DC52D", title: "Origen", popup: <span className="text-xs">Origen: {trip.origin}</span> },
+    { id: "d", position: trip.destinationCoord, color: "#EAA33D", title: "Destino", popup: <span className="text-xs">Destino: {trip.destination}</span> },
   ];
 
   return (
@@ -179,7 +179,7 @@ export default function TripDetailPage() {
                   <span className="h-1 w-6 rounded bg-info" /> Ruta planeada
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="h-1 w-6 rounded bg-destructive" style={{ borderTop: "2px dashed #dc2626" }} /> Ruta recorrida
+                  <span className="h-1 w-6 rounded bg-destructive" style={{ borderTop: "2px dashed #EAA33D" }} /> Ruta recorrida
                 </span>
               </div>
               <div className="h-72 overflow-hidden rounded-lg">

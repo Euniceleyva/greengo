@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 // Avatar por iniciales con color determinístico a partir del nombre.
-const COLORS = ["#2563eb", "#7c3aed", "#16a34a", "#dc2626", "#d97706", "#0891b2", "#db2777"];
+const COLORS = ["#9DC52D", "#94D9D9", "#EAA33D"];
 
 function colorFor(name: string): string {
   let hash = 0;
@@ -23,7 +23,7 @@ export function Avatar({
   return (
     <span
       className={cn(
-        "inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white",
+        "inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-foreground",
         sizeClass,
         className,
       )}

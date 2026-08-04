@@ -1,13 +1,13 @@
 import {
-  LayoutDashboard,
+  Gauge,
   Route,
-  MapPinned,
-  Car,
-  Users,
+  Radar,
+  BusFront,
+  UserRoundCheck,
   Fuel,
   Wrench,
-  Bell,
-  BarChart3,
+  ShieldAlert,
+  ChartNoAxesCombined,
   type LucideIcon,
 } from "lucide-react";
 
@@ -23,15 +23,15 @@ export interface NavGroup {
 }
 
 export const ADMIN_NAV: NavItem[] = [
-  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/dashboard", label: "Dashboard", icon: Gauge },
   { href: "/admin/trips", label: "Servicios", icon: Route },
-  { href: "/admin/monitoring", label: "Monitoreo", icon: MapPinned },
-  { href: "/admin/vehicles", label: "Vehículos", icon: Car },
-  { href: "/admin/drivers", label: "Conductores", icon: Users },
+  { href: "/admin/monitoring", label: "Monitoreo", icon: Radar },
+  { href: "/admin/vehicles", label: "Vehículos", icon: BusFront },
+  { href: "/admin/drivers", label: "Conductores", icon: UserRoundCheck },
   { href: "/admin/fuel", label: "Combustible", icon: Fuel },
   { href: "/admin/maintenance", label: "Mantenimiento", icon: Wrench },
-  { href: "/admin/alerts", label: "Alertas", icon: Bell },
-  { href: "/admin/reports", label: "Reportes", icon: BarChart3 },
+  { href: "/admin/alerts", label: "Alertas", icon: ShieldAlert },
+  { href: "/admin/reports", label: "Reportes", icon: ChartNoAxesCombined },
 ];
 
 export const ADMIN_NAV_GROUPS: NavGroup[] = [

@@ -14,11 +14,11 @@ import {
   Cell,
 } from "recharts";
 
-const AXIS = { fontSize: 12, fill: "#5f7770" };
-const GRID_COLOR = "#d9e5e1";
+const AXIS = { fontSize: 12, fill: "hsl(var(--muted-foreground))" };
+const GRID_COLOR = "#94D9D9";
 const TOOLTIP_STYLE = {
   borderRadius: 10,
-  border: "1px solid #d9e5e1",
+  border: "1px solid #94D9D9",
   fontSize: 12,
   boxShadow: "0 4px 14px rgba(19,43,36,0.08)",
 };
@@ -31,7 +31,7 @@ export interface BarDatum {
 
 export function SimpleBarChart({
   data,
-  color = "#29876B",
+  color = "#9DC52D",
   height = 220,
   unit = "",
 }: {
@@ -49,7 +49,7 @@ export function SimpleBarChart({
         <Tooltip
           formatter={(v: number) => [`${v.toLocaleString("es-MX")} ${unit}`.trim(), ""]}
           contentStyle={TOOLTIP_STYLE}
-          cursor={{ fill: "rgba(41,135,107,0.08)" }}
+          cursor={{ fill: "rgba(148,217,217,0.25)" }}
         />
         <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={48}>
           {data.map((d, i) => (
@@ -63,7 +63,7 @@ export function SimpleBarChart({
 
 export function SimpleLineChart({
   data,
-  color = "#00AFEE",
+  color = "#94D9D9",
   height = 220,
   unit = "",
 }: {
