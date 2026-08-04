@@ -9,10 +9,10 @@ export function LandingDestinations() {
     <section id="destinos" data-adventure-reveal className="adventure-destinations px-4 py-20 sm:px-6 sm:py-32 lg:px-10">
       <div className="mx-auto max-w-[1280px]">
       <div className="adventure-destinations__heading">
-        <h2 data-reveal-item>Traslados desde el Aeropuerto de Cancún a la Riviera Maya.</h2>
+        <h2 data-reveal-item>Rutas populares desde el Aeropuerto de Cancún.</h2>
         <div data-reveal-item className="adventure-map-note">
           <MapPin className="h-5 w-5" aria-hidden />
-          <span>Rutas a hoteles, playas,<br />parques y ferries.</span>
+          <span>Hoteles, playas,<br />tours y ferries.</span>
         </div>
       </div>
 
@@ -39,7 +39,7 @@ export function LandingDestinations() {
                   <strong>Desde <LocalizedCurrency amount={destination.priceFrom} /></strong>
                 </div>
                 <span className="adventure-postcard__link">
-                  Ver destino <ArrowRight className="h-4 w-4" aria-hidden />
+                  Ver traslado <ArrowRight className="h-4 w-4" aria-hidden />
                 </span>
               </div>
           </Link>

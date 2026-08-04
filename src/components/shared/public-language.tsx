@@ -5,7 +5,7 @@ import * as React from "react";
 export type PublicLanguage = "es" | "en";
 export type PublicCurrency = "MXN" | "USD";
 
-const STORAGE_KEY = "marea-public-language";
+export const PUBLIC_LANGUAGE_STORAGE_KEY = "marea-public-language";
 export const DEMO_MXN_PER_USD = 17;
 
 const ES_TO_EN: Record<string, string> = {
@@ -209,6 +209,7 @@ const ES_TO_EN: Record<string, string> = {
   "Viajamos en grupo familiar con niños pequeños y el vehículo tenía espacio de sobra para el equipaje. Excelente comunicación antes del viaje.": "We traveled as a family group with young children and had plenty of room for luggage. Excellent communication before the trip.",
   "Muy buena opción para llegar a Xcaret sin depender de tours. El conductor nos recogió puntual de regreso al hotel.": "A great way to reach Xcaret without relying on tours. The driver picked us up right on time for the return to our hotel.",
   "Traslados privados en Cancún y Riviera Maya": "Private transfers in Cancún and the Riviera Maya",
+  "TRASLADOS PRIVADOS EN CANCÚN Y RIVIERA MAYA": "PRIVATE TRANSFERS IN CANCÚN AND THE RIVIERA MAYA",
   "Traslados": "Transfers",
   "privados": "private",
   "en Cancún": "in Cancún",
@@ -216,9 +217,18 @@ const ES_TO_EN: Record<string, string> = {
   "y Riviera Maya.": "and the Riviera Maya.",
   "sin sorpresas.": "no surprises.",
   "Traslados privados en Cancún, sin esperas ni sorpresas": "Private transfers in Cancún, no waiting or surprises",
+  "Aterriza. Sube. Disfruta.": "Land. Hop in. Enjoy.",
+  "ATERRIZA.": "LAND.",
+  "SUBE.": "HOP IN.",
+  "DISFRUTA.": "ENJOY.",
   "Reserva transporte privado desde el Aeropuerto de Cancún hacia tu hotel, parque, playa o experiencia en la Riviera Maya. Viaja cómodo, seguro y sin esperas innecesarias.": "Book private transportation from Cancún Airport to your hotel, park, beach or Riviera Maya experience. Travel comfortably, safely and without unnecessary waits.",
   "Reserva transporte privado desde el Aeropuerto de Cancún hacia tu hotel, tour o destino en la Riviera Maya. Seguimos tu vuelo, cuidamos tu equipaje y te mostramos la tarifa antes de confirmar.": "Book private transportation from Cancún Airport to your hotel, tour or Riviera Maya destination. We track your flight, take care of your luggage and show you the fare before confirming.",
+  "Te recogemos en el Aeropuerto de Cancún y te llevamos cómodamente a tu hotel o destino. Servicio privado, seguimiento de vuelo y tarifa clara desde el inicio.": "We pick you up at Cancún Airport and take you comfortably to your hotel or destination. Private service, flight tracking and a clear fare from the start.",
+  "Tu chofer te espera al aterrizar en el Aeropuerto de Cancún. Seguimos tu vuelo y te llevamos directo a tu hotel o destino en la Riviera Maya, con tarifa clara desde el primer mensaje.": "Your driver waits for you when you land at Cancún Airport. We track your flight and take you straight to your hotel or Riviera Maya destination, with a clear fare from the first message.",
+  "Reserva tu traslado privado desde el Aeropuerto de Cancún y empieza tus vacaciones sin filas ni negociaciones. Te llevamos directo a tu hotel, tour o destino en la Riviera Maya con seguimiento de vuelo y tarifa clara.": "Book your private transfer from Cancún Airport and start your vacation with no lines or negotiations. We take you straight to your hotel, tour or Riviera Maya destination with flight tracking and a clear fare.",
+  "Reserva tu traslado privado desde el Aeropuerto de Cancún y empieza tus vacaciones sin filas ni negociaciones. Te llevamos directo a tu hotel, tour o destino.": "Book your private transfer from Cancún Airport and start your vacation with no lines or negotiations. We take you straight to your hotel, tour or destination.",
   "Cotizar traslado privado": "Quote private transfer",
+  "Cotizar mi traslado": "Quote my transfer",
   "Ver tarifa de mi traslado": "See my transfer fare",
   "Aeropuerto de Cancún → hotel o destino": "Cancún Airport → hotel or destination",
   "Cotiza tu traslado en Cancún": "Quote your transfer in Cancún",
@@ -258,6 +268,47 @@ const ES_TO_EN: Record<string, string> = {
   "Atención por WhatsApp antes y durante tu viaje": "WhatsApp support before and during your trip",
   "Tu traslado empieza tranquilo desde el primer mensaje.": "Your transfer feels calm from the first message.",
   "Viaja en unidades privadas y espaciosas, con atención por WhatsApp desde que cotizas hasta que llegas a tu hotel, parque o destino.": "Travel in spacious private vehicles with WhatsApp support from quote to arrival at your hotel, park or destination.",
+  "Recepción en el Aeropuerto de Cancún": "Reception at Cancún Airport",
+  "Seguimiento de vuelo para ajustar tu pickup": "Flight tracking to adjust your pickup",
+  "Conductores locales para rutas en Riviera Maya": "Local drivers for Riviera Maya routes",
+  "Vehículos privados, limpios y verificados": "Private, clean and checked vehicles",
+  "Tarifa clara antes de confirmar tu reserva": "Clear fare before confirming your booking",
+  "Atención por WhatsApp antes y durante el traslado": "WhatsApp support before and during the transfer",
+  "Seguro de pasajero incluido": "Passenger insurance included",
+  "Transporte privado en Cancún con la confianza que buscas al llegar.": "Private transportation in Cancún with the confidence you want when you arrive.",
+  "Cotiza tu traslado desde el aeropuerto a hoteles, tours y destinos de la Riviera Maya con atención personalizada antes, durante y después del viaje.": "Quote your transfer from the airport to hotels, tours and Riviera Maya destinations with personalized support before, during and after the trip.",
+  "Rutas frecuentes: Cancún, Playa del Carmen, Tulum, Xcaret e Isla Mujeres.": "Frequent routes: Cancún, Playa del Carmen, Tulum, Xcaret and Isla Mujeres.",
+  "Traslado hotel a hotel": "Hotel-to-hotel transfer",
+  "Muévete entre resorts sin perder tiempo: te recogemos en tu lobby y te llevamos directo a tu siguiente hotel en Cancún, Playa del Carmen, Tulum o Riviera Maya.": "Move between resorts without wasting time: we pick you up in your lobby and take you straight to your next hotel in Cancún, Playa del Carmen, Tulum or the Riviera Maya.",
+  "Aeropuerto de Cancún ↔ hotel": "Cancún Airport ↔ hotel",
+  "Reserva tu traslado desde o hacia el Aeropuerto de Cancún con recepción en llegadas, seguimiento de vuelo y ruta directa a tu hotel.": "Book your transfer to or from Cancún Airport with arrivals reception, flight tracking and a direct route to your hotel.",
+  "Transporte privado con chofer": "Private transportation with driver",
+  "Contrata un vehículo con chofer local por horas o día completo para visitar playas, cenotes, restaurantes, parques y puntos turísticos a tu ritmo.": "Book a vehicle with a local driver by the hour or full day to visit beaches, cenotes, restaurants, parks and tourist spots at your pace.",
+  "Transporte para grupos y eventos": "Transportation for groups and events",
+  "Coordinamos vans, sprinters y rutas para bodas, familias, agencias y grupos, con horarios claros y soporte por WhatsApp.": "We coordinate vans, Sprinters and routes for weddings, families, agencies and groups, with clear schedules and WhatsApp support.",
+  "Servicios de traslados privados en Cancún": "Private transfer services in Cancún",
+  "Elige el traslado que necesitas en Cancún y Riviera Maya.": "Choose the transfer you need in Cancún and the Riviera Maya.",
+  "Del Aeropuerto de Cancún a tu hotel, entre resorts o hacia tus tours favoritos. Tú eliges la ruta; GreenGo coordina conductor, horario y tarifa clara.": "From Cancún Airport to your hotel, between resorts or to your favorite tours. You choose the route; GreenGo coordinates driver, schedule and clear fare.",
+  "Cotizar servicio": "Quote service",
+  "Rutas populares desde el Aeropuerto de Cancún.": "Popular routes from Cancún Airport.",
+  "Hoteles, playas,": "Hotels, beaches,",
+  "tours y ferries.": "tours and ferries.",
+  "Ver traslado": "See transfer",
+  "Cotiza tu ruta": "Quote your route",
+  "Indica origen, destino, fecha, horario, pasajeros y equipaje para calcular tu traslado privado.": "Enter origin, destination, date, time, passengers and luggage to calculate your private transfer.",
+  "Confirma con tarifa clara": "Confirm with a clear fare",
+  "Revisa los detalles del servicio antes de reservar y evita sorpresas al llegar a Cancún.": "Review the service details before booking and avoid surprises when you arrive in Cancún.",
+  "Tu conductor te espera": "Your driver waits for you",
+  "Te recibimos en el aeropuerto, hotel o punto acordado, con seguimiento de vuelo cuando aplica.": "We meet you at the airport, hotel or agreed point, with flight tracking when applicable.",
+  "Reserva en línea": "Book online",
+  "Cómo reservar tu traslado privado en Cancún.": "How to book your private transfer in Cancún.",
+  "Un proceso simple para viajar del Aeropuerto de Cancún a tu hotel, tour o destino con conductor asignado y soporte por WhatsApp.": "A simple process to travel from Cancún Airport to your hotel, tour or destination with an assigned driver and WhatsApp support.",
+  "Traslados privados que viajeros y grupos eligen en Cancún.": "Private transfers travelers and groups choose in Cancún.",
+  "Rutas frecuentes al aeropuerto, hoteles, parques y destinos de la Riviera Maya con atención clara desde la reserva.": "Frequent routes to the airport, hotels, parks and Riviera Maya destinations with clear support from booking.",
+  "Preguntas frecuentes sobre traslados privados en Cancún.": "Frequently asked questions about private transfers in Cancún.",
+  "Resuelve dudas sobre el Aeropuerto de Cancún, equipaje, vuelos, pagos, cambios y transporte para grupos antes de reservar.": "Get answers about Cancún Airport, luggage, flights, payments, changes and group transportation before booking.",
+  "GreenGo Transfers ofrece traslados privados en Cancún y Riviera Maya desde el aeropuerto hasta hoteles, tours, eventos y terminales de ferry.": "GreenGo Transfers offers private transfers in Cancún and the Riviera Maya from the airport to hotels, tours, events and ferry terminals.",
+  "Traslados desde el Aeropuerto de Cancún a Zona Hotelera, Playa del Carmen, Tulum, Isla Mujeres, Cozumel, Xcaret y más destinos de Riviera Maya.": "Transfers from Cancún Airport to the Hotel Zone, Playa del Carmen, Tulum, Isla Mujeres, Cozumel, Xcaret and more Riviera Maya destinations.",
   "Traslados privados en Cancún y la Riviera Maya desde el aeropuerto hasta tu hotel, tour o evento.": "Private transfers in Cancún and the Riviera Maya from the airport to your hotel, tour or event.",
   "Servicio de traslados privados en Cancún, Playa del Carmen, Tulum, Isla Mujeres, Cozumel y Xcaret.": "Private transfer service in Cancún, Playa del Carmen, Tulum, Isla Mujeres, Cozumel and Xcaret.",
   "Traslado privado a": "Private transfer to",
@@ -278,15 +329,39 @@ const ES_TO_EN: Record<string, string> = {
   "¿Cómo reservo un traslado privado en Cancún?": "How do I book a private transfer in Cancún?",
   "Completa el formulario de cotización rápida o entra a \"Reservar ahora\". Elige el tipo de servicio, origen, destino, fecha, horario, pasajeros y datos de contacto para confirmar tu traslado.": "Complete the quick quote form or go to \"Book now\". Choose the service type, origin, destination, date, time, passengers and contact details to confirm your transfer.",
   "Completa el formulario de cotización rápida o entra a \"Reservar ahora\". Elige origen, destino, fecha, horario y pasajeros; revisa la tarifa y confirma tus datos para apartar tu traslado.": "Complete the quick quote form or go to \"Book now\". Choose origin, destination, date, time and passengers; review the fare and confirm your details to reserve your transfer.",
+  "Completa el formulario de cotización rápida o entra a \"Reservar ahora\". Elige origen, destino, fecha, horario y pasajeros; revisa la tarifa y confirma tus datos para apartar tu traslado privado.": "Complete the quick quote form or go to \"Book now\". Choose origin, destination, date, time and passengers; review the fare and confirm your details to reserve your private transfer.",
   "¿Qué pasa si mi vuelo al Aeropuerto de Cancún se retrasa?": "What happens if my flight to Cancún Airport is delayed?",
   "Monitoreamos el número de vuelo que proporcionas al reservar. Si el aterrizaje cambia, ajustamos la llegada del conductor para recibirte en el horario real.": "We monitor the flight number you provide when booking. If landing time changes, we adjust the driver's arrival to meet you at the actual time.",
+  "¿Puedo cambiar mi reservación de traslado?": "Can I change my transfer booking?",
+  "Sí, puedes solicitar cambios de fecha, hora, hotel o destino desde la confirmación de tu reservación o por WhatsApp con al menos 24 horas de anticipación.": "Yes, you can request changes to date, time, hotel or destination from your booking confirmation or by WhatsApp at least 24 hours in advance.",
   "¿Qué formas de pago aceptan para reservar?": "What payment methods do you accept for booking?",
   "Aceptamos tarjeta de crédito o débito, pago en efectivo en OXXO y transferencia SPEI. La disponibilidad de métodos de pago se confirma antes de finalizar tu reservación.": "We accept credit or debit cards, OXXO cash payments and SPEI transfers. Payment method availability is confirmed before finalizing your booking.",
   "¿Ofrecen transporte privado para grupos grandes?": "Do you offer private transportation for large groups?",
+  "¿Cuánto equipaje puedo llevar en mi traslado?": "How much luggage can I bring on my transfer?",
+  "¿La tarifa del traslado incluye casetas y estacionamiento?": "Does the transfer fare include tolls and parking?",
+  "¿Ofrecen transporte privado para grupos en Cancún?": "Do you offer private transportation for groups in Cancún?",
   "Revisa la tarifa antes de pagar, comparte tus datos de contacto y recibe los detalles del servicio.": "Review the fare before paying, share your contact details and receive the service information.",
   "Tu conductor te espera en el punto acordado, con seguimiento de vuelo cuando aplica.": "Your driver waits at the agreed pickup point, with flight tracking when applicable.",
   "Un proceso claro para llegar del Aeropuerto de Cancún a tu hotel o destino con tarifa visible, conductor asignado y soporte por WhatsApp.": "A clear process to get from Cancún Airport to your hotel or destination with a visible fare, assigned driver and WhatsApp support.",
   "La tarifa se muestra antes de confirmar e incluye los conceptos indicados en tu cotización. Si algún estacionamiento o cargo especial aplica en destino, te lo avisamos antes del servicio.": "The fare is shown before confirming and includes the items listed in your quote. If parking or a special destination charge applies, we let you know before the service.",
+  "Asistente GreenGo": "GreenGo Assistant",
+  "Rutas, tarifas y reservas": "Routes, fares and bookings",
+  "Asistente virtual de GreenGo": "GreenGo virtual assistant",
+  "Cerrar asistente": "Close assistant",
+  "Cerrar asistente virtual": "Close virtual assistant",
+  "Abrir asistente virtual": "Open virtual assistant",
+  "Escribiendo…": "Typing…",
+  "¡Hola! Te ayudo a cotizar tu traslado privado en Cancún, revisar destinos o hablar con un asesor.": "Hi! I can help you quote your private transfer in Cancún, review destinations or talk to an advisor.",
+  "Cotizar un traslado": "Quote a transfer",
+  "Ver destinos": "See destinations",
+  "Tipos de servicio": "Service types",
+  "Hablar con un humano": "Talk to a person",
+  "Cotiza tu ruta en segundos: elige origen, destino, fecha, horario y número de pasajeros.": "Quote your route in seconds: choose origin, destination, date, time and number of passengers.",
+  "Ir a cotizar": "Go to quote",
+  "Ver todos los destinos": "See all destinations",
+  "Ver detalle de servicios": "See service details",
+  "Abrir WhatsApp": "Open WhatsApp",
+  "Volver al inicio del chat": "Back to chat start",
 };
 
 const EN_TO_ES = Object.fromEntries(Object.entries(ES_TO_EN).map(([es, en]) => [en, es]));
@@ -318,6 +393,10 @@ function translateValue(value: string, language: PublicLanguage) {
   return translated ? `${leading}${translated}${trailing}` : value;
 }
 
+export function translatePublicText(value: string, language: PublicLanguage) {
+  return translateValue(value, language);
+}
+
 function translateRoot(root: ParentNode, language: PublicLanguage) {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   let node = walker.nextNode();
@@ -340,13 +419,14 @@ export function PublicLanguageProvider({ children }: { children: React.ReactNode
   const [language, setLanguage] = React.useState<PublicLanguage>("es");
 
   React.useEffect(() => {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
+    const saved = window.localStorage.getItem(PUBLIC_LANGUAGE_STORAGE_KEY);
     if (saved === "en") setLanguage("en");
   }, []);
 
   React.useEffect(() => {
     document.documentElement.lang = language;
-    window.localStorage.setItem(STORAGE_KEY, language);
+    window.localStorage.setItem(PUBLIC_LANGUAGE_STORAGE_KEY, language);
+    window.dispatchEvent(new CustomEvent("greengo-language-change", { detail: language }));
 
     const roots = document.querySelectorAll<HTMLElement>(".adventure-theme");
     roots.forEach((root) => translateRoot(root, language));

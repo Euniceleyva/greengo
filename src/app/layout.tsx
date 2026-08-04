@@ -43,9 +43,9 @@ export const metadata: Metadata = {
   description:
     "Traslados privados desde el Aeropuerto de Cancún a hoteles, playas, parques y destinos de la Riviera Maya.",
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "/images/logos/favicon_greengo.png",
+    shortcut: "/images/logos/favicon_greengo.png",
+    apple: "/images/logos/favicon_greengo.png",
   },
 };
 

@@ -4,12 +4,12 @@ import { Carousel } from "@/components/ui/carousel";
 import { GALLERY_IMAGES } from "@/mocks/gallery";
 
 const REASONS: { text: string; tone: "green" | "blue" }[] = [
-  { text: "Seguimos tu vuelo en tiempo real", tone: "green" },
-  { text: "Cuidamos tu equipaje como si fuera nuestro", tone: "blue" },
-  { text: "Conductores locales que conocen la ruta", tone: "green" },
-  { text: "Unidades limpias y verificadas", tone: "blue" },
-  { text: "Tarifa clara antes de confirmar", tone: "green" },
-  { text: "Atención por WhatsApp antes y durante tu viaje", tone: "blue" },
+  { text: "Recepción en el Aeropuerto de Cancún", tone: "green" },
+  { text: "Seguimiento de vuelo para ajustar tu pickup", tone: "blue" },
+  { text: "Conductores locales para rutas en Riviera Maya", tone: "green" },
+  { text: "Vehículos privados, limpios y verificados", tone: "blue" },
+  { text: "Tarifa clara antes de confirmar tu reserva", tone: "green" },
+  { text: "Seguro de pasajero incluido", tone: "blue" },
 ];
 
 export function LandingGallery() {
@@ -32,10 +32,10 @@ export function LandingGallery() {
         <div className="adventure-section-heading">
           <div data-reveal-item className="adventure-stamp adventure-stamp--passport">RIVIERA<br />MAYA</div>
           <div data-reveal-item>
-            <h2>Tu traslado empieza tranquilo desde el primer mensaje.</h2>
-            <p>Viaja en unidades privadas y espaciosas, con atención por WhatsApp desde que cotizas hasta que llegas a tu hotel, parque o destino.</p>
+            <h2>Transporte privado en Cancún con la confianza que buscas al llegar.</h2>
+            <p>Cotiza tu traslado desde el aeropuerto a hoteles, tours y destinos de la Riviera Maya con atención personalizada antes, durante y después del viaje.</p>
           </div>
-          <p data-reveal-item className="adventure-margin-note">Vistas reales de nuestras rutas favoritas.</p>
+          <p data-reveal-item className="adventure-margin-note">Rutas frecuentes: Cancún, Playa del Carmen, Tulum, Xcaret e Isla Mujeres.</p>
         </div>
 
         <div className="adventure-gallery-split mt-12">

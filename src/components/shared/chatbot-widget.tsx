@@ -5,17 +5,23 @@
 
 import * as React from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Bot, MessageSquareText, X } from "lucide-react";
+import { ArrowUpRight, Bot, MessageSquareText, Sparkles, X } from "lucide-react";
 import { useChatbotStore } from "@/stores/chatbot-store";
 import { CHATBOT_NODES } from "@/mocks/chatbot";
 import { WHATSAPP_PHONE } from "@/constants";
 import { cn } from "@/lib/utils";
+import {
+  PUBLIC_LANGUAGE_STORAGE_KEY,
+  translatePublicText,
+  type PublicLanguage,
+} from "@/components/shared/public-language";
 import type { ChatbotOption } from "@/types";
 
 export function ChatbotWidget() {
   const pathname = usePathname();
   const router = useRouter();
   const { isOpen, isTyping, currentNodeId, messages, toggleOpen, selectOption, recordChoice } = useChatbotStore();
+  const [language, setLanguage] = React.useState<PublicLanguage>("es");
   const listRef = React.useRef<HTMLDivElement>(null);
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
 
@@ -35,9 +41,24 @@ export function ChatbotWidget() {
     return () => document.removeEventListener("keydown", onKey);
   }, [isOpen, toggleOpen]);
 
+  React.useEffect(() => {
+    const saved = window.localStorage.getItem(PUBLIC_LANGUAGE_STORAGE_KEY);
+    if (saved === "en") setLanguage("en");
+    else if (document.documentElement.lang === "en") setLanguage("en");
+
+    const onLanguageChange = (event: Event) => {
+      const next = (event as CustomEvent<PublicLanguage>).detail;
+      if (next === "es" || next === "en") setLanguage(next);
+    };
+
+    window.addEventListener("greengo-language-change", onLanguageChange);
+    return () => window.removeEventListener("greengo-language-change", onLanguageChange);
+  }, []);
+
   if (pathname.startsWith("/admin") || pathname.startsWith("/driver")) return null;
 
   const node = CHATBOT_NODES[currentNodeId];
+  const t = (value: string) => translatePublicText(value, language);
 
   const handleOption = (option: ChatbotOption) => {
     if (option.action.kind === "node") {
@@ -46,7 +67,10 @@ export function ChatbotWidget() {
     }
     if (option.action.kind === "whatsapp") {
       recordChoice(option.label);
-      const message = "Hola, quiero hablar con un asesor de GreenGo Traslados.";
+      const message =
+        language === "en"
+          ? "Hi, I want to talk to a GreenGo Transfers advisor."
+          : "Hola, quiero hablar con un asesor de GreenGo Traslados.";
       window.open(`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
       return;
     }
@@ -61,56 +85,62 @@ export function ChatbotWidget() {
       {isOpen && (
         <div
           role="dialog"
-          aria-label="Asistente virtual de GreenGo"
-          className="fixed bottom-40 right-5 z-40 flex h-[28rem] w-[calc(100vw-2.5rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-popover sm:bottom-44 sm:right-6"
+          aria-label={t("Asistente virtual de GreenGo")}
+          className="greengo-chatbot-panel"
         >
-          <div className="flex items-center justify-between bg-primary px-4 py-3 text-primary-foreground">
-            <div className="flex items-center gap-2">
-              <Bot className="h-5 w-5" aria-hidden />
-              <span className="font-heading text-sm font-semibold">Asistente GreenGo</span>
+          <div className="greengo-chatbot-header">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="greengo-chatbot-mark">
+                <Bot className="h-5 w-5" aria-hidden />
+              </span>
+              <div className="min-w-0">
+                <span className="greengo-chatbot-title">{t("Asistente GreenGo")}</span>
+                <p className="greengo-chatbot-subtitle">{t("Rutas, tarifas y reservas")}</p>
+              </div>
             </div>
             <button
               ref={closeButtonRef}
               type="button"
               onClick={toggleOpen}
-              aria-label="Cerrar asistente"
-              className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              aria-label={t("Cerrar asistente")}
+              className="greengo-chatbot-close"
             >
-              <X className="h-4 w-4" aria-hidden />
+              <X className="h-5 w-5" aria-hidden />
             </button>
           </div>
 
-          <div ref={listRef} className="flex-1 space-y-2 overflow-y-auto p-4">
+          <div ref={listRef} className="greengo-chatbot-messages">
             {messages.map((m) => (
               <div
                 key={m.id}
                 className={cn(
-                  "max-w-[85%] rounded-xl px-3 py-2 text-sm",
+                  "greengo-chatbot-bubble",
                   m.from === "bot"
-                    ? "mr-auto bg-secondary text-foreground"
-                    : "ml-auto bg-primary text-primary-foreground",
+                    ? "greengo-chatbot-bubble--bot"
+                    : "greengo-chatbot-bubble--user",
                 )}
               >
-                {m.text}
+                {t(m.text)}
               </div>
             ))}
             {isTyping && (
-              <div className="mr-auto flex items-center gap-1 rounded-xl bg-secondary px-3 py-2 text-sm text-muted-foreground">
-                <span className="animate-pulse">Escribiendo…</span>
+              <div className="greengo-chatbot-bubble greengo-chatbot-bubble--bot">
+                <span className="animate-pulse">{t("Escribiendo…")}</span>
               </div>
             )}
           </div>
 
           {!isTyping && (
-            <div className="flex flex-wrap gap-2 border-t border-border p-3">
+            <div className="greengo-chatbot-actions">
               {node.options.map((option) => (
                 <button
                   key={option.id}
                   type="button"
                   onClick={() => handleOption(option)}
-                  className="min-h-[44px] rounded-full border border-primary/30 bg-primary-soft px-3 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="greengo-chatbot-option"
                 >
-                  {option.label}
+                  <span>{t(option.label)}</span>
+                  <ArrowUpRight className="h-4 w-4" aria-hidden />
                 </button>
               ))}
             </div>
@@ -121,11 +151,16 @@ export function ChatbotWidget() {
       <button
         type="button"
         onClick={toggleOpen}
-        aria-label={isOpen ? "Cerrar asistente virtual" : "Abrir asistente virtual"}
+        aria-label={isOpen ? t("Cerrar asistente virtual") : t("Abrir asistente virtual")}
         aria-expanded={isOpen}
-        className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-popover transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:bottom-6 sm:right-6"
+        className="greengo-assistant-button"
       >
-        {isOpen ? <X className="h-6 w-6" aria-hidden /> : <MessageSquareText className="h-6 w-6" aria-hidden />}
+        {isOpen ? <X className="h-6 w-6" aria-hidden /> : (
+          <>
+            <MessageSquareText className="h-6 w-6" aria-hidden />
+            <Sparkles className="greengo-assistant-spark" aria-hidden />
+          </>
+        )}
       </button>
     </>
   );

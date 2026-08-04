@@ -12,7 +12,7 @@ export function LandingFooter() {
           <div>
             <Logo variant="white" imgClassName="h-10 w-auto" />
             <p className="mt-3 text-sm text-white/70">
-              Traslados privados en Cancún y la Riviera Maya desde el aeropuerto hasta tu hotel, tour o evento.
+              GreenGo Transfers ofrece traslados privados en Cancún y Riviera Maya desde el aeropuerto hasta hoteles, tours, eventos y terminales de ferry.
             </p>
           </div>
 
@@ -68,7 +68,7 @@ export function LandingFooter() {
 
         <div className="mt-10 border-t border-white/20 pt-6 text-center text-xs text-white/55">
           <p>
-            Servicio de traslados privados en Cancún, Playa del Carmen, Tulum, Isla Mujeres, Cozumel y Xcaret.
+            Traslados desde el Aeropuerto de Cancún a Zona Hotelera, Playa del Carmen, Tulum, Isla Mujeres, Cozumel, Xcaret y más destinos de Riviera Maya.
           </p>
           <p className="mt-1">© {new Date().getFullYear()} GreenGo Transfers Cancún.</p>
         </div>

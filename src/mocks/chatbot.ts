@@ -5,7 +5,7 @@ import type { ChatbotNode } from "@/types";
 export const CHATBOT_NODES: Record<string, ChatbotNode> = {
   start: {
     id: "start",
-    message: "¡Hola! Soy el asistente virtual de GreenGo Traslados. ¿En qué te puedo ayudar?",
+    message: "¡Hola! Te ayudo a cotizar tu traslado privado en Cancún, revisar destinos o hablar con un asesor.",
     options: [
       { id: "opt-cotizar", label: "Cotizar un traslado", action: { kind: "node", nodeId: "cotizar" } },
       { id: "opt-destinos", label: "Ver destinos", action: { kind: "node", nodeId: "destinos" } },
@@ -16,10 +16,10 @@ export const CHATBOT_NODES: Record<string, ChatbotNode> = {
   cotizar: {
     id: "cotizar",
     message:
-      "Puedes cotizar tu traslado en segundos: elige origen, destino, fecha y número de pasajeros en nuestro formulario de reserva.",
+      "Cotiza tu ruta en segundos: elige origen, destino, fecha, horario y número de pasajeros.",
     options: [
       { id: "opt-ir-reservar", label: "Ir a cotizar", action: { kind: "link", href: "/reservar" } },
-      { id: "opt-volver-1", label: "Volver al inicio", action: { kind: "node", nodeId: "start" } },
+      { id: "opt-volver-1", label: "Volver al inicio del chat", action: { kind: "node", nodeId: "start" } },
     ],
   },
   destinos: {
@@ -28,7 +28,7 @@ export const CHATBOT_NODES: Record<string, ChatbotNode> = {
       "Cubrimos los destinos más solicitados de Cancún y la Riviera Maya: Zona Hotelera, Playa del Carmen, Tulum, Isla Mujeres, Cozumel y Xcaret.",
     options: [
       { id: "opt-ver-destinos", label: "Ver todos los destinos", action: { kind: "link", href: "/#destinos" } },
-      { id: "opt-volver-2", label: "Volver al inicio", action: { kind: "node", nodeId: "start" } },
+      { id: "opt-volver-2", label: "Volver al inicio del chat", action: { kind: "node", nodeId: "start" } },
     ],
   },
   servicios: {
@@ -37,7 +37,7 @@ export const CHATBOT_NODES: Record<string, ChatbotNode> = {
       "Ofrecemos 4 tipos de servicio: hotel a hotel, aeropuerto ↔ hotel, transporte abierto (chofer por periodo) y soluciones a medida.",
     options: [
       { id: "opt-ver-servicios", label: "Ver detalle de servicios", action: { kind: "link", href: "/#servicios" } },
-      { id: "opt-volver-3", label: "Volver al inicio", action: { kind: "node", nodeId: "start" } },
+      { id: "opt-volver-3", label: "Volver al inicio del chat", action: { kind: "node", nodeId: "start" } },
     ],
   },
   humano: {
@@ -45,7 +45,7 @@ export const CHATBOT_NODES: Record<string, ChatbotNode> = {
     message: "Con gusto te conectamos con nuestro equipo por WhatsApp para atenderte directamente.",
     options: [
       { id: "opt-whatsapp", label: "Abrir WhatsApp", action: { kind: "whatsapp" } },
-      { id: "opt-volver-4", label: "Volver al inicio", action: { kind: "node", nodeId: "start" } },
+      { id: "opt-volver-4", label: "Volver al inicio del chat", action: { kind: "node", nodeId: "start" } },
     ],
   },
 };

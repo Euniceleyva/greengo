@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { ArrowLeft, ArrowRight, Pause, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CarouselProps {
@@ -78,17 +78,17 @@ export function Carousel({ className, autoPlayMs = 5000, slides, ariaLabel }: Ca
         type="button"
         onClick={scrollPrev}
         aria-label="Anterior"
-        className="absolute left-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-card/90 text-foreground shadow-card ring-1 ring-border transition-colors hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="absolute left-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center bg-transparent text-white drop-shadow-[0_2px_8px_rgba(0,0,0,.9)] transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <ChevronLeft className="h-5 w-5" />
+        <ArrowLeft className="h-8 w-8" strokeWidth={3} />
       </button>
       <button
         type="button"
         onClick={scrollNext}
         aria-label="Siguiente"
-        className="absolute right-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-card/90 text-foreground shadow-card ring-1 ring-border transition-colors hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="absolute right-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center bg-transparent text-white drop-shadow-[0_2px_8px_rgba(0,0,0,.9)] transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <ChevronRight className="h-5 w-5" />
+        <ArrowRight className="h-8 w-8" strokeWidth={3} />
       </button>
 
       <div className="mt-3 flex items-center justify-center gap-3">

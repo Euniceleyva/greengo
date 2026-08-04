@@ -180,18 +180,17 @@ export function LandingHero() {
       <div className="adventure-hero__layout mx-auto max-w-[1440px] px-4 pb-16 pt-8 sm:px-6 lg:px-10 lg:pb-24 lg:pt-10">
         <div className="adventure-hero__copy relative z-10">
           <div data-hero-sticker className="adventure-stamp adventure-stamp--sun">CUN · MX<br />365 días de sol</div>
-          <p className="adventure-kicker">Traslados privados en Cancún y Riviera Maya</p>
-          <h1 className="adventure-hero__title" aria-label="Traslados privados en Cancún, sin esperas ni sorpresas">
-            <span className="adventure-word-mask"><span data-hero-word className="normal-case">Traslados</span></span>
-            <span className="adventure-word-mask"><span data-hero-word className="text-[var(--adventure-sun)]">privados</span></span>
-            <span className="adventure-word-mask"><span data-hero-word>en Cancún,</span></span>
-            <span className="adventure-word-mask"><span data-hero-word className="adventure-title-stroke">sin sorpresas.</span></span>
+          <p className="adventure-kicker">TRASLADOS PRIVADOS EN CANCÚN Y RIVIERA MAYA</p>
+          <h1 className="adventure-hero__title" aria-label="Aterriza. Sube. Disfruta.">
+            <span className="adventure-word-mask"><span data-hero-word>ATERRIZA.</span></span>
+            <span className="adventure-word-mask"><span data-hero-word className="text-[var(--adventure-sun)]">SUBE.</span></span>
+            <span className="adventure-word-mask"><span data-hero-word className="text-[var(--adventure-coral)]">DISFRUTA.</span></span>
           </h1>
           <p className="adventure-hero__lede">
-            Reserva transporte privado desde el Aeropuerto de Cancún hacia tu hotel, tour o destino en la Riviera Maya. Seguimos tu vuelo, cuidamos tu equipaje y te mostramos la tarifa antes de confirmar.
+            Reserva tu traslado privado desde el Aeropuerto de Cancún y empieza tus vacaciones sin filas ni negociaciones. Te llevamos directo a tu hotel, tour o destino.
           </p>
           <button type="button" onClick={() => router.push("/reservar")} className="adventure-text-link">
-            Ver tarifa de mi traslado <ArrowRight aria-hidden />
+            Cotizar mi traslado <ArrowRight aria-hidden />
           </button>
         </div>
 

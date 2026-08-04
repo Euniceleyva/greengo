@@ -1,9 +1,9 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { MessageCircle } from "lucide-react";
 import { useActiveSection } from "@/lib/hooks";
 import { WHATSAPP_PHONE } from "@/constants";
+import { WhatsAppLogo } from "@/components/shared/brand-icons";
 
 const SECTION_MESSAGES: Record<string, string> = {
   servicios: "Hola, quiero más información sobre los tipos de servicio.",
@@ -42,9 +42,9 @@ export function WhatsAppSticky() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Escribir por WhatsApp"
-      className="fixed bottom-24 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-success text-success-foreground shadow-popover transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:bottom-28 sm:right-6"
+      className="greengo-whatsapp-button"
     >
-      <MessageCircle className="h-7 w-7" aria-hidden />
+      <WhatsAppLogo className="h-7 w-7" />
     </a>
   );
 }

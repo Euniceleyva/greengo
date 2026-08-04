@@ -6,7 +6,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     id: "faq-01",
     question: "¿Cómo reservo un traslado privado en Cancún?",
     answer:
-      "Completa el formulario de cotización rápida o entra a \"Reservar ahora\". Elige origen, destino, fecha, horario y pasajeros; revisa la tarifa y confirma tus datos para apartar tu traslado.",
+      "Completa el formulario de cotización rápida o entra a \"Reservar ahora\". Elige origen, destino, fecha, horario y pasajeros; revisa la tarifa y confirma tus datos para apartar tu traslado privado.",
   },
   {
     id: "faq-02",
@@ -16,9 +16,9 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     id: "faq-03",
-    question: "¿Puedo cancelar o cambiar mi reservación?",
+    question: "¿Puedo cambiar mi reservación de traslado?",
     answer:
-      "Sí, puedes solicitar cambios de fecha, hora o destino desde la confirmación de tu reservación o contactando a nuestro equipo por WhatsApp con al menos 24 horas de anticipación.",
+      "Sí, puedes solicitar cambios de fecha, hora, hotel o destino desde la confirmación de tu reservación o por WhatsApp con al menos 24 horas de anticipación.",
   },
   {
     id: "faq-04",
@@ -34,19 +34,19 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     id: "faq-06",
-    question: "¿Cuánto equipaje puedo llevar?",
+    question: "¿Cuánto equipaje puedo llevar en mi traslado?",
     answer:
       "Cada pasajero puede llevar una maleta grande y un artículo de mano sin costo extra. Si viajas con equipaje adicional o especial (tablas de surf, equipo de buceo), indícalo en el paso de detalles.",
   },
   {
     id: "faq-07",
-    question: "¿El precio incluye casetas y estacionamiento?",
+    question: "¿La tarifa del traslado incluye casetas y estacionamiento?",
     answer:
       "La tarifa se muestra antes de confirmar e incluye los conceptos indicados en tu cotización. Si algún estacionamiento o cargo especial aplica en destino, te lo avisamos antes del servicio.",
   },
   {
     id: "faq-08",
-    question: "¿Ofrecen transporte privado para grupos grandes?",
+    question: "¿Ofrecen transporte privado para grupos en Cancún?",
     answer:
       "Sí, contamos con unidades tipo van y sprinter para grupos. Selecciona \"Soluciones a medida\" en el formulario y nuestro equipo te contactará con una propuesta personalizada.",
   },

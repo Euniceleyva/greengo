@@ -3,18 +3,18 @@ import { ClipboardList, CalendarCheck, CarFront, PartyPopper } from "lucide-reac
 const STEPS = [
   {
     icon: ClipboardList,
-    title: "Cotiza tu traslado privado",
-    description: "Indica origen, destino, fecha, horario, pasajeros y equipaje en el formulario de reserva.",
+    title: "Cotiza tu ruta",
+    description: "Indica origen, destino, fecha, horario, pasajeros y equipaje para calcular tu traslado privado.",
   },
   {
     icon: CalendarCheck,
-    title: "Confirma tu reservación",
-    description: "Revisa la tarifa antes de pagar, comparte tus datos de contacto y recibe los detalles del servicio.",
+    title: "Confirma con tarifa clara",
+    description: "Revisa los detalles del servicio antes de reservar y evita sorpresas al llegar a Cancún.",
   },
   {
     icon: CarFront,
-    title: "Te recogemos a tiempo",
-    description: "Tu conductor te espera en el punto acordado, con seguimiento de vuelo cuando aplica.",
+    title: "Tu conductor te espera",
+    description: "Te recibimos en el aeropuerto, hotel o punto acordado, con seguimiento de vuelo cuando aplica.",
   },
   {
     icon: PartyPopper,
@@ -30,10 +30,10 @@ export function LandingHowItWorks() {
         <div className="adventure-itinerary__heading">
           <div data-reveal-item className="adventure-sticker adventure-sticker--sun">FÁCIL<br />FÁCIL</div>
           <div data-reveal-item>
-            <p className="adventure-kicker">Tu itinerario</p>
-            <h2>Reserva tu traslado privado en 4 pasos.</h2>
+            <p className="adventure-kicker">Reserva en línea</p>
+            <h2>Cómo reservar tu traslado privado en Cancún.</h2>
           </div>
-          <p data-reveal-item>Un proceso claro para llegar del Aeropuerto de Cancún a tu hotel o destino con tarifa visible, conductor asignado y soporte por WhatsApp.</p>
+          <p data-reveal-item>Un proceso simple para viajar del Aeropuerto de Cancún a tu hotel, tour o destino con conductor asignado y soporte por WhatsApp.</p>
         </div>
 
         <ol className="adventure-itinerary__steps mt-14">

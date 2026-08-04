@@ -11,26 +11,26 @@ const SERVICES: {
   {
     type: "hotel_hotel",
     icon: Building2,
-    title: "Hotel a hotel",
-    description: "Cambia de hotel sin perder medio día: vamos por ti a la puerta y te llevamos directo a tu siguiente resort en Cancún, Playa del Carmen o Tulum.",
+    title: "Traslado hotel a hotel",
+    description: "Muévete entre resorts sin perder tiempo: te recogemos en tu lobby y te llevamos directo a tu siguiente hotel en Cancún, Playa del Carmen, Tulum o Riviera Maya.",
   },
   {
     type: "aeropuerto",
     icon: Plane,
-    title: "Aeropuerto ↔ hotel",
-    description: "Te esperamos en llegadas, seguimos tu vuelo y te llevamos directo a tu hotel sin filas, transbordos ni esperas innecesarias.",
+    title: "Aeropuerto de Cancún ↔ hotel",
+    description: "Reserva tu traslado desde o hacia el Aeropuerto de Cancún con recepción en llegadas, seguimiento de vuelo y ruta directa a tu hotel.",
   },
   {
     type: "transporte_abierto",
     icon: Car,
-    title: "Transporte abierto",
-    description: "Un vehículo privado con chofer local por horas o día completo para visitar playas, cenotes, parques y restaurantes a tu ritmo.",
+    title: "Transporte privado con chofer",
+    description: "Contrata un vehículo con chofer local por horas o día completo para visitar playas, cenotes, restaurantes, parques y puntos turísticos a tu ritmo.",
   },
   {
     type: "a_medida",
     icon: Sparkles,
-    title: "Soluciones a medida",
-    description: "Coordinamos vans, sprinters y rutas para grupos, bodas o eventos, con horarios claros y atención por WhatsApp.",
+    title: "Transporte para grupos y eventos",
+    description: "Coordinamos vans, sprinters y rutas para bodas, familias, agencias y grupos, con horarios claros y soporte por WhatsApp.",
   },
 ];
 
@@ -40,10 +40,10 @@ export function LandingServices() {
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-10">
         <div className="adventure-services__intro">
           <div data-reveal-item>
-            <p className="adventure-kicker">Servicios de transporte privado</p>
-            <h2>Traslados en Cancún sin filas, prisas ni costos ocultos.</h2>
+            <p className="adventure-kicker">Servicios de traslados privados en Cancún</p>
+            <h2>Elige el traslado que necesitas en Cancún y Riviera Maya.</h2>
           </div>
-          <p data-reveal-item>Del aeropuerto al hotel, entre resorts o a tus tours favoritos. Tú pones el plan; nosotros ponemos puntualidad, ruta clara y conductor listo.</p>
+          <p data-reveal-item>Del Aeropuerto de Cancún a tu hotel, entre resorts o hacia tus tours favoritos. Tú eliges la ruta; GreenGo coordina conductor, horario y tarifa clara.</p>
         </div>
 
         <div className="adventure-road-signs mt-14">
@@ -56,7 +56,7 @@ export function LandingServices() {
                 <p>{description}</p>
               </div>
               <span className="adventure-road-sign__action">
-                Cotizar <ArrowRight aria-hidden />
+                Cotizar servicio <ArrowRight aria-hidden />
               </span>
             </Link>
           ))}
