@@ -10,6 +10,7 @@ export interface ChatMessage {
   id: string;
   from: "bot" | "user";
   text: string;
+  textEn: string;
 }
 
 interface ChatbotState {
@@ -19,13 +20,14 @@ interface ChatbotState {
   messages: ChatMessage[];
   toggleOpen: () => void;
   close: () => void;
-  selectOption: (label: string, nextNodeId: string) => void;
-  recordChoice: (label: string) => void;
+  selectOption: (label: string, labelEn: string, nextNodeId: string) => void;
+  recordChoice: (label: string, labelEn: string) => void;
   resetChat: () => void;
 }
 
 function initialMessages(): ChatMessage[] {
-  return [{ id: "msg-start", from: "bot", text: CHATBOT_NODES[CHATBOT_START_NODE_ID].message }];
+  const startNode = CHATBOT_NODES[CHATBOT_START_NODE_ID];
+  return [{ id: "msg-start", from: "bot", text: startNode.message, textEn: startNode.messageEn }];
 }
 
 export const useChatbotStore = create<ChatbotState>()((set, get) => ({
@@ -37,8 +39,8 @@ export const useChatbotStore = create<ChatbotState>()((set, get) => ({
   toggleOpen: () => set((s) => ({ isOpen: !s.isOpen })),
   close: () => set({ isOpen: false }),
 
-  selectOption: (label, nextNodeId) => {
-    const userMsg: ChatMessage = { id: `msg-${Date.now()}-u`, from: "user", text: label };
+  selectOption: (label, labelEn, nextNodeId) => {
+    const userMsg: ChatMessage = { id: `msg-${Date.now()}-u`, from: "user", text: label, textEn: labelEn };
     set((s) => ({ messages: [...s.messages, userMsg], isTyping: true }));
 
     setTimeout(() => {
@@ -47,13 +49,13 @@ export const useChatbotStore = create<ChatbotState>()((set, get) => ({
         set({ isTyping: false });
         return;
       }
-      const botMsg: ChatMessage = { id: `msg-${Date.now()}-b`, from: "bot", text: node.message };
+      const botMsg: ChatMessage = { id: `msg-${Date.now()}-b`, from: "bot", text: node.message, textEn: node.messageEn };
       set((s) => ({ messages: [...s.messages, botMsg], isTyping: false, currentNodeId: nextNodeId }));
     }, 900);
   },
 
-  recordChoice: (label) => {
-    const userMsg: ChatMessage = { id: `msg-${Date.now()}-u`, from: "user", text: label };
+  recordChoice: (label, labelEn) => {
+    const userMsg: ChatMessage = { id: `msg-${Date.now()}-u`, from: "user", text: label, textEn: labelEn };
     set((s) => ({ messages: [...s.messages, userMsg] }));
   },
 

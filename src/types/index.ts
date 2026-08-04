@@ -339,12 +339,14 @@ export type ChatbotAction =
 export interface ChatbotOption {
   id: string;
   label: string;
+  labelEn: string;
   action: ChatbotAction;
 }
 
 export interface ChatbotNode {
   id: string;
   message: string;
+  messageEn: string;
   options: ChatbotOption[];
 }
 

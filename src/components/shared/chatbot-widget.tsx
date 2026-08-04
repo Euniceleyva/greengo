@@ -59,14 +59,17 @@ export function ChatbotWidget() {
 
   const node = CHATBOT_NODES[currentNodeId];
   const t = (value: string) => translatePublicText(value, language);
+  const chatText = (message: { text: string; textEn?: string }) =>
+    language === "en" ? message.textEn ?? t(message.text) : message.text;
+  const optionLabel = (option: ChatbotOption) => (language === "en" ? option.labelEn : option.label);
 
   const handleOption = (option: ChatbotOption) => {
     if (option.action.kind === "node") {
-      selectOption(option.label, option.action.nodeId);
+      selectOption(option.label, option.labelEn, option.action.nodeId);
       return;
     }
     if (option.action.kind === "whatsapp") {
-      recordChoice(option.label);
+      recordChoice(option.label, option.labelEn);
       const message =
         language === "en"
           ? "Hi, I want to talk to a GreenGo Transfers advisor."
@@ -75,7 +78,7 @@ export function ChatbotWidget() {
       return;
     }
     // action.kind === "link"
-    recordChoice(option.label);
+    recordChoice(option.label, option.labelEn);
     toggleOpen();
     router.push(option.action.href);
   };
@@ -120,7 +123,7 @@ export function ChatbotWidget() {
                     : "greengo-chatbot-bubble--user",
                 )}
               >
-                {t(m.text)}
+                {chatText(m)}
               </div>
             ))}
             {isTyping && (
@@ -139,7 +142,7 @@ export function ChatbotWidget() {
                   onClick={() => handleOption(option)}
                   className="greengo-chatbot-option"
                 >
-                  <span>{t(option.label)}</span>
+                  <span>{optionLabel(option)}</span>
                   <ArrowUpRight className="h-4 w-4" aria-hidden />
                 </button>
               ))}
