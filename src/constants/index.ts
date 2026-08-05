@@ -12,6 +12,8 @@ import type {
   ServiceType,
   TripStatus,
   VehicleStatus,
+  VehiclePaymentConcept,
+  VehiclePaymentStatus,
   VehicleType,
 } from "@/types";
 
@@ -107,6 +109,27 @@ export const VEHICLE_TYPE_LABELS: Record<VehicleType, string> = {
   sedan: "Sedán",
   sprinter: "Sprinter",
   autobus: "Autobús",
+};
+
+export const VEHICLE_PAYMENT_CONCEPT_LABELS: Record<VehiclePaymentConcept, string> = {
+  tenencia: "Tenencia",
+  verificacion: "Verificación",
+  permiso: "Permiso",
+  poliza: "Póliza de seguro",
+};
+
+export const VEHICLE_PAYMENT_STATUS_LABELS: Record<VehiclePaymentStatus, string> = {
+  pendiente: "Pendiente",
+  programado: "Programado",
+  pagado: "Pagado",
+  vencido: "Vencido",
+};
+
+export const VEHICLE_PAYMENT_STATUS_TONE: Record<VehiclePaymentStatus, BadgeTone> = {
+  pendiente: "warning",
+  programado: "info",
+  pagado: "success",
+  vencido: "danger",
 };
 
 // --- Conductores -----------------------------------------------------------

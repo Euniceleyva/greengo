@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   Phone,
+  CreditCard,
   Plane,
   MapPin,
   Users,
@@ -34,7 +35,7 @@ import {
   DRIVER_ACTION_LABELS,
   TRIP_STATUS_LABELS,
 } from "@/constants";
-import type { TripStatus } from "@/types";
+import type { PaymentStatus, TripStatus } from "@/types";
 import { formatMXN } from "@/lib/utils";
 import { vehicleLabel } from "@/lib/lookups";
 
@@ -151,12 +152,13 @@ function ActiveTripContent() {
           <h2 className="mb-2 text-sm font-semibold">Datos del servicio</h2>
           <div className="space-y-2 text-sm">
             <Row label="Pasajero / cliente" value={trip.client} />
-            <Row icon={Phone} label="Teléfono" value="998-555-0100 (simulado)" />
+            {trip.contactPhone && <Row icon={Phone} label="Teléfono" value={trip.contactPhone} />}
             <Row icon={Users} label="Pasajeros" value={`${trip.passengers}`} />
-            <Row icon={Luggage} label="Equipaje estimado" value={`${trip.passengers + 1} piezas`} />
+            <Row icon={Luggage} label="Equipaje estimado" value={`${trip.bags ?? trip.passengers + 1} piezas`} />
             <Row label="Fecha y hora" value={`${trip.date} · ${trip.time} h`} />
             {trip.flightNumber && <Row icon={Plane} label="Vuelo" value={`${trip.flightNumber} · ${trip.airline ?? ""}`} />}
-            <Row label="Tarifa" value={formatMXN(trip.amount)} />
+            {trip.hotel && <Row label="Hotel / referencia" value={trip.hotel} />}
+            <Row icon={CreditCard} label="Pago" value={paymentText(trip.paymentStatus, trip.amount)} />
           </div>
           {trip.specialReception && (
             <div className="mt-2 flex items-start gap-2 rounded-md bg-info-soft p-2 text-xs text-info">
@@ -280,4 +282,11 @@ function Row({
       <span className="text-right font-medium">{value}</span>
     </div>
   );
+}
+
+function paymentText(status: PaymentStatus | undefined, amount: number) {
+  if (status === "pagado") return `Pagado · ${formatMXN(amount)}`;
+  if (status === "parcial") return `Pago parcial · ${formatMXN(amount)}`;
+  if (status === "cotizacion") return "Cotización pendiente";
+  return amount > 0 ? `Pendiente · ${formatMXN(amount)}` : "Pendiente de cotizar";
 }

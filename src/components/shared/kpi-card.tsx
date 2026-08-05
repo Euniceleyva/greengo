@@ -25,13 +25,13 @@ const toneClasses: Record<NonNullable<KpiCardProps["tone"]>, string> = {
 export function KpiCard({ label, value, icon: Icon, hint, tone = "neutral", size = "hero" }: KpiCardProps) {
   const compact = size === "compact";
   return (
-    <Card className={cn(compact ? "p-3" : "p-4 sm:p-5")}>
+    <Card className={cn(compact ? "p-3.5" : "p-4 sm:p-5")}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p
             className={cn(
               "font-medium text-muted-foreground",
-              compact ? "line-clamp-2 text-[11px] leading-tight" : "truncate text-xs",
+              compact ? "text-xs leading-snug" : "truncate text-xs",
             )}
           >
             {label}

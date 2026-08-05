@@ -7,7 +7,7 @@ export const MOCK_DRIVERS: Driver[] = [
     name: "José Ramírez",
     phone: "998-100-2233",
     licenseNumber: "LIC-QR-88213",
-    licenseExpiresOn: "2027-04-10",
+    licenseExpiresOn: "2026-08-20",
     status: "en_servicio",
     assignedVehicleId: "veh-01",
     completedTrips: 342,

@@ -882,3 +882,56 @@
   .adventure-hero__van--animated { visibility: hidden; }
   .adventure-hero__van--static { visibility: visible; }
 }
+
+@media screen {
+  .accounting-letter-sheet {
+    width: min(8.5in, 100%);
+    min-height: 11in;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+}
+
+@media print {
+  @page {
+    size: letter;
+    margin: 14mm;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .accounting-print-area,
+  .accounting-print-area * {
+    visibility: visible !important;
+  }
+
+  .accounting-print-area {
+    position: fixed !important;
+    inset: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    border: 0 !important;
+    background: #fff !important;
+  }
+
+  .accounting-letter-sheet {
+    width: 8.5in !important;
+    min-height: 11in !important;
+    margin: 0 auto !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    color: #111 !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+    page-break-after: avoid;
+  }
+
+  .accounting-print-area button {
+    display: none !important;
+  }
+}

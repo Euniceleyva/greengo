@@ -24,7 +24,7 @@ export function WhatsAppSticky() {
   const pathname = usePathname();
   const activeSectionId = useActiveSection(Object.keys(SECTION_MESSAGES));
 
-  if (pathname.startsWith("/admin") || pathname.startsWith("/driver")) return null;
+  if (pathname.startsWith("/admin") || pathname.startsWith("/driver") || pathname.startsWith("/demo")) return null;
 
   let message = DEFAULT_MESSAGE;
   if (pathname === "/" && activeSectionId && SECTION_MESSAGES[activeSectionId]) {

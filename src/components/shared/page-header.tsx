@@ -17,7 +17,7 @@ interface PageHeaderProps {
 export function PageHeader({ title, description, breadcrumbs, actions }: PageHeaderProps) {
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div>
+      <div className="min-w-0">
         {breadcrumbs && breadcrumbs.length > 0 && (
           <nav className="mb-1 flex items-center gap-1 text-xs text-muted-foreground">
             {breadcrumbs.map((c, i) => (
@@ -39,7 +39,7 @@ export function PageHeader({ title, description, breadcrumbs, actions }: PageHea
           <p className="mt-1 text-sm text-muted-foreground">{description}</p>
         )}
       </div>
-      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+      {actions && <div className="flex w-full flex-wrap items-center gap-2 [&>*]:min-w-0 sm:w-auto sm:justify-end">{actions}</div>}
     </div>
   );
 }

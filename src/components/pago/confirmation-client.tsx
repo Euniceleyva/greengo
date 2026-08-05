@@ -11,6 +11,7 @@ import { useDemoStore } from "@/stores/demo-store";
 import { useHydrated } from "@/lib/hooks";
 import { LOCATIONS } from "@/mocks/locations";
 import { getFareBreakdown, CUSTOM_QUOTE_LABEL } from "@/mocks/pricing";
+import { reservationDraftToTripInput } from "@/lib/reservation-to-trip";
 import { SERVICE_TYPE_LABELS } from "@/constants";
 import { LocalizedCurrency } from "@/components/shared/public-language";
 import { Card } from "@/components/ui/card";
@@ -37,36 +38,9 @@ export function ConfirmationClient() {
     if (!hydrated || createdRef.current || confirmedFolio || !hasDraft) return;
     createdRef.current = true;
 
-    const origin = LOCATIONS.find((l) => l.id === draft.originLocationId);
-    const destination = LOCATIONS.find((l) => l.id === draft.destinationLocationId);
-    const fare = getFareBreakdown({
-      serviceType: draft.serviceType!,
-      originLocationId: draft.originLocationId!,
-      destinationLocationId: draft.destinationLocationId!,
-      passengers: draft.passengers,
-      bags: draft.bags,
-      time: draft.time,
-      isRoundTrip: draft.direction === "redondo",
-    });
-
-    const trip = createTrip({
-      serviceType: draft.serviceType!,
-      client: draft.contactName || "Cliente web",
-      passengers: draft.passengers,
-      origin: origin?.name ?? "—",
-      destination: destination?.name ?? "—",
-      date: draft.date,
-      time: draft.time,
-      amount: fare.isCustomQuote ? 0 : fare.total,
-      driverId: null,
-      vehicleId: null,
-      flightNumber: draft.flightNumber || undefined,
-      hotel: draft.hotel || undefined,
-      specialInstructions: draft.notes || undefined,
-      originCoord: origin?.coord,
-      destinationCoord: destination?.coord,
-      folioPrefix: "GG-WEB",
-    });
+    const tripInput = reservationDraftToTripInput(draft);
+    if (!tripInput) return;
+    const trip = createTrip(tripInput);
 
     setConfirmedFolio(trip.folio);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -171,7 +145,9 @@ export function ConfirmationClient() {
           <SummaryRow label="Destino" value={destination?.name ?? "—"} />
           <SummaryRow label="Fecha y hora" value={`${draft.date} · ${draft.time}`} />
           <SummaryRow label="Pasajeros" value={String(draft.passengers)} />
+          <SummaryRow label="Equipaje" value={`${draft.bags} piezas`} />
           <SummaryRow label="Contacto" value={draft.contactName} />
+          <SummaryRow label="Teléfono" value={draft.contactPhone} />
           <SummaryRow label="Correo" value={draft.contactEmail} />
           </dl>
           <div className="adventure-confirmation-total">

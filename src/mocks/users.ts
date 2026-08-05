@@ -27,4 +27,12 @@ export const MOCK_USERS: DemoUser[] = [
   },
 ];
 
+export const MOCK_LOGIN_PASSWORD = "demo123";
+
+export const MOCK_LOGIN_CREDENTIALS = MOCK_USERS.map((user) => ({
+  userId: user.id,
+  email: user.email,
+  password: MOCK_LOGIN_PASSWORD,
+}));
+
 export const DEFAULT_DRIVER_ID = "drv-01";

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { MapPin, Users, Car } from "lucide-react";
+import { MapPin, Users, Car, Luggage } from "lucide-react";
 import { useDemoStore } from "@/stores/demo-store";
 import { useHydrated } from "@/lib/hooks";
 import { useActiveDriverId } from "@/lib/use-active-driver";
@@ -97,7 +97,9 @@ function ServiceCard({ trip, vehicleText }: { trip: Trip; vehicleText: string })
           <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-border pt-2 text-xs text-muted-foreground">
             <span>{formatDate(trip.date, "dd MMM")}</span>
             <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {trip.passengers} pax</span>
+            <span className="flex items-center gap-1"><Luggage className="h-3 w-3" /> {trip.bags ?? trip.passengers + 1}</span>
             <span className="flex items-center gap-1"><Car className="h-3 w-3" /> {vehicleText}</span>
+            {trip.bookingSource === "web" && <span className="font-semibold text-info">Reserva web</span>}
           </div>
         </CardContent>
       </Card>

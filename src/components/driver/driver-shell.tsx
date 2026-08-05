@@ -6,7 +6,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { ClipboardCheck, CircleUserRound, Fuel, House, LogOut, TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSessionStore } from "@/stores/session-store";
+import { useDemoStore } from "@/stores/demo-store";
 import { useHydrated } from "@/lib/hooks";
+import { DEFAULT_DRIVER_ID } from "@/mocks/users";
+import { getLicenseNotice } from "@/lib/driver-compliance";
 
 const NAV = [
   { href: "/driver/home", label: "Inicio", icon: House },
@@ -21,7 +24,11 @@ export function DriverShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const hydrated = useHydrated();
   const currentUser = useSessionStore((s) => s.currentUser);
+  const drivers = useDemoStore((s) => s.drivers);
   const driverName = hydrated ? currentUser?.name.split(" ")[0] ?? "Conductor" : "Conductor";
+  const activeDriverId = currentUser?.driverId ?? DEFAULT_DRIVER_ID;
+  const activeDriver = drivers.find((driver) => driver.id === activeDriverId);
+  const licenseNotice = activeDriver ? getLicenseNotice(activeDriver.licenseExpiresOn) : null;
 
   return (
     <div className="flex min-h-screen justify-center bg-muted">
@@ -73,11 +80,14 @@ export function DriverShell({ children }: { children: React.ReactNode }) {
                 >
                   <span
                     className={cn(
-                      "flex h-8 w-12 items-center justify-center rounded-full transition-colors",
+                      "relative flex h-8 w-12 items-center justify-center rounded-full transition-colors",
                       active ? "bg-primary text-primary-foreground shadow-soft" : "bg-transparent",
                     )}
                   >
                     <Icon className="h-5 w-5" />
+                    {item.href === "/driver/profile" && licenseNotice && (
+                      <span className="absolute right-1 top-0 h-2.5 w-2.5 rounded-full bg-warning ring-2 ring-card" />
+                    )}
                   </span>
                   {item.label}
                 </Link>

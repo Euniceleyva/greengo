@@ -7,7 +7,7 @@ import { useDemoStore } from "@/stores/demo-store";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea, Select, Label } from "@/components/ui/input";
 import { SERVICE_TYPE_LABELS } from "@/constants";
-import type { ServiceType, Trip } from "@/types";
+import type { BookingSource, PaymentStatus, ServiceType, Trip, TripDirection } from "@/types";
 
 interface TripFormProps {
   initial?: Trip;
@@ -21,6 +21,25 @@ const SERVICE_TYPES: ServiceType[] = [
   "transporte_abierto",
   "a_medida",
 ];
+
+const SOURCE_LABELS: Record<BookingSource, string> = {
+  web: "Reserva web",
+  admin: "Captura admin",
+  whatsapp: "WhatsApp",
+  agencia: "Agencia",
+};
+
+const PAYMENT_LABELS: Record<PaymentStatus, string> = {
+  pendiente: "Pendiente",
+  parcial: "Parcial",
+  pagado: "Pagado",
+  cotizacion: "Cotización",
+};
+
+const DIRECTION_LABELS: Record<TripDirection, string> = {
+  sencillo: "Sencillo",
+  redondo: "Redondo",
+};
 
 export function TripForm({ initial, onSubmit, onCancel }: TripFormProps) {
   const vehicles = useDemoStore((s) => s.vehicles);
@@ -36,8 +55,13 @@ export function TripForm({ initial, onSubmit, onCancel }: TripFormProps) {
     defaultValues: initial
       ? {
           serviceType: initial.serviceType,
+          direction: initial.direction ?? "sencillo",
+          bookingSource: initial.bookingSource ?? "admin",
           client: initial.client,
+          contactPhone: initial.contactPhone ?? "",
+          contactEmail: initial.contactEmail ?? "",
           passengers: initial.passengers,
+          bags: initial.bags ?? initial.passengers + 1,
           origin: initial.origin,
           destination: initial.destination,
           date: initial.date,
@@ -52,11 +76,17 @@ export function TripForm({ initial, onSubmit, onCancel }: TripFormProps) {
           specialInstructions: initial.specialInstructions,
           specialReception: initial.specialReception,
           discount: initial.discount,
+          paymentStatus: initial.paymentStatus ?? "pendiente",
         }
       : {
           serviceType: "aeropuerto",
+          direction: "sencillo",
+          bookingSource: "admin",
           client: "",
+          contactPhone: "",
+          contactEmail: "",
           passengers: 1,
+          bags: 2,
           origin: "",
           destination: "",
           date: "2026-07-12",
@@ -64,6 +94,7 @@ export function TripForm({ initial, onSubmit, onCancel }: TripFormProps) {
           amount: 0,
           driverId: null,
           vehicleId: null,
+          paymentStatus: "pendiente",
         },
   });
 
@@ -74,23 +105,54 @@ export function TripForm({ initial, onSubmit, onCancel }: TripFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <Label>Tipo de traslado</Label>
-        <Select {...register("serviceType")} className="mt-1">
-          {SERVICE_TYPES.map((t) => (
-            <option key={t} value={t}>
-              {SERVICE_TYPE_LABELS[t]}
-            </option>
-          ))}
-        </Select>
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Field label="Tipo de traslado">
+          <Select {...register("serviceType")}>
+            {SERVICE_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {SERVICE_TYPE_LABELS[t]}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field label="Sentido">
+          <Select {...register("direction")}>
+            {(Object.keys(DIRECTION_LABELS) as TripDirection[]).map((direction) => (
+              <option key={direction} value={direction}>
+                {DIRECTION_LABELS[direction]}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field label="Origen de reserva">
+          <Select {...register("bookingSource")}>
+            {(Object.keys(SOURCE_LABELS) as BookingSource[]).map((source) => (
+              <option key={source} value={source}>
+                {SOURCE_LABELS[source]}
+              </option>
+            ))}
+          </Select>
+        </Field>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Cliente" error={errors.client?.message}>
           <Input {...register("client")} placeholder="Nombre o agencia" />
         </Field>
-        <Field label="Número de pasajeros" error={errors.passengers?.message}>
+        <Field label="Teléfono del pasajero">
+          <Input {...register("contactPhone")} placeholder="9985550100" />
+        </Field>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Field label="Correo">
+          <Input type="email" {...register("contactEmail")} placeholder="cliente@email.com" />
+        </Field>
+        <Field label="Pasajeros" error={errors.passengers?.message}>
           <Input type="number" min={1} {...register("passengers")} />
+        </Field>
+        <Field label="Equipaje" error={errors.bags?.message}>
+          <Input type="number" min={0} {...register("bags")} />
         </Field>
       </div>
 
@@ -103,7 +165,7 @@ export function TripForm({ initial, onSubmit, onCancel }: TripFormProps) {
         </Field>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-4">
         <Field label="Fecha" error={errors.date?.message}>
           <Input type="date" {...register("date")} />
         </Field>
@@ -112,6 +174,15 @@ export function TripForm({ initial, onSubmit, onCancel }: TripFormProps) {
         </Field>
         <Field label="Tarifa (MXN)" error={errors.amount?.message}>
           <Input type="number" min={0} step={10} {...register("amount")} />
+        </Field>
+        <Field label="Pago">
+          <Select {...register("paymentStatus")}>
+            {(Object.keys(PAYMENT_LABELS) as PaymentStatus[]).map((status) => (
+              <option key={status} value={status}>
+                {PAYMENT_LABELS[status]}
+              </option>
+            ))}
+          </Select>
         </Field>
       </div>
 

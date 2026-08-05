@@ -24,12 +24,14 @@ import { useDemoStore } from "@/stores/demo-store";
 import { useSessionStore } from "@/stores/session-store";
 import { MOCK_USERS } from "@/mocks/users";
 import { useHydrated } from "@/lib/hooks";
+import { hasAdminPermission, permissionLabel, rolePermissionSummary } from "@/lib/admin-permissions";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [collapsed, setCollapsed] = React.useState(false);
+  const [sidebarHidden, setSidebarHidden] = React.useState(false);
   const [confirmReset, setConfirmReset] = React.useState(false);
   const resetDemo = useDemoStore((s) => s.resetDemo);
   const pendingAlerts = useDemoStore((s) =>
@@ -39,33 +41,55 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const hydrated = useHydrated();
   const user = hydrated ? sessionUser ?? MOCK_USERS[0] : MOCK_USERS[0];
   const currentSection = ADMIN_NAV.find((item) => pathname.startsWith(item.href));
+  const canResetDemo = hasAdminPermission(user.role, "admin:reset");
 
   const handleReset = () => {
+    if (!canResetDemo) {
+      toast.warning(`Tu rol de ${user.role} no puede ${permissionLabel("admin:reset")}.`);
+      return;
+    }
     resetDemo();
     setConfirmReset(false);
     toast.success("Datos del DEMO restablecidos a su estado original.");
   };
 
+  React.useEffect(() => {
+    const savedCollapsed = window.localStorage.getItem("greengo-admin-sidebar-collapsed");
+    const savedHidden = window.localStorage.getItem("greengo-admin-sidebar-hidden");
+    if (savedCollapsed) setCollapsed(savedCollapsed === "true");
+    if (savedHidden) setSidebarHidden(savedHidden === "true");
+  }, []);
+
+  React.useEffect(() => {
+    window.localStorage.setItem("greengo-admin-sidebar-collapsed", String(collapsed));
+  }, [collapsed]);
+
+  React.useEffect(() => {
+    window.localStorage.setItem("greengo-admin-sidebar-hidden", String(sidebarHidden));
+  }, [sidebarHidden]);
+
   return (
     <div className="flex min-h-screen bg-surface-soft">
       {/* Sidebar desktop */}
-      <aside
-        className={cn(
-          "hidden shrink-0 flex-col border-r border-border bg-card/95 shadow-soft transition-[width] duration-200 lg:flex",
-          collapsed ? "w-[4.5rem]" : "w-64",
-        )}
-      >
-        <SidebarContent pathname={pathname} collapsed={collapsed} />
-        <div className="border-t border-border p-2">
-          <button
-            onClick={() => setCollapsed((v) => !v)}
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-md text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-            aria-label={collapsed ? "Expandir menú" : "Colapsar menú"}
-          >
-            {collapsed ? <ChevronsRight className="h-4 w-4" /> : <><ChevronsLeft className="h-4 w-4" /> Colapsar</>}
-          </button>
-        </div>
-      </aside>
+      {!sidebarHidden && (
+        <aside
+          className={cn(
+            "hidden shrink-0 flex-col border-r border-border bg-card/95 shadow-soft transition-[width] duration-200 lg:flex",
+            collapsed ? "w-[4.5rem]" : "w-60",
+          )}
+        >
+          <SidebarContent pathname={pathname} collapsed={collapsed} />
+          <div className="border-t border-border p-2">
+            <button
+              onClick={() => setCollapsed((v) => !v)}
+              className="flex h-10 w-full items-center justify-center gap-2 rounded-md text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              aria-label={collapsed ? "Expandir menú" : "Colapsar menú"}
+            >
+              {collapsed ? <ChevronsRight className="h-4 w-4" /> : <><ChevronsLeft className="h-4 w-4" /> Colapsar</>}
+            </button>
+          </div>
+        </aside>
+      )}
 
       {/* Sidebar móvil */}
       <Dialog open={mobileOpen} onClose={() => setMobileOpen(false)} side className="max-w-[16rem]">
@@ -83,6 +107,17 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             aria-label="Abrir menú"
           >
             <Menu />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden lg:inline-flex"
+            onClick={() => setSidebarHidden((value) => !value)}
+            aria-label={sidebarHidden ? "Mostrar barra lateral" : "Ocultar barra lateral"}
+            title={sidebarHidden ? "Mostrar barra lateral" : "Ocultar barra lateral"}
+          >
+            {sidebarHidden ? <ChevronsRight /> : <ChevronsLeft />}
           </Button>
 
           <div className="min-w-0 flex-1">
@@ -122,7 +157,20 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             }
           >
             <DropdownMenuLabel>Cuenta</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => setConfirmReset(true)}>
+            <div className="px-3 pb-2 text-xs text-muted-foreground">
+              <p className="font-medium capitalize text-foreground">{user.role}</p>
+              <p className="mt-0.5 leading-snug">{rolePermissionSummary(user.role)}</p>
+            </div>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => {
+                if (!canResetDemo) {
+                  toast.warning(`Tu rol de ${user.role} no puede ${permissionLabel("admin:reset")}.`);
+                  return;
+                }
+                setConfirmReset(true);
+              }}
+            >
               <RotateCcw /> Restablecer datos del DEMO
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -167,35 +215,27 @@ function SidebarContent({
   return (
     <>
       <div className={cn("flex h-16 items-center gap-2 border-b border-border px-5", collapsed && "justify-center px-2")}>
-        <div className={cn(
-          "flex shrink-0 items-center justify-center rounded-lg bg-white ring-1 ring-border",
-          collapsed ? "h-10 w-10" : "h-10 w-36 px-2",
-        )}>
+        <div className={cn("flex shrink-0 items-center", collapsed ? "justify-center" : "justify-start")}>
           <Image
             src={collapsed ? "/images/logos/favicon_greengo.png" : "/images/logos/logo_color.png"}
             alt="GreenGo Transfers Cancún"
             width={collapsed ? 32 : 148}
             height={collapsed ? 32 : 66}
-            className={cn(collapsed ? "h-7 w-7" : "h-8 w-auto")}
+            className={cn(collapsed ? "h-8 w-8" : "h-9 w-auto")}
             priority
           />
         </div>
-        {!collapsed && (
-          <div className="min-w-0">
-            <p className="truncate text-[10px] text-muted-foreground">Panel administrativo</p>
-          </div>
-        )}
         {onNavigate && (
           <Button variant="ghost" size="icon" className="ml-auto" onClick={onNavigate} aria-label="Cerrar">
             <X />
           </Button>
         )}
       </div>
-      <nav className="flex-1 space-y-4 overflow-y-auto p-3">
+      <nav className="flex-1 space-y-3 overflow-y-auto p-2.5">
         {ADMIN_NAV_GROUPS.map((group) => (
           <div key={group.label}>
             {!collapsed && (
-              <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">
+              <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase text-muted-foreground/70">
                 {group.label}
               </p>
             )}
@@ -210,20 +250,20 @@ function SidebarContent({
                     onClick={onNavigate}
                     title={collapsed ? item.label : undefined}
                     className={cn(
-                      "group/nav relative flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-colors",
+                      "group/nav relative flex items-center gap-3 rounded-lg border border-transparent px-3 py-2 text-sm font-medium transition-colors",
                       collapsed && "justify-center px-0",
                       active
-                        ? "border-primary/15 bg-primary-soft text-primary font-semibold shadow-soft"
+                        ? "border-primary/15 bg-primary-soft text-primary font-semibold shadow-soft before:absolute before:left-0 before:top-2 before:h-5 before:w-1 before:rounded-r-full before:bg-primary"
                         : "text-muted-foreground hover:border-border hover:bg-secondary hover:text-foreground",
                     )}
                   >
                     <span
                       className={cn(
-                        "flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors",
+                        "flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors",
                         active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground group-hover/nav:bg-card group-hover/nav:text-primary",
                       )}
                     >
-                      <Icon className="h-[17px] w-[17px]" />
+                      <Icon className="h-4 w-4" />
                     </span>
                     {!collapsed && <span className="truncate">{item.label}</span>}
                     {collapsed && (

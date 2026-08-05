@@ -19,6 +19,28 @@ export interface DemoUser {
 }
 
 // ---------------------------------------------------------------------------
+// Actividad administrativa
+// ---------------------------------------------------------------------------
+
+export type AdminActivityType =
+  | "servicio"
+  | "vehiculo"
+  | "conductor"
+  | "mantenimiento"
+  | "combustible"
+  | "contabilidad"
+  | "obligacion";
+
+export interface AdminActivityEvent {
+  id: string;
+  type: AdminActivityType;
+  title: string;
+  detail: string;
+  href: string;
+  createdAt: string; // ISO datetime
+}
+
+// ---------------------------------------------------------------------------
 // Vehículos
 // ---------------------------------------------------------------------------
 
@@ -58,6 +80,23 @@ export interface VehicleDocument {
   expiresOn: string; // ISO date
 }
 
+export type VehiclePaymentConcept = "tenencia" | "verificacion" | "permiso" | "poliza";
+export type VehiclePaymentStatus = "pendiente" | "programado" | "pagado" | "vencido";
+
+export interface VehicleCompliancePayment {
+  id: string;
+  vehicleId: string;
+  concept: VehiclePaymentConcept;
+  description: string;
+  amount: number; // MXN
+  dueDate: string; // ISO date
+  paidDate?: string; // ISO date
+  status: VehiclePaymentStatus;
+  provider?: string;
+  reference?: string;
+  notes?: string;
+}
+
 // ---------------------------------------------------------------------------
 // Conductores
 // ---------------------------------------------------------------------------
@@ -78,6 +117,20 @@ export interface Driver {
   drivenKm: number;
   emergencyContact: string;
   emergencyPhone: string;
+}
+
+export type DriverDocumentKind = "licencia_digital" | "tarjeta_circulacion";
+
+export interface DriverDocumentFile {
+  id: string;
+  driverId: string;
+  vehicleId: string | null;
+  kind: DriverDocumentKind;
+  fileName: string;
+  fileSizeKb: number;
+  mimeType: "application/pdf";
+  uploadedAt: string; // ISO datetime
+  expiresOn?: string; // ISO date si aplica al documento
 }
 
 // ---------------------------------------------------------------------------
@@ -101,12 +154,20 @@ export type TripStatus =
   | "cancelado"
   | "con_incidencia";
 
+export type BookingSource = "web" | "admin" | "whatsapp" | "agencia";
+export type PaymentStatus = "pendiente" | "parcial" | "pagado" | "cotizacion";
+
 export interface Trip {
   id: string;
   folio: string;
   serviceType: ServiceType;
+  direction?: TripDirection;
+  bookingSource?: BookingSource;
   client: string;
+  contactPhone?: string;
+  contactEmail?: string;
   passengers: number;
+  bags?: number;
   origin: string;
   originCoord: LatLng;
   destination: string;
@@ -121,6 +182,7 @@ export interface Trip {
   specialReception?: boolean;
   discount?: number; // %
   amount: number; // MXN
+  paymentStatus?: PaymentStatus;
   driverId: string | null;
   vehicleId: string | null;
   status: TripStatus;
@@ -138,6 +200,113 @@ export interface Trip {
   startOdometer?: number;
   endOdometer?: number;
   createdAt: string; // ISO datetime
+}
+
+// ---------------------------------------------------------------------------
+// Contabilidad interna (Admin)
+// ---------------------------------------------------------------------------
+
+export type AccountingEntryType = "ingreso" | "egreso";
+
+export type AccountingPaymentMethod =
+  | "efectivo"
+  | "transferencia"
+  | "tarjeta"
+  | "deposito";
+
+export type AccountingAccount = "caja" | "banco";
+
+export type AccountingCategory =
+  | "traslados"
+  | "transporte_abierto"
+  | "extras"
+  | "combustible"
+  | "mantenimiento"
+  | "nomina"
+  | "comisiones"
+  | "oficina"
+  | "impuestos"
+  | "otros";
+
+export type AccountingInvoiceStatus = "no_requiere" | "por_facturar" | "facturada";
+export type AccountingDeductibleStatus = "deducible" | "no_deducible";
+
+export interface AccountingEntry {
+  id: string;
+  date: string; // ISO date (yyyy-MM-dd)
+  concept: string;
+  type: AccountingEntryType;
+  category: AccountingCategory;
+  paymentMethod: AccountingPaymentMethod;
+  account: AccountingAccount;
+  amount: number; // MXN
+  reference?: string;
+  status: "conciliado" | "pendiente";
+  invoiceStatus?: AccountingInvoiceStatus;
+  invoiceFolio?: string;
+  deductibleStatus?: AccountingDeductibleStatus;
+  notes?: string;
+}
+
+export interface AccountingReceivable {
+  id: string;
+  client: string;
+  concept: string;
+  total: number;
+  paid: number;
+  dueDate: string; // ISO date (yyyy-MM-dd)
+  status: "pendiente" | "parcial" | "pagado";
+}
+
+export interface AccountingPayable {
+  id: string;
+  provider: string;
+  concept: string;
+  amount: number;
+  dueDate: string; // ISO date (yyyy-MM-dd)
+  status: "pendiente" | "programado" | "pagado";
+}
+
+export interface AccountingFixedExpense {
+  id: string;
+  concept: string;
+  amount: number;
+  frequency: "semanal" | "mensual" | "anual";
+}
+
+export interface AccountingCommission {
+  id: string;
+  name: string;
+  source: "Agencia" | "Hotel" | "Conductor" | "Otro";
+  sales: number;
+  rate: number;
+  status: "pendiente" | "programado" | "pagado";
+}
+
+export interface AccountingPeriodClose {
+  id: string;
+  periodId: string;
+  periodLabel: string;
+  closedAt: string; // ISO datetime
+  closedBy: string;
+  income: number;
+  expenses: number;
+  net: number;
+  fiscalScore: number;
+  pendingItems: number;
+  status: "cerrado" | "cerrado_con_pendientes";
+  note?: string;
+}
+
+export interface AccountingAuditEvent {
+  id: string;
+  date: string; // ISO datetime
+  actor: string;
+  action: "movimiento_creado" | "periodo_cerrado" | "periodo_reabierto" | "ajuste_creado" | "reporte_generado";
+  periodId?: string;
+  periodLabel?: string;
+  detail: string;
+  note?: string;
 }
 
 // ---------------------------------------------------------------------------

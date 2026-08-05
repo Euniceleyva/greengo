@@ -11,12 +11,19 @@ import {
   MapPin,
   Plane,
   Info,
+  Phone,
+  Mail,
+  Luggage,
+  CreditCard,
+  Globe2,
+  Users as UsersIcon,
 } from "lucide-react";
 import { useDemoStore } from "@/stores/demo-store";
 import { useHydrated } from "@/lib/hooks";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Dialog } from "@/components/ui/dialog";
 import { Select, Label } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/misc";
@@ -29,13 +36,27 @@ import {
   SERVICE_TYPE_LABELS,
   TRIP_STATUS_LABELS,
 } from "@/constants";
-import type { TripStatus } from "@/types";
+import type { BookingSource, PaymentStatus, TripStatus } from "@/types";
 import type { TripFormValues } from "@/lib/schemas";
 import { formatMXN, formatNumber } from "@/lib/utils";
 import { formatDate } from "@/lib/format";
 import { driverName, vehicleLabel } from "@/lib/lookups";
 
 const ALL_STATUSES = Object.keys(TRIP_STATUS_LABELS) as TripStatus[];
+
+const SOURCE_LABELS: Record<BookingSource, string> = {
+  web: "Reserva web",
+  admin: "Captura admin",
+  whatsapp: "WhatsApp",
+  agencia: "Agencia",
+};
+
+const PAYMENT_LABELS: Record<PaymentStatus, string> = {
+  pendiente: "Pago pendiente",
+  parcial: "Pago parcial",
+  pagado: "Pagado",
+  cotizacion: "Cotización",
+};
 
 export default function TripDetailPage() {
   const params = useParams<{ id: string }>();
@@ -138,11 +159,25 @@ export default function TripDetailPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Detalles</CardTitle>
+              <CardTitle>Reserva y contacto</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <Row label="Cliente" value={trip.client} />
-              <Row label="Pasajeros" value={String(trip.passengers)} />
+              {trip.contactPhone && <Row icon={Phone} label="Teléfono" value={trip.contactPhone} />}
+              {trip.contactEmail && <Row icon={Mail} label="Correo" value={trip.contactEmail} />}
+              <Row icon={UsersIcon} label="Pasajeros" value={String(trip.passengers)} />
+              <Row icon={Luggage} label="Equipaje" value={`${trip.bags ?? trip.passengers + 1} piezas`} />
+              <Row icon={Globe2} label="Origen de reserva" value={trip.bookingSource ? SOURCE_LABELS[trip.bookingSource] : "Captura admin"} />
+              <Row icon={CreditCard} label="Pago" value={trip.paymentStatus ? PAYMENT_LABELS[trip.paymentStatus] : "Pendiente"} />
+              <Row label="Sentido" value={trip.direction === "redondo" ? "Redondo" : "Sencillo"} />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Detalles del traslado</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm">
               <Row label="Origen" value={trip.origin} />
               <Row label="Destino" value={trip.destination} />
               <Row label="Fecha" value={`${formatDate(trip.date)} · ${trip.time} h`} />
@@ -153,6 +188,11 @@ export default function TripDetailPage() {
               <Row label="Conductor" value={driverName(drivers, trip.driverId)} />
               <Row label="Unidad" value={vehicleLabel(vehicles, trip.vehicleId)} />
               <Row label="Importe" value={formatMXN(trip.amount)} />
+              {trip.bookingSource === "web" && (
+                <Badge tone="info" className="mt-1">
+                  Servicio creado desde reserva web
+                </Badge>
+              )}
               {trip.specialReception && (
                 <div className="flex items-start gap-2 rounded-md bg-info-soft p-2 text-xs text-info">
                   <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" /> Recepción personalizada solicitada.
@@ -287,10 +327,21 @@ function AssignForm({
   );
 }
 
-function Row({ label, value }: { label: string; value: string }) {
+function Row({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon?: typeof RouteIcon;
+  label: string;
+  value: string;
+}) {
   return (
     <div className="flex items-start justify-between gap-3">
-      <span className="text-muted-foreground">{label}</span>
+      <span className="flex items-center gap-1.5 text-muted-foreground">
+        {Icon && <Icon className="h-3.5 w-3.5" />}
+        {label}
+      </span>
       <span className="text-right font-medium">{value}</span>
     </div>
   );

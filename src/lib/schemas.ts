@@ -4,8 +4,13 @@ import { isValidLuhn } from "@/lib/utils";
 export const tripSchema = z
   .object({
     serviceType: z.enum(["hotel_hotel", "aeropuerto", "transporte_abierto", "a_medida"]),
+    direction: z.enum(["sencillo", "redondo"]).optional(),
+    bookingSource: z.enum(["web", "admin", "whatsapp", "agencia"]).optional(),
     client: z.string().min(2, "Ingresa el cliente"),
+    contactPhone: z.string().optional(),
+    contactEmail: z.string().email("Ingresa un correo válido").or(z.literal("")).optional(),
     passengers: z.coerce.number().int().min(1, "Mínimo 1 pasajero").max(60),
+    bags: z.coerce.number().int().min(0, "Cantidad inválida").max(80).optional(),
     origin: z.string().min(2, "Ingresa el origen"),
     destination: z.string().min(2, "Ingresa el destino"),
     date: z.string().min(1, "Selecciona una fecha"),
@@ -20,6 +25,7 @@ export const tripSchema = z
     specialInstructions: z.string().optional(),
     specialReception: z.boolean().optional(),
     discount: z.coerce.number().min(0).max(100).optional(),
+    paymentStatus: z.enum(["pendiente", "parcial", "pagado", "cotizacion"]).optional(),
   })
   .refine(
     (data) => data.serviceType !== "transporte_abierto" || (data.durationHours ?? 0) > 0,

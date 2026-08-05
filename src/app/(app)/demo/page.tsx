@@ -1,144 +1,131 @@
 "use client";
 
+import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { ShieldCheck, Smartphone, ArrowRight, Sparkles } from "lucide-react";
-import { MOCK_USERS } from "@/mocks/users";
+import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
+import { MOCK_LOGIN_CREDENTIALS, MOCK_LOGIN_PASSWORD, MOCK_USERS } from "@/mocks/users";
 import { useSessionStore } from "@/stores/session-store";
 import type { DemoUser } from "@/types";
-import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input, Label } from "@/components/ui/input";
+import { toast } from "@/components/ui/toast";
 
-export default function HomePage() {
+export default function DemoLoginPage() {
   const router = useRouter();
   const setUser = useSessionStore((s) => s.setUser);
+  const [email, setEmail] = useState(MOCK_USERS[0].email);
+  const [password, setPassword] = useState(MOCK_LOGIN_PASSWORD);
+  const [showPassword, setShowPassword] = useState(false);
 
   const enter = (user: DemoUser) => {
     setUser(user);
     router.push(user.role === "conductor" ? "/driver/home" : "/admin/dashboard");
   };
 
-  const adminUsers = MOCK_USERS.filter((u) => u.role !== "conductor");
-  const driverUser = MOCK_USERS.find((u) => u.role === "conductor")!;
+  const handleLogin = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const normalizedEmail = email.trim().toLowerCase();
+    const credential = MOCK_LOGIN_CREDENTIALS.find(
+      (item) => item.email.toLowerCase() === normalizedEmail && item.password === password,
+    );
+    const user = credential ? MOCK_USERS.find((item) => item.id === credential.userId) : null;
+
+    if (!user) {
+      toast.warning("Correo o contraseña incorrectos para el DEMO.");
+      return;
+    }
+
+    toast.success(`Bienvenido, ${user.name.split(" ")[0]}.`);
+    enter(user);
+  };
 
   return (
-    <main className="route-pattern relative min-h-screen bg-gradient-to-b from-primary-soft via-background to-background">
-      <div className="mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center px-4 py-8">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-3xl bg-white shadow-card ring-1 ring-border">
-            <Image src="/logo.png" alt="GreenGo Traslados" width={72} height={60} className="h-16 w-auto" priority />
-          </div>
-          <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-warning-soft px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-warning">
-            <Sparkles className="h-3 w-3" /> Demo
-          </div>
-          <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            GreenGo Traslados
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-            Gestión y monitoreo de traslados turísticos en Cancún.
-          </p>
-          <p className="mt-1 text-sm font-medium text-foreground">
-            ¿Con qué experiencia quieres entrar?
-          </p>
-        </div>
+    <main className="relative min-h-screen overflow-hidden bg-[#edf5f3]">
+      <Image
+        src="/images/destinations/cancun.webp"
+        alt=""
+        fill
+        sizes="100vw"
+        className="object-cover"
+        priority
+      />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,32,27,0.18)_0%,rgba(237,245,243,0.2)_42%,rgba(7,32,27,0.52)_100%)]" />
+      <div className="absolute inset-0 backdrop-blur-[1px]" />
 
-        <div className="grid w-full gap-5 sm:grid-cols-2">
-          {/* Administrador / operador */}
-          <Card className="flex flex-col overflow-hidden">
-            <div className="h-1.5 w-full bg-primary" aria-hidden />
-            <div className="flex flex-1 flex-col p-6">
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
-                  <ShieldCheck className="h-5 w-5" />
-                </div>
-                <div>
-                  <h2 className="font-heading font-semibold leading-tight">Panel administrativo</h2>
-                  <p className="text-xs text-muted-foreground">Dueño · Administrador · Operador</p>
-                </div>
-              </div>
-              <p className="mb-4 text-sm text-muted-foreground">
-                Servicios, monitoreo en tiempo real, flota, combustible, alertas y reportes.
-              </p>
-              <div className="mt-auto space-y-2">
-                {adminUsers.map((u) => (
-                  <UserButton key={u.id} user={u} cta="Entrar al panel" onClick={() => enter(u)} />
-                ))}
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-8">
+        <section className="w-full max-w-[440px] rounded-[1.65rem] border border-white/65 bg-white/[0.84] p-5 shadow-[0_28px_90px_rgba(8,34,29,0.34)] backdrop-blur-2xl sm:p-6">
+          <div className="mb-7 text-center">
+            <Image
+              src="/images/logos/logo_color.png"
+              alt="GreenGo Transfers Cancún"
+              width={210}
+              height={92}
+              className="mx-auto h-16 w-auto"
+              priority
+            />
+            <h1 className="mt-5 font-heading text-2xl font-bold text-foreground">
+              Iniciar sesión
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Acceso mock para panel y conductor.
+            </p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Correo</Label>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="usuario@greengo.demo"
+                  className="h-12 rounded-xl border-white/70 bg-white/70 pl-9 shadow-soft backdrop-blur"
+                  autoComplete="username"
+                  required
+                />
               </div>
             </div>
-          </Card>
 
-          {/* Conductor */}
-          <Card className="flex flex-col overflow-hidden">
-            <div className="h-1.5 w-full bg-brand-orange" aria-hidden />
-            <div className="flex flex-1 flex-col p-6">
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-warning-soft text-warning">
-                  <Smartphone className="h-5 w-5" />
-                </div>
-                <div>
-                  <h2 className="font-heading font-semibold leading-tight">Aplicación del conductor</h2>
-                  <p className="text-xs text-muted-foreground">Vista móvil · una mano</p>
-                </div>
-              </div>
-              <p className="mb-4 text-sm text-muted-foreground">
-                Servicio activo, siguiente acción, registro de gasolina e incidencias.
-              </p>
-              <div className="mt-auto space-y-2">
-                <UserButton user={driverUser} cta="Ver experiencia del conductor" onClick={() => enter(driverUser)} />
+            <div className="space-y-1.5">
+              <Label htmlFor="password">Contraseña</Label>
+              <div className="relative">
+                <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="Contraseña"
+                  className="h-12 rounded-xl border-white/70 bg-white/70 pl-9 pr-11 shadow-soft backdrop-blur"
+                  autoComplete="current-password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((value) => !value)}
+                  className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white hover:text-foreground"
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
             </div>
-          </Card>
-        </div>
 
-        <p className="mt-6 max-w-xl text-center text-[11px] text-muted-foreground">
-          Prototipo con datos simulados. Sin backend ni autenticación real — los cambios se guardan
-          solo en este navegador.
-        </p>
+            <Button type="submit" size="lg" className="h-12 w-full rounded-xl text-base shadow-card">
+              Entrar <ArrowRight />
+            </Button>
+          </form>
+
+          <p className="mt-5 text-center text-[11px] text-muted-foreground">
+            Demo sin backend real · contraseña:{" "}
+            <span className="font-semibold text-foreground">{MOCK_LOGIN_PASSWORD}</span>
+          </p>
+        </section>
       </div>
     </main>
-  );
-}
-
-function UserButton({
-  user,
-  cta,
-  onClick,
-}: {
-  user: DemoUser;
-  cta: string;
-  onClick: () => void;
-}) {
-  const initials = user.name
-    .split(" ")
-    .slice(0, 2)
-    .map((n) => n[0])
-    .join("");
-  const roleLabel =
-    user.role === "administrador"
-      ? "Administrador"
-      : user.role === "operador"
-        ? "Operador"
-        : "Conductor";
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "group flex w-full items-center gap-3 rounded-xl border border-border bg-card p-3 text-left shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-      )}
-    >
-      <span
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
-        style={{ backgroundColor: user.avatarColor }}
-      >
-        {initials}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-semibold">{user.name}</span>
-        <span className="block text-xs text-muted-foreground">
-          {roleLabel} · <span className="font-medium text-primary">{cta}</span>
-        </span>
-      </span>
-      <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
-    </button>
   );
 }

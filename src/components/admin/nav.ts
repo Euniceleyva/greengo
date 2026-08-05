@@ -8,6 +8,8 @@ import {
   Wrench,
   ShieldAlert,
   ChartNoAxesCombined,
+  Calculator,
+  TrendingUp,
   type LucideIcon,
 } from "lucide-react";
 
@@ -32,6 +34,8 @@ export const ADMIN_NAV: NavItem[] = [
   { href: "/admin/maintenance", label: "Mantenimiento", icon: Wrench },
   { href: "/admin/alerts", label: "Alertas", icon: ShieldAlert },
   { href: "/admin/reports", label: "Reportes", icon: ChartNoAxesCombined },
+  { href: "/admin/accounting", label: "Contabilidad", icon: Calculator },
+  { href: "/admin/analytics", label: "Análisis", icon: TrendingUp },
 ];
 
 export const ADMIN_NAV_GROUPS: NavGroup[] = [
@@ -45,6 +49,6 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
   },
   {
     label: "Gestión",
-    items: [ADMIN_NAV[7], ADMIN_NAV[8]],
+    items: [ADMIN_NAV[7], ADMIN_NAV[8], ADMIN_NAV[9], ADMIN_NAV[10]],
   },
 ];

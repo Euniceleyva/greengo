@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Car, Clock, MapPin, ArrowRight, AlertTriangle, CheckCircle2, Fuel } from "lucide-react";
+import { Car, Clock, MapPin, ArrowRight, AlertTriangle, CheckCircle2, Fuel, Phone } from "lucide-react";
 import { useDemoStore } from "@/stores/demo-store";
 import { useHydrated } from "@/lib/hooks";
 import { useActiveDriverId } from "@/lib/use-active-driver";
@@ -21,6 +21,7 @@ import {
 import type { TripStatus } from "@/types";
 import { isToday } from "@/lib/lookups";
 import { formatDate } from "@/lib/format";
+import { DriverLicenseNotice } from "@/components/driver/license-notice";
 
 // Pasos del flujo de estado que requieren captura de datos (kilometraje, fotos)
 // y por lo tanto deben resolverse en el detalle del servicio, no en un solo tap.
@@ -86,6 +87,8 @@ export default function DriverHomePage() {
         </div>
       </div>
 
+      <DriverLicenseNotice driver={driver} compact />
+
       {/* 2 y 3. Servicio activo/próximo + siguiente acción */}
       {nextTrip ? (
         <div>
@@ -109,8 +112,23 @@ export default function DriverHomePage() {
 
               <div className="mt-3 flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
                 <span>{formatDate(nextTrip.date, "dd MMM")} · {nextTrip.time} h</span>
-                <span>{nextTrip.passengers} pax</span>
+                <span>{nextTrip.passengers} pax · {nextTrip.bags ?? nextTrip.passengers + 1} maletas</span>
               </div>
+
+              {(nextTrip.contactPhone || nextTrip.bookingSource === "web") && (
+                <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                  {nextTrip.contactPhone && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-1 text-muted-foreground">
+                      <Phone className="h-3 w-3" /> {nextTrip.contactPhone}
+                    </span>
+                  )}
+                  {nextTrip.bookingSource === "web" && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-info-soft px-2 py-1 font-semibold text-info">
+                      Reserva web
+                    </span>
+                  )}
+                </div>
+              )}
 
               <div className="mt-3 space-y-2">
                 {nextStatus ? (
@@ -161,15 +179,16 @@ export default function DriverHomePage() {
       {/* 5. Alertas relevantes */}
       {myAlerts.length > 0 && (
         <Card className="border-warning/30 bg-warning-soft">
-          <CardContent className="p-4">
-            <p className="flex items-center gap-2 text-sm font-semibold text-warning">
-              <AlertTriangle className="h-4 w-4" /> Alertas de tu unidad
-            </p>
-            <ul className="mt-2 space-y-1 text-xs text-warning/90">
-              {myAlerts.slice(0, 3).map((a) => (
-                <li key={a.id}>• {a.description}</li>
-              ))}
-            </ul>
+          <CardContent className="flex items-start gap-3 p-3">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-warning">
+                {myAlerts.length} alerta(s) de unidad
+              </p>
+              <p className="mt-0.5 line-clamp-2 text-xs text-warning/90">
+                {myAlerts[0].description}
+              </p>
+            </div>
           </CardContent>
         </Card>
       )}
@@ -198,7 +217,9 @@ export default function DriverHomePage() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">{t.destination}</p>
-                      <p className="truncate text-xs text-muted-foreground">{t.client}</p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {t.client} · {t.passengers} pax · {t.bags ?? t.passengers + 1} maletas
+                      </p>
                     </div>
                     <TripStatusBadge status={t.status} />
                   </CardContent>

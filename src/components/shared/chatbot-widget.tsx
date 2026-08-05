@@ -55,7 +55,7 @@ export function ChatbotWidget() {
     return () => window.removeEventListener("greengo-language-change", onLanguageChange);
   }, []);
 
-  if (pathname.startsWith("/admin") || pathname.startsWith("/driver")) return null;
+  if (pathname.startsWith("/admin") || pathname.startsWith("/driver") || pathname.startsWith("/demo")) return null;
 
   const node = CHATBOT_NODES[currentNodeId];
   const t = (value: string) => translatePublicText(value, language);

@@ -32,6 +32,8 @@ interface DataTableProps<T> {
   onRowClick?: (row: T) => void;
   emptyTitle?: string;
   emptyDescription?: string;
+  emptyAction?: React.ReactNode;
+  renderMobileCard?: (row: T) => React.ReactNode;
 }
 
 export function DataTable<T>({
@@ -44,6 +46,8 @@ export function DataTable<T>({
   onRowClick,
   emptyTitle = "Sin resultados",
   emptyDescription = "No hay registros que coincidan con la búsqueda.",
+  emptyAction,
+  renderMobileCard,
 }: DataTableProps<T>) {
   const [query, setQuery] = React.useState("");
   const [filterValues, setFilterValues] = React.useState<Record<number, string>>({});
@@ -102,45 +106,73 @@ export function DataTable<T>({
       )}
 
       {filtered.length === 0 ? (
-        <EmptyState title={emptyTitle} description={emptyDescription} />
+        <EmptyState title={emptyTitle} description={emptyDescription} action={emptyAction} />
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-border bg-card">
-          <table className="w-full min-w-[640px] border-collapse text-sm">
-            <thead>
-              <tr className="border-b border-border bg-muted/50">
-                {columns.map((c) => (
-                  <th
-                    key={c.key}
-                    className={cn(
-                      "whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground",
-                      c.className,
-                    )}
-                  >
-                    {c.header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
+        <>
+          {renderMobileCard && (
+            <div className="grid gap-2 md:hidden">
               {filtered.map((row) => (
-                <tr
+                <div
                   key={getRowId(row)}
+                  role={onRowClick ? "button" : undefined}
+                  tabIndex={onRowClick ? 0 : undefined}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  onKeyDown={(event) => {
+                    if (!onRowClick || (event.key !== "Enter" && event.key !== " ")) return;
+                    event.preventDefault();
+                    onRowClick(row);
+                  }}
                   className={cn(
-                    "border-b border-border last:border-0 transition-colors",
-                    onRowClick && "cursor-pointer hover:bg-secondary",
+                    "rounded-lg border border-border bg-card p-3 shadow-soft",
+                    onRowClick && "cursor-pointer transition-colors hover:border-primary/30 hover:bg-primary-soft/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   )}
                 >
+                  {renderMobileCard(row)}
+                </div>
+              ))}
+            </div>
+          )}
+          <div className={cn("overflow-x-auto rounded-lg border border-border bg-card", renderMobileCard && "hidden md:block")}>
+            <table className="w-full min-w-[720px] border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-border bg-muted/50">
                   {columns.map((c) => (
-                    <td key={c.key} className={cn("px-4 py-3 align-middle", c.className)}>
-                      {c.render(row)}
-                    </td>
+                    <th
+                      key={c.key}
+                      className={cn(
+                        "whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground",
+                        c.className,
+                      )}
+                    >
+                      {c.header}
+                    </th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {filtered.map((row) => (
+                  <tr
+                    key={getRowId(row)}
+                    onClick={onRowClick ? () => onRowClick(row) : undefined}
+                    className={cn(
+                      "border-b border-border last:border-0 transition-colors",
+                      onRowClick && "cursor-pointer hover:bg-secondary",
+                    )}
+                  >
+                    {columns.map((c) => (
+                      <td key={c.key} className={cn("px-4 py-3 align-middle", c.className)}>
+                        {c.render(row)}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {!renderMobileCard && (
+            <p className="text-[11px] text-muted-foreground md:hidden">Desliza la tabla para ver más columnas.</p>
+          )}
+        </>
       )}
       <p className="text-xs text-muted-foreground">
         {filtered.length} de {rows.length} registros
