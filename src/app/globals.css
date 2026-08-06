@@ -899,6 +899,8 @@
 
   body {
     background: #fff !important;
+    min-height: 0 !important;
+    overflow: visible !important;
   }
 
   body * {
@@ -911,8 +913,11 @@
   }
 
   .accounting-print-area {
-    position: fixed !important;
-    inset: 0 !important;
+    position: absolute !important;
+    inset: auto !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow: visible !important;

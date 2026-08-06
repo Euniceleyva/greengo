@@ -75,11 +75,14 @@ import type {
   AccountingPayable,
   AccountingPeriodClose,
   AccountingReceivable,
+  MoneyCurrency,
 } from "@/types";
 
 type ReportMode = "week" | "month" | "year";
+type AccountingSection = "summary" | "movements";
 type CaptureDialog = "receivable" | "payable" | "fixed" | "commission" | "adjustment" | "closePeriod" | "closureDetail" | "reopenPeriod" | "printReport" | null;
 type PrintReportType = "accounting" | "tax" | "closure";
+type ExchangeRateState = "loading" | "ready" | "fallback";
 
 interface CloseControlItem {
   label: string;
@@ -94,6 +97,14 @@ interface AdminAlertItem {
   detail: string;
   tone: BadgeTone;
   value: string;
+}
+
+interface UsdMxnRateResponse {
+  result?: string;
+  rates?: {
+    MXN?: number;
+  };
+  time_last_update_utc?: string;
 }
 
 const REPORT_LABELS: Record<PrintReportType, string> = {
@@ -128,6 +139,8 @@ const YEARLY_PERIODS: PeriodOption[] = [
 
 const ACCOUNTING_TODAY = "2026-08-04";
 const ACCOUNTING_SOON_DATE = "2026-08-08";
+const ACCOUNTING_DEFAULT_EXCHANGE_RATE = 17.5;
+const USD_MXN_RATE_ENDPOINT = "https://open.er-api.com/v6/latest/USD";
 
 const CATEGORY_OPTIONS = Object.entries(ACCOUNTING_CATEGORY_LABELS).map(([value, label]) => ({
   value,
@@ -142,6 +155,11 @@ const TYPE_LABELS: Record<AccountingEntryType, string> = {
 const ACCOUNT_LABELS: Record<AccountingAccount, string> = {
   caja: "Caja",
   banco: "Banco",
+};
+
+const CURRENCY_LABELS: Record<MoneyCurrency, string> = {
+  MXN: "Pesos mexicanos",
+  USD: "Dólares",
 };
 
 const INVOICE_STATUS_LABELS: Record<AccountingInvoiceStatus, string> = {
@@ -163,6 +181,7 @@ const DEFAULT_ENTRY: NewAccountingEntryInput = {
   paymentMethod: "efectivo",
   account: "caja",
   amount: 0,
+  currency: "MXN",
   reference: "",
   status: "conciliado",
   invoiceStatus: "por_facturar",
@@ -237,6 +256,7 @@ export default function AccountingPage() {
   } = useDemoStore();
   const [mode, setMode] = React.useState<ReportMode>("week");
   const [periodId, setPeriodId] = React.useState(WEEKLY_PERIODS[0].id);
+  const [accountingSection, setAccountingSection] = React.useState<AccountingSection>("summary");
   const [entryOpen, setEntryOpen] = React.useState(false);
   const [captureOpen, setCaptureOpen] = React.useState<CaptureDialog>(null);
   const [entryDraft, setEntryDraft] = React.useState<NewAccountingEntryInput>(DEFAULT_ENTRY);
@@ -248,12 +268,45 @@ export default function AccountingPage() {
   const [closureDetail, setClosureDetail] = React.useState<AccountingPeriodClose | null>(null);
   const [reopenTarget, setReopenTarget] = React.useState<AccountingPeriodClose | null>(null);
   const [printReportType, setPrintReportType] = React.useState<PrintReportType>("accounting");
+  const [usdMxnRate, setUsdMxnRate] = React.useState(ACCOUNTING_DEFAULT_EXCHANGE_RATE);
+  const [usdMxnRateState, setUsdMxnRateState] = React.useState<ExchangeRateState>("loading");
+  const [usdMxnUpdatedAt, setUsdMxnUpdatedAt] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (window.location.search.includes("new=entry")) {
       setEntryOpen(true);
     }
   }, []);
+
+  React.useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadUsdMxnRate() {
+      try {
+        const response = await fetch(USD_MXN_RATE_ENDPOINT, {
+          signal: controller.signal,
+          cache: "no-store",
+        });
+        if (!response.ok) throw new Error("No se pudo consultar el tipo de cambio.");
+        const data = (await response.json()) as UsdMxnRateResponse;
+        const rate = data.rates?.MXN;
+        if (typeof rate !== "number" || rate <= 0) throw new Error("Tipo de cambio inválido.");
+        setUsdMxnRate(rate);
+        setUsdMxnUpdatedAt(data.time_last_update_utc ?? null);
+        setUsdMxnRateState("ready");
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        setUsdMxnRate(ACCOUNTING_DEFAULT_EXCHANGE_RATE);
+        setUsdMxnUpdatedAt(null);
+        setUsdMxnRateState("fallback");
+      }
+    }
+
+    void loadUsdMxnRate();
+    return () => controller.abort();
+  }, []);
+
+  const appliedUsdMxnRate = usdMxnRateState === "ready" ? usdMxnRate : ACCOUNTING_DEFAULT_EXCHANGE_RATE;
 
   const periodOptions = mode === "week" ? WEEKLY_PERIODS : mode === "month" ? MONTHLY_PERIODS : YEARLY_PERIODS;
   const selectedPeriod = periodOptions.find((period) => period.id === periodId) ?? periodOptions[0];
@@ -326,7 +379,11 @@ export default function AccountingPage() {
         Categoria: ACCOUNTING_CATEGORY_LABELS[entry.category],
         Metodo: ACCOUNTING_PAYMENT_LABELS[entry.paymentMethod],
         Cuenta: ACCOUNT_LABELS[entry.account],
-        Monto: entry.amount,
+        "Monto original": entry.amount,
+        Moneda: getEntryCurrency(entry),
+        "Tipo de cambio": getEntryCurrency(entry) === "USD" ? getEntryExchangeRate(entry) : "",
+        "Manejo del USD": getEntryCurrency(entry) === "USD" ? getUsdHandlingLabel(entry) : "",
+        "Equivalente MXN": getEntryAmountMxn(entry),
         Referencia: entry.reference ?? "",
         Estado: entry.status,
         Fiscal: entry.type === "ingreso" ? INVOICE_STATUS_LABELS[getInvoiceStatus(entry)] : DEDUCTIBLE_STATUS_LABELS[getDeductibleStatus(entry)],
@@ -341,7 +398,8 @@ export default function AccountingPage() {
       periodEntries.map((entry) => {
         const invoiceStatus = getInvoiceStatus(entry);
         const deductibleStatus = getDeductibleStatus(entry);
-        const taxableIncome = entry.type === "ingreso" && invoiceStatus !== "no_requiere" ? entry.amount : 0;
+        const amountMxn = getEntryAmountMxn(entry);
+        const taxableIncome = entry.type === "ingreso" && invoiceStatus !== "no_requiere" ? amountMxn : 0;
         return {
           Fecha: entry.date,
           Tipo: TYPE_LABELS[entry.type],
@@ -349,7 +407,11 @@ export default function AccountingPage() {
           Categoria: ACCOUNTING_CATEGORY_LABELS[entry.category],
           Metodo: ACCOUNTING_PAYMENT_LABELS[entry.paymentMethod],
           Cuenta: ACCOUNT_LABELS[entry.account],
-          Monto: entry.amount,
+          "Monto original": entry.amount,
+          Moneda: getEntryCurrency(entry),
+          "Tipo de cambio": getEntryCurrency(entry) === "USD" ? getEntryExchangeRate(entry) : "",
+          "Manejo del USD": getEntryCurrency(entry) === "USD" ? getUsdHandlingLabel(entry) : "",
+          "Equivalente MXN": amountMxn,
           "Estado factura": entry.type === "ingreso" ? INVOICE_STATUS_LABELS[invoiceStatus] : "",
           "Folio factura": entry.invoiceFolio ?? "",
           "Ingreso base IVA": taxableIncome,
@@ -376,6 +438,28 @@ export default function AccountingPage() {
       periodLabel: selectedPeriod.label,
       detail: `Preparó ${REPORT_LABELS[type].toLowerCase()} para impresión PDF.`,
     });
+  };
+
+  const handlePrintCurrentReport = () => {
+    const sheet = document.querySelector<HTMLElement>("[data-accounting-print-sheet]");
+    if (!sheet) {
+      window.print();
+      return;
+    }
+
+    const printWindow = window.open("", "_blank", "width=900,height=1200");
+    if (!printWindow) {
+      window.print();
+      return;
+    }
+
+    printWindow.document.write(buildAccountingPrintDocument(sheet.outerHTML, document.title));
+    printWindow.document.close();
+    printWindow.focus();
+    window.setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
   };
 
   const handleClosePeriod = (event: React.FormEvent<HTMLFormElement>) => {
@@ -454,19 +538,28 @@ export default function AccountingPage() {
       toast.warning("El monto debe ser mayor a cero.");
       return;
     }
-    addAccountingEntry({
+    const entryExchangeRate = entryDraft.exchangeRate ?? appliedUsdMxnRate;
+    if ((entryDraft.currency ?? "MXN") === "USD" && entryExchangeRate <= 0) {
+      toast.warning("Agrega un tipo de cambio válido para dólares.");
+      return;
+    }
+    const nextEntry: NewAccountingEntryInput = {
       ...entryDraft,
+      currency: entryDraft.currency ?? "MXN",
+      exchangeRate: (entryDraft.currency ?? "MXN") === "USD" ? entryExchangeRate : undefined,
+      exchangedToMxn: (entryDraft.currency ?? "MXN") === "USD" ? Boolean(entryDraft.exchangedToMxn) : undefined,
       concept: entryDraft.concept.trim(),
       reference: entryDraft.reference?.trim() || undefined,
       invoiceFolio: entryDraft.invoiceFolio?.trim() || undefined,
       notes: entryDraft.notes?.trim() || undefined,
-    });
+    };
+    addAccountingEntry(nextEntry);
     logAccountingEvent({
       actor: "Laura Martínez",
       action: "movimiento_creado",
       periodId: selectedPeriod.id,
       periodLabel: selectedPeriod.label,
-      detail: `Registró ${entryDraft.type === "ingreso" ? "ingreso" : "egreso"} por ${formatMXN(entryDraft.amount)}.`,
+      detail: `Registró ${entryDraft.type === "ingreso" ? "ingreso" : "egreso"} por ${formatEntryAmount(nextEntry)}.`,
       note: entryDraft.concept.trim(),
     });
     setEntryDraft(DEFAULT_ENTRY);
@@ -608,6 +701,8 @@ export default function AccountingPage() {
     const account = readFormString(formData, "account") as AccountingAccount;
     const status = readFormString(formData, "status") as AccountingEntry["status"];
     const amount = readFormNumber(formData, "amount");
+    const currency = (readFormString(formData, "currency") || "MXN") as MoneyCurrency;
+    const exchangeRate = readFormNumber(formData, "exchangeRate") || appliedUsdMxnRate;
     const reference = readFormString(formData, "reference") || "Ajuste administrativo";
     const notes = readFormString(formData, "notes");
     if (!concept) {
@@ -618,7 +713,11 @@ export default function AccountingPage() {
       toast.warning("El monto del ajuste debe ser mayor a cero.");
       return;
     }
-    addAccountingEntry({
+    if (currency === "USD" && exchangeRate <= 0) {
+      toast.warning("Agrega un tipo de cambio válido para dólares.");
+      return;
+    }
+    const nextAdjustment: NewAccountingEntryInput = {
       ...adjustmentDraft,
       type,
       date,
@@ -627,15 +726,19 @@ export default function AccountingPage() {
       status,
       concept,
       amount,
+      currency,
+      exchangeRate: currency === "USD" ? exchangeRate : undefined,
+      exchangedToMxn: currency === "USD" ? Boolean(adjustmentDraft.exchangedToMxn) : undefined,
       reference,
       notes: notes || undefined,
-    });
+    };
+    addAccountingEntry(nextAdjustment);
     logAccountingEvent({
       actor: "Laura Martínez",
       action: "ajuste_creado",
       periodId: selectedPeriod.id,
       periodLabel: selectedPeriod.label,
-      detail: `Registró ajuste ${type === "ingreso" ? "de ingreso" : "de egreso"} por ${formatMXN(amount)}.`,
+      detail: `Registró ajuste ${type === "ingreso" ? "de ingreso" : "de egreso"} por ${formatEntryAmount(nextAdjustment)}.`,
       note: concept,
     });
     setAdjustmentDraft(DEFAULT_ADJUSTMENT);
@@ -697,15 +800,27 @@ export default function AccountingPage() {
       header: "Monto",
       className: "text-right",
       render: (entry) => (
-        <span
+        <div
           className={cn(
-            "whitespace-nowrap font-semibold tabular-nums",
+            "text-right font-semibold tabular-nums",
             entry.type === "ingreso" ? "text-success" : "text-warning",
           )}
         >
-          {entry.type === "ingreso" ? "+" : "-"}
-          {formatMXN(entry.amount)}
-        </span>
+          <p className="whitespace-nowrap">
+            {entry.type === "ingreso" ? "+" : "-"}
+            {formatEntryOriginalAmount(entry)}
+          </p>
+          {getEntryCurrency(entry) === "USD" && (
+            <>
+              <p className="text-[11px] font-medium text-muted-foreground">
+                {formatMXN(getEntryAmountMxn(entry))} MXN
+              </p>
+              <p className="text-[10px] font-medium text-muted-foreground">
+                {getUsdHandlingLabel(entry)}
+              </p>
+            </>
+          )}
+        </div>
       ),
     },
   ];
@@ -770,10 +885,10 @@ export default function AccountingPage() {
           <div>
             <p className="text-sm font-semibold">Generador de reporte contable</p>
             <p className="text-xs text-muted-foreground">
-              Cambia entre corte semanal, mensual o anual para recalcular ingresos, egresos y saldos.
+              Cambia entre corte semanal, mensual o anual para recalcular ingresos, egresos y saldos en MXN.
             </p>
           </div>
-          <div className="grid gap-2 sm:grid-cols-[auto_240px_auto] sm:items-center">
+          <div className="grid gap-2 sm:grid-cols-[auto_240px_auto_auto] sm:items-center">
             <div className="inline-flex rounded-lg border border-border bg-muted p-1">
               {(["week", "month", "year"] as ReportMode[]).map((option) => (
                 <button
@@ -796,6 +911,7 @@ export default function AccountingPage() {
                 </option>
               ))}
             </Select>
+            <ExchangeRateBadge rate={appliedUsdMxnRate} state={usdMxnRateState} updatedAt={usdMxnUpdatedAt} />
             <PeriodStatusBadge closure={currentClosure} />
           </div>
         </CardContent>
@@ -829,6 +945,15 @@ export default function AccountingPage() {
         </Card>
       )}
 
+      <AccountingSectionTabs
+        active={accountingSection}
+        onChange={setAccountingSection}
+        movementsCount={periodEntries.length}
+        usdHeldCount={summary.usdHeldCount}
+      />
+
+      {accountingSection === "summary" && (
+        <>
       <div className="mb-5 grid gap-4 xl:grid-cols-[.9fr_1.4fr_.9fr]">
         <FiscalSignalCard
           tone={closeControl.tone}
@@ -884,11 +1009,12 @@ export default function AccountingPage() {
         </Card>
       )}
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <KpiCard label="Ingresos" value={formatMXN(summary.income)} icon={ArrowUpRight} tone="success" />
-        <KpiCard label="Egresos" value={formatMXN(summary.expenses)} icon={ArrowDownRight} tone="warning" />
-        <KpiCard label="Ingreso neto" value={formatMXN(summary.net)} icon={Receipt} tone={summary.net >= 0 ? "primary" : "warning"} />
-        <KpiCard label="Por conciliar" value={formatMXN(summary.pending)} icon={CalendarDays} tone={summary.pending > 0 ? "warning" : "success"} />
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+        <KpiCard label="Ingresos MXN" value={formatMXN(summary.income)} icon={ArrowUpRight} tone="success" />
+        <KpiCard label="Egresos MXN" value={formatMXN(summary.expenses)} icon={ArrowDownRight} tone="warning" />
+        <KpiCard label="Neto MXN" value={formatMXN(summary.net)} icon={Receipt} tone={summary.net >= 0 ? "primary" : "warning"} />
+        <KpiCard label="Por conciliar MXN" value={formatMXN(summary.pending)} icon={CalendarDays} tone={summary.pending > 0 ? "warning" : "success"} />
+        <KpiCard label="Registros USD" value={String(summary.usdHeldCount)} icon={Wallet} tone={summary.usdHeldCount > 0 ? "info" : "success"} />
       </div>
 
       <div className="mt-5 grid gap-4 xl:grid-cols-3">
@@ -907,7 +1033,7 @@ export default function AccountingPage() {
         <Card>
           <CardHeader>
             <CardTitle>Corte de caja</CardTitle>
-            <CardDescription>Saldo inicial, movimientos del periodo y saldo estimado.</CardDescription>
+            <CardDescription>Saldo en pesos. Los dólares guardados se muestran aparte.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <CashRow label="Caja anterior" value={summary.cashBefore} />
@@ -917,6 +1043,12 @@ export default function AccountingPage() {
               <CashRow label="Caja actual estimada" value={summary.cashCurrent} strong />
             </div>
             <CashRow label="Banco estimado" value={summary.bankCurrent} icon={Landmark} />
+            <CashRow
+              label="Dólares guardados"
+              value={0}
+              textValue={formatCurrencyAmount(summary.usdHeld, "USD")}
+              icon={Wallet}
+            />
           </CardContent>
         </Card>
       </div>
@@ -957,11 +1089,13 @@ export default function AccountingPage() {
           <CardDescription>Lectura rápida para cierre interno del periodo seleccionado.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
             <AdminMetric label="Movimientos" value={String(periodEntries.length)} />
             <AdminMetric label="Margen operativo" value={`${formatNumber(summary.margin, 1)}%`} />
             <AdminMetric label="Ingresos en banco" value={formatMXN(summary.bankIncome)} />
             <AdminMetric label="Egresos administrativos" value={formatMXN(summary.adminExpenses)} />
+            <AdminMetric label="Registros USD" value={String(summary.usdHeldCount)} />
+            <AdminMetric label="Dólares guardados" value={formatCurrencyAmount(summary.usdHeld, "USD")} />
           </div>
         </CardContent>
       </Card>
@@ -1034,7 +1168,7 @@ export default function AccountingPage() {
         <Card>
           <CardHeader>
             <CardTitle>Corte diario</CardTitle>
-            <CardDescription>Cierre de efectivo del último día con movimientos.</CardDescription>
+            <CardDescription>Cierre de efectivo del último día con movimientos líquidos en MXN.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <CashRow label="Día de corte" value={0} textValue={dailyClose.date ? formatDate(dailyClose.date, "dd MMM yyyy") : "Sin movimientos"} icon={CalendarDays} />
@@ -1143,8 +1277,8 @@ export default function AccountingPage() {
                 render={(item) => (
                   <MoneyListItem
                     title={item.concept}
-                    detail={`${ACCOUNTING_PAYMENT_LABELS[item.paymentMethod]} · ${formatDate(item.date, "dd MMM")}`}
-                    amount={item.amount}
+                    detail={`${ACCOUNTING_PAYMENT_LABELS[item.paymentMethod]} · ${formatDate(item.date, "dd MMM")}${getEntryCurrency(item) === "USD" ? ` · ${formatEntryOriginalAmount(item)}` : ""}`}
+                    amount={getEntryAmountMxn(item)}
                     badge="Pendiente"
                     tone="warning"
                   />
@@ -1157,7 +1291,7 @@ export default function AccountingPage() {
         <Card>
           <CardHeader>
             <CardTitle>Resumen fiscal</CardTitle>
-            <CardDescription>Se llena con el campo Factura y Gasto deducible de cada movimiento.</CardDescription>
+            <CardDescription>Se llena con factura, gasto deducible y equivalente contable en MXN.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <CashRow label="Ingresos facturables" value={fiscalSummary.billableIncome} icon={Receipt} />
@@ -1167,7 +1301,7 @@ export default function AccountingPage() {
             <CashRow label="Gastos deducibles" value={fiscalSummary.deductibleExpenses} icon={Receipt} />
             <CashRow label="No deducibles" value={fiscalSummary.nonDeductibleExpenses} icon={Receipt} />
             <div className="rounded-lg bg-secondary/60 p-3 text-xs text-muted-foreground">
-              Captura ingresos como Facturada o Por facturar; marca egresos como deducibles solo si tendrán comprobante fiscal.
+              Captura ingresos como Facturada o Por facturar; marca egresos como deducibles solo si tendrán comprobante fiscal. Si un movimiento está en USD, el IVA mock usa el equivalente contable en MXN.
             </div>
           </CardContent>
         </Card>
@@ -1208,21 +1342,49 @@ export default function AccountingPage() {
           </CardContent>
         </Card>
       </div>
+        </>
+      )}
 
-      <div className="mt-5">
-        <DataTable
-          columns={columns}
-          rows={periodEntries}
-          getRowId={(entry) => entry.id}
-          searchPlaceholder="Buscar por concepto, referencia, categoría o método…"
-          searchAccessor={(entry) =>
-            `${entry.concept} ${entry.reference ?? ""} ${ACCOUNTING_CATEGORY_LABELS[entry.category]} ${ACCOUNTING_PAYMENT_LABELS[entry.paymentMethod]} ${entry.type === "ingreso" ? INVOICE_STATUS_LABELS[getInvoiceStatus(entry)] : DEDUCTIBLE_STATUS_LABELS[getDeductibleStatus(entry)]}`
-          }
-          filters={filters}
-          emptyTitle="Sin movimientos contables"
-          emptyDescription="No hay ingresos ni egresos registrados en este periodo mock."
-        />
-      </div>
+      {accountingSection === "movements" && (
+        <Card>
+          <CardHeader>
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <CardTitle>Movimientos contables</CardTitle>
+                <CardDescription>Listado de ingresos y egresos del periodo seleccionado.</CardDescription>
+              </div>
+              <Button
+                onClick={() => setEntryOpen(true)}
+                disabled={periodIsClosed}
+                title={periodIsClosed ? "Reabre el periodo para registrar movimientos." : undefined}
+              >
+                <Plus /> Nuevo movimiento
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+              <AdminMetric label="Movimientos" value={String(periodEntries.length)} />
+              <AdminMetric label="Ingresos MXN" value={formatMXN(summary.income)} />
+              <AdminMetric label="Egresos MXN" value={formatMXN(summary.expenses)} />
+              <AdminMetric label="Registros USD" value={String(summary.usdHeldCount)} />
+              <AdminMetric label="Dólares guardados" value={formatCurrencyAmount(summary.usdHeld, "USD")} />
+            </div>
+            <DataTable
+              columns={columns}
+              rows={periodEntries}
+              getRowId={(entry) => entry.id}
+              searchPlaceholder="Buscar por concepto, referencia, categoría o método…"
+              searchAccessor={(entry) =>
+                `${entry.concept} ${entry.reference ?? ""} ${ACCOUNTING_CATEGORY_LABELS[entry.category]} ${ACCOUNTING_PAYMENT_LABELS[entry.paymentMethod]} ${entry.type === "ingreso" ? INVOICE_STATUS_LABELS[getInvoiceStatus(entry)] : DEDUCTIBLE_STATUS_LABELS[getDeductibleStatus(entry)]}`
+              }
+              filters={filters}
+              emptyTitle="Sin movimientos contables"
+              emptyDescription="No hay ingresos ni egresos registrados en este periodo mock."
+            />
+          </CardContent>
+        </Card>
+      )}
 
       <Dialog
         open={entryOpen}
@@ -1232,7 +1394,7 @@ export default function AccountingPage() {
         className="max-w-2xl"
       >
         <form onSubmit={handleCreateEntry} className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-4">
             <Field label="Tipo">
               <Select
                 value={entryDraft.type}
@@ -1257,17 +1419,65 @@ export default function AccountingPage() {
                 onChange={(event) => setEntryDraft((draft) => ({ ...draft, date: event.target.value }))}
               />
             </Field>
+            <Field label="Moneda">
+              <Select
+                value={entryDraft.currency ?? "MXN"}
+                onChange={(event) =>
+                  setEntryDraft((draft) => ({
+                    ...draft,
+                    currency: event.target.value as MoneyCurrency,
+                    exchangeRate: event.target.value === "USD" ? draft.exchangeRate ?? appliedUsdMxnRate : undefined,
+                    exchangedToMxn: event.target.value === "USD" ? Boolean(draft.exchangedToMxn) : undefined,
+                  }))
+                }
+              >
+                {(Object.keys(CURRENCY_LABELS) as MoneyCurrency[]).map((currency) => (
+                  <option key={currency} value={currency}>
+                    {currency} · {CURRENCY_LABELS[currency]}
+                  </option>
+                ))}
+              </Select>
+            </Field>
             <Field label="Monto">
               <Input
                 type="number"
                 min={1}
-                step={10}
+                step={entryDraft.currency === "USD" ? 1 : 10}
                 value={entryDraft.amount || ""}
                 onChange={(event) => setEntryDraft((draft) => ({ ...draft, amount: Number(event.target.value) }))}
-                placeholder="1500"
+                placeholder={entryDraft.currency === "USD" ? "210" : "1500"}
               />
             </Field>
           </div>
+
+          {entryDraft.currency === "USD" && (
+            <div className="rounded-lg border border-info/30 bg-info-soft/40 p-4">
+              <div className="grid gap-4 sm:grid-cols-[180px_1fr] sm:items-end">
+                <Field label="Tipo de cambio">
+                  <Input
+                    type="number"
+                    min={1}
+                    step={0.01}
+                    value={entryDraft.exchangeRate ?? appliedUsdMxnRate}
+                    onChange={(event) => setEntryDraft((draft) => ({ ...draft, exchangeRate: Number(event.target.value) }))}
+                    placeholder="17.50"
+                  />
+                </Field>
+                <div className="rounded-md bg-card p-3 text-sm">
+                  <p className="font-semibold text-foreground">
+                    Equivalente: {formatMXN(getMoneyAmountMxn({ ...entryDraft, exchangeRate: entryDraft.exchangeRate ?? appliedUsdMxnRate }))}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Solo sirve como referencia para reportes y resumen fiscal.
+                  </p>
+                </div>
+              </div>
+              <UsdHandlingChoice
+                checked={Boolean(entryDraft.exchangedToMxn)}
+                onChange={(checked) => setEntryDraft((draft) => ({ ...draft, exchangedToMxn: checked }))}
+              />
+            </div>
+          )}
 
           <Field label="Concepto sencillo">
             <Input
@@ -1655,7 +1865,7 @@ export default function AccountingPage() {
         className="max-w-2xl"
       >
         <form onSubmit={handleCreateAdjustment} className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-4">
             <Field label="Tipo">
               <Select
                 name="type"
@@ -1680,18 +1890,67 @@ export default function AccountingPage() {
                 onChange={(event) => setAdjustmentDraft((draft) => ({ ...draft, date: event.target.value }))}
               />
             </Field>
+            <Field label="Moneda">
+              <Select
+                name="currency"
+                value={adjustmentDraft.currency ?? "MXN"}
+                onChange={(event) =>
+                  setAdjustmentDraft((draft) => ({
+                    ...draft,
+                    currency: event.target.value as MoneyCurrency,
+                    exchangeRate: event.target.value === "USD" ? draft.exchangeRate ?? appliedUsdMxnRate : undefined,
+                    exchangedToMxn: event.target.value === "USD" ? Boolean(draft.exchangedToMxn) : undefined,
+                  }))
+                }
+              >
+                {(Object.keys(CURRENCY_LABELS) as MoneyCurrency[]).map((currency) => (
+                  <option key={currency} value={currency}>
+                    {currency} · {CURRENCY_LABELS[currency]}
+                  </option>
+                ))}
+              </Select>
+            </Field>
             <Field label="Monto">
               <Input
                 name="amount"
                 type="number"
                 min={1}
-                step={10}
+                step={adjustmentDraft.currency === "USD" ? 1 : 10}
                 value={adjustmentDraft.amount || ""}
                 onChange={(event) => setAdjustmentDraft((draft) => ({ ...draft, amount: Number(event.target.value) }))}
-                placeholder="500"
+                placeholder={adjustmentDraft.currency === "USD" ? "50" : "500"}
               />
             </Field>
           </div>
+          {adjustmentDraft.currency === "USD" && (
+            <div className="rounded-lg border border-info/30 bg-info-soft/40 p-4">
+              <div className="grid gap-4 sm:grid-cols-[180px_1fr] sm:items-end">
+                <Field label="Tipo de cambio">
+                  <Input
+                    name="exchangeRate"
+                    type="number"
+                    min={1}
+                    step={0.01}
+                    value={adjustmentDraft.exchangeRate ?? appliedUsdMxnRate}
+                    onChange={(event) => setAdjustmentDraft((draft) => ({ ...draft, exchangeRate: Number(event.target.value) }))}
+                    placeholder="17.50"
+                  />
+                </Field>
+                <div className="rounded-md bg-card p-3 text-sm">
+                  <p className="font-semibold text-foreground">
+                    Equivalente: {formatMXN(getMoneyAmountMxn({ ...adjustmentDraft, exchangeRate: adjustmentDraft.exchangeRate ?? appliedUsdMxnRate }))}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Solo sirve como referencia para reportes y resumen fiscal.
+                  </p>
+                </div>
+              </div>
+              <UsdHandlingChoice
+                checked={Boolean(adjustmentDraft.exchangedToMxn)}
+                onChange={(checked) => setAdjustmentDraft((draft) => ({ ...draft, exchangedToMxn: checked }))}
+              />
+            </div>
+          )}
           <Field label="Motivo del ajuste">
             <Input
               name="concept"
@@ -1936,7 +2195,7 @@ export default function AccountingPage() {
                 </button>
               ))}
             </div>
-            <Button type="button" onClick={() => window.print()}>
+            <Button type="button" onClick={handlePrintCurrentReport}>
               <Printer /> Imprimir / guardar PDF
             </Button>
           </div>
@@ -1960,28 +2219,99 @@ function isInPeriod(entry: AccountingEntry, period: PeriodOption) {
   return entry.date >= period.start && entry.date <= period.end;
 }
 
+type AccountingMoney = {
+  amount: number;
+  currency?: MoneyCurrency;
+  exchangeRate?: number;
+  exchangedToMxn?: boolean;
+};
+
+function getEntryCurrency(entry: AccountingMoney): MoneyCurrency {
+  return entry.currency ?? "MXN";
+}
+
+function getEntryExchangeRate(entry: AccountingMoney) {
+  return entry.exchangeRate && entry.exchangeRate > 0 ? entry.exchangeRate : ACCOUNTING_DEFAULT_EXCHANGE_RATE;
+}
+
+function getMoneyAmountMxn(entry: AccountingMoney) {
+  return getEntryCurrency(entry) === "USD" ? entry.amount * getEntryExchangeRate(entry) : entry.amount;
+}
+
+function getEntryAmountMxn(entry: AccountingEntry) {
+  return getMoneyAmountMxn(entry);
+}
+
+function formatCurrencyAmount(amount: number, currency: MoneyCurrency) {
+  return new Intl.NumberFormat(currency === "USD" ? "en-US" : "es-MX", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: currency === "USD" ? 2 : 0,
+  }).format(amount);
+}
+
+function formatEntryOriginalAmount(entry: AccountingMoney) {
+  return formatCurrencyAmount(entry.amount, getEntryCurrency(entry));
+}
+
+function formatEntryAmount(entry: AccountingMoney) {
+  const original = formatEntryOriginalAmount(entry);
+  if (getEntryCurrency(entry) === "MXN") return original;
+  return `${original} (${formatMXN(getMoneyAmountMxn(entry))} MXN)`;
+}
+
+function isEntryExchangedToMxn(entry: AccountingMoney) {
+  return getEntryCurrency(entry) !== "USD" || Boolean(entry.exchangedToMxn);
+}
+
+function getUsdHandlingLabel(entry: AccountingMoney) {
+  return isEntryExchangedToMxn(entry) ? "Cambiado a pesos" : "Guardado en dólares";
+}
+
+function getEntryLiquidAmountMxn(entry: AccountingEntry) {
+  return isEntryExchangedToMxn(entry) ? getEntryAmountMxn(entry) : 0;
+}
+
 function sumEntries(entries: AccountingEntry[], type?: AccountingEntryType, account?: AccountingAccount) {
   return entries
     .filter((entry) => (!type || entry.type === type) && (!account || entry.account === account))
+    .reduce((sum, entry) => sum + getEntryAmountMxn(entry), 0);
+}
+
+function sumLiquidEntries(entries: AccountingEntry[], type?: AccountingEntryType, account?: AccountingAccount) {
+  return entries
+    .filter((entry) => (!type || entry.type === type) && (!account || entry.account === account))
+    .reduce((sum, entry) => sum + getEntryLiquidAmountMxn(entry), 0);
+}
+
+function sumUsdHeld(entries: AccountingEntry[]) {
+  return entries
+    .filter((entry) => getEntryCurrency(entry) === "USD" && !isEntryExchangedToMxn(entry))
     .reduce((sum, entry) => sum + entry.amount, 0);
+}
+
+function countUsdHeld(entries: AccountingEntry[]) {
+  return entries.filter((entry) => getEntryCurrency(entry) === "USD" && !isEntryExchangedToMxn(entry)).length;
 }
 
 function buildSummary(entries: AccountingEntry[], period: PeriodOption, allEntries: AccountingEntry[]) {
   const previousEntries = allEntries.filter((entry) => entry.date < period.start);
   const income = sumEntries(entries, "ingreso");
   const expenses = sumEntries(entries, "egreso");
-  const cashIncome = sumEntries(entries, "ingreso", "caja");
-  const cashExpenses = sumEntries(entries, "egreso", "caja");
-  const bankIncome = sumEntries(entries, "ingreso", "banco");
-  const bankExpenses = sumEntries(entries, "egreso", "banco");
-  const previousCash = sumEntries(previousEntries, "ingreso", "caja") - sumEntries(previousEntries, "egreso", "caja");
-  const previousBank = sumEntries(previousEntries, "ingreso", "banco") - sumEntries(previousEntries, "egreso", "banco");
+  const cashIncome = sumLiquidEntries(entries, "ingreso", "caja");
+  const cashExpenses = sumLiquidEntries(entries, "egreso", "caja");
+  const bankIncome = sumLiquidEntries(entries, "ingreso", "banco");
+  const bankExpenses = sumLiquidEntries(entries, "egreso", "banco");
+  const previousCash = sumLiquidEntries(previousEntries, "ingreso", "caja") - sumLiquidEntries(previousEntries, "egreso", "caja");
+  const previousBank = sumLiquidEntries(previousEntries, "ingreso", "banco") - sumLiquidEntries(previousEntries, "egreso", "banco");
+  const usdHeld = sumUsdHeld(entries);
+  const usdHeldCount = countUsdHeld(entries);
   const pending = entries
     .filter((entry) => entry.status === "pendiente")
-    .reduce((sum, entry) => sum + entry.amount, 0);
+    .reduce((sum, entry) => sum + getEntryAmountMxn(entry), 0);
   const adminExpenses = entries
     .filter((entry) => entry.type === "egreso" && ["oficina", "impuestos", "comisiones"].includes(entry.category))
-    .reduce((sum, entry) => sum + entry.amount, 0);
+    .reduce((sum, entry) => sum + getEntryAmountMxn(entry), 0);
   const net = income - expenses;
 
   return {
@@ -1998,6 +2328,8 @@ function buildSummary(entries: AccountingEntry[], period: PeriodOption, allEntri
     bankExpenses,
     bankCurrent: ACCOUNTING_OPENING_BALANCE.bank + previousBank + bankIncome - bankExpenses,
     adminExpenses,
+    usdHeld,
+    usdHeldCount,
   };
 }
 
@@ -2042,7 +2374,7 @@ function buildPaymentBreakdown(entries: AccountingEntry[]) {
     method,
     total: entries
       .filter((entry) => entry.type === "ingreso" && entry.paymentMethod === method)
-      .reduce((sum, entry) => sum + entry.amount, 0),
+      .reduce((sum, entry) => sum + getEntryAmountMxn(entry), 0),
   }));
 }
 
@@ -2053,7 +2385,7 @@ function buildCategoryBreakdown(entries: AccountingEntry[]) {
       category,
       total: entries
         .filter((entry) => entry.type === "egreso" && entry.category === category)
-        .reduce((sum, entry) => sum + entry.amount, 0),
+        .reduce((sum, entry) => sum + getEntryAmountMxn(entry), 0),
     }))
     .filter((item) => item.total > 0)
     .sort((a, b) => b.total - a.total);
@@ -2100,7 +2432,7 @@ function buildCloseControl(
     (item) => item.status !== "pagado" && item.dueDate >= ACCOUNTING_TODAY && item.dueDate <= ACCOUNTING_SOON_DATE,
   );
   const overduePayables = payables.filter((item) => item.status !== "pagado" && item.dueDate < ACCOUNTING_TODAY);
-  const bankPendingAmount = bankPending.reduce((sum, entry) => sum + entry.amount, 0);
+  const bankPendingAmount = bankPending.reduce((sum, entry) => sum + getEntryAmountMxn(entry), 0);
   const overdueReceivableAmount = overdueReceivables.reduce((sum, item) => sum + Math.max(item.total - item.paid, 0), 0);
   const duePayableAmount = [...overduePayables, ...dueSoonPayables].reduce((sum, item) => sum + item.amount, 0);
 
@@ -2217,9 +2549,9 @@ function buildDailyClose(entries: AccountingEntry[], cashBefore: number) {
   const date = cashEntries.map((entry) => entry.date).sort().at(-1) ?? "";
   const dayEntries = cashEntries.filter((entry) => entry.date === date);
   const previousDayEntries = cashEntries.filter((entry) => entry.date < date);
-  const previousMovement = sumEntries(previousDayEntries, "ingreso", "caja") - sumEntries(previousDayEntries, "egreso", "caja");
-  const cashIncome = sumEntries(dayEntries, "ingreso", "caja");
-  const cashExpenses = sumEntries(dayEntries, "egreso", "caja");
+  const previousMovement = sumLiquidEntries(previousDayEntries, "ingreso", "caja") - sumLiquidEntries(previousDayEntries, "egreso", "caja");
+  const cashIncome = sumLiquidEntries(dayEntries, "ingreso", "caja");
+  const cashExpenses = sumLiquidEntries(dayEntries, "egreso", "caja");
   const expectedCash = cashBefore + previousMovement + cashIncome - cashExpenses;
   return {
     date,
@@ -2265,20 +2597,20 @@ function buildFiscalSummary(entries: AccountingEntry[]) {
   const expenseEntries = entries.filter((entry) => entry.type === "egreso");
   const billableIncome = incomeEntries
     .filter((entry) => getInvoiceStatus(entry) !== "no_requiere")
-    .reduce((sum, entry) => sum + entry.amount, 0);
+    .reduce((sum, entry) => sum + getEntryAmountMxn(entry), 0);
   const invoicedIncome = incomeEntries
     .filter((entry) => getInvoiceStatus(entry) === "facturada")
-    .reduce((sum, entry) => sum + entry.amount, 0);
+    .reduce((sum, entry) => sum + getEntryAmountMxn(entry), 0);
   const pendingInvoiceIncome = incomeEntries
     .filter((entry) => getInvoiceStatus(entry) === "por_facturar")
-    .reduce((sum, entry) => sum + entry.amount, 0);
+    .reduce((sum, entry) => sum + getEntryAmountMxn(entry), 0);
   const estimatedVat = billableIncome * 0.16;
   const deductibleExpenses = expenseEntries
     .filter((entry) => getDeductibleStatus(entry) === "deducible")
-    .reduce((sum, entry) => sum + entry.amount, 0);
+    .reduce((sum, entry) => sum + getEntryAmountMxn(entry), 0);
   const nonDeductibleExpenses = expenseEntries
     .filter((entry) => getDeductibleStatus(entry) === "no_deducible")
-    .reduce((sum, entry) => sum + entry.amount, 0);
+    .reduce((sum, entry) => sum + getEntryAmountMxn(entry), 0);
   return { billableIncome, invoicedIncome, pendingInvoiceIncome, estimatedVat, deductibleExpenses, nonDeductibleExpenses };
 }
 
@@ -2290,6 +2622,145 @@ function getInvoiceStatus(entry: AccountingEntry): AccountingInvoiceStatus {
 function getDeductibleStatus(entry: AccountingEntry): AccountingDeductibleStatus {
   if (entry.deductibleStatus) return entry.deductibleStatus;
   return ["combustible", "mantenimiento", "oficina", "impuestos"].includes(entry.category) ? "deducible" : "no_deducible";
+}
+
+function formatExchangeRateDate(value: string | null) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return format(date, "dd MMM yyyy", { locale: es });
+}
+
+function ExchangeRateBadge({
+  rate,
+  state,
+  updatedAt,
+}: {
+  rate: number;
+  state: ExchangeRateState;
+  updatedAt: string | null;
+}) {
+  const updatedLabel = formatExchangeRateDate(updatedAt);
+  const tone: BadgeTone = state === "ready" ? "success" : state === "loading" ? "info" : "warning";
+  const label =
+    state === "loading"
+      ? "Dólar hoy consultando"
+      : `Dólar hoy $${formatNumber(rate, 2)} MXN`;
+
+  return (
+    <div className="min-w-[170px] text-center sm:text-left">
+      <Badge tone={tone} className="justify-center">
+        <Wallet className="h-3.5 w-3.5" /> {label}
+      </Badge>
+      <p className="mt-1 text-[10px] font-medium text-muted-foreground">
+        {state === "fallback" ? "Fallback editable" : updatedLabel ? `Actualizado ${updatedLabel}` : "Actualización diaria"} ·{" "}
+        <a
+          href="https://www.exchangerate-api.com"
+          target="_blank"
+          rel="noreferrer"
+          className="underline-offset-2 hover:underline"
+        >
+          Rates by Exchange Rate API
+        </a>
+      </p>
+    </div>
+  );
+}
+
+function AccountingSectionTabs({
+  active,
+  onChange,
+  movementsCount,
+  usdHeldCount,
+}: {
+  active: AccountingSection;
+  onChange: (section: AccountingSection) => void;
+  movementsCount: number;
+  usdHeldCount: number;
+}) {
+  const options: Array<{ id: AccountingSection; label: string; detail: string }> = [
+    {
+      id: "summary",
+      label: "Resumen",
+      detail: "Indicadores, caja, reportes y alertas",
+    },
+    {
+      id: "movements",
+      label: "Movimientos",
+      detail: `${movementsCount} registros · ${usdHeldCount} USD guardados`,
+    },
+  ];
+
+  return (
+    <div className="mb-5 grid gap-3 rounded-xl border border-border bg-card p-2 shadow-soft sm:grid-cols-2">
+      {options.map((option) => (
+        <button
+          key={option.id}
+          type="button"
+          onClick={() => onChange(option.id)}
+          className={cn(
+            "rounded-lg p-4 text-left transition-colors",
+            active === option.id
+              ? "bg-primary text-primary-foreground shadow-soft"
+              : "text-muted-foreground hover:bg-secondary/70 hover:text-foreground",
+          )}
+        >
+          <span className="block font-heading text-lg font-bold">{option.label}</span>
+          <span className={cn("mt-1 block text-xs font-medium", active === option.id ? "text-primary-foreground/80" : "text-muted-foreground")}>
+            {option.detail}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function UsdHandlingChoice({ checked, onChange }: { checked: boolean; onChange: (checked: boolean) => void }) {
+  const options = [
+    {
+      value: false,
+      title: "Se quedó en dólares",
+      detail: "No entra al saldo en pesos. Se suma aparte como dólares guardados.",
+    },
+    {
+      value: true,
+      title: "Se cambió a pesos",
+      detail: "Entra al saldo de caja/banco usando el tipo de cambio capturado.",
+    },
+  ];
+
+  return (
+    <div className="mt-4">
+      <p className="text-sm font-semibold">¿Cómo se guardó este dinero?</p>
+      <div className="mt-2 grid gap-2 sm:grid-cols-2">
+        {options.map((option) => (
+          <button
+            key={option.title}
+            type="button"
+            onClick={() => onChange(option.value)}
+            className={cn(
+              "rounded-lg border p-3 text-left transition-colors",
+              checked === option.value
+                ? "border-primary bg-primary/10 text-foreground shadow-soft"
+                : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:bg-secondary/60",
+            )}
+          >
+            <span className="flex items-center gap-2 text-sm font-bold">
+              <span
+                className={cn(
+                  "h-3 w-3 rounded-full border",
+                  checked === option.value ? "border-primary bg-primary" : "border-muted-foreground",
+                )}
+                aria-hidden
+              />
+              {option.title}
+            </span>
+            <span className="mt-1 block text-xs leading-relaxed">{option.detail}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function PeriodStatusBadge({ closure }: { closure?: AccountingPeriodClose }) {
@@ -2432,6 +2903,91 @@ function AuditEventRow({ event }: { event: AccountingAuditEvent }) {
   );
 }
 
+function buildAccountingPrintDocument(sheetHtml: string, title: string) {
+  const escapedTitle = title.replace(/[<>&"]/g, (character) => {
+    const entities: Record<string, string> = {
+      "<": "&lt;",
+      ">": "&gt;",
+      "&": "&amp;",
+      "\"": "&quot;",
+    };
+    return entities[character] ?? character;
+  });
+
+  return `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <base href="${window.location.origin}" />
+    <title>${escapedTitle}</title>
+    <style>
+      @page { size: letter; margin: 12mm; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        color: #111;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      body { width: 100%; }
+      .accounting-letter-sheet {
+        width: 100%;
+        min-height: auto;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+        color: #111;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      header, section, footer { break-inside: avoid; }
+      img { max-width: 132px; height: auto; object-fit: contain; }
+      table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 8.5px; }
+      th, td { border: 1px solid #d4d4d4; padding: 4px; vertical-align: top; word-break: break-word; }
+      th { background: #f5f5f5; text-align: left; }
+      .grid { display: grid; }
+      .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .grid-cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+      .gap-3 { gap: 0.5rem; }
+      .flex { display: flex; }
+      .items-start { align-items: flex-start; }
+      .justify-between { justify-content: space-between; }
+      .text-right { text-align: right; }
+      .text-left { text-align: left; }
+      .font-bold, .font-semibold { font-weight: 700; }
+      .text-xl { font-size: 18px; }
+      .text-base { font-size: 12px; }
+      .text-sm { font-size: 10px; }
+      .text-xs, .text-\\[10px\\] { font-size: 8.5px; }
+      .text-\\[9px\\] { font-size: 7.8px; }
+      .uppercase { text-transform: uppercase; }
+      .text-neutral-950 { color: #111; }
+      .text-neutral-600, .text-neutral-500 { color: #525252; }
+      .bg-neutral-100 { background: #f5f5f5; }
+      .bg-white { background: #fff; }
+      .border-b { border-bottom: 1px solid #d4d4d4; }
+      .border-t { border-top: 1px solid #d4d4d4; }
+      .border-neutral-300 { border-color: #d4d4d4; }
+      .rounded, .rounded-lg { border-radius: 0; }
+      .mt-1 { margin-top: 0.25rem; }
+      .mt-2 { margin-top: 0.5rem; }
+      .mt-4 { margin-top: 1rem; }
+      .mt-5 { margin-top: 1.25rem; }
+      .mt-6 { margin-top: 1.5rem; }
+      .pb-4 { padding-bottom: 1rem; }
+      .pt-3 { padding-top: 0.75rem; }
+      .p-2, .p-3, .p-8 { padding: 0.5rem; }
+      .p-1\\.5 { padding: 0.25rem; }
+      .block { display: block; }
+      .mx-auto { margin-left: auto; margin-right: auto; }
+      .shadow-soft { box-shadow: none; }
+    </style>
+  </head>
+  <body>${sheetHtml}</body>
+</html>`;
+}
+
 function PrintReportSheet({
   reportType,
   period,
@@ -2450,10 +3006,10 @@ function PrintReportSheet({
   closure?: AccountingPeriodClose;
 }) {
   const reportTitle = REPORT_LABELS[reportType];
-  const visibleEntries = entries.slice(0, 14);
+  const visibleEntries = entries.slice(0, 10);
   return (
     <div className="accounting-print-area rounded-lg border border-border bg-muted p-4">
-      <article className="accounting-letter-sheet mx-auto bg-white p-8 text-neutral-950 shadow-soft">
+      <article data-accounting-print-sheet className="accounting-letter-sheet mx-auto bg-white p-8 text-neutral-950 shadow-soft">
         <header className="flex items-start justify-between border-b border-neutral-300 pb-4">
           <div className="flex items-start gap-4">
             <Image
@@ -2472,13 +3028,16 @@ function PrintReportSheet({
           <div className="text-right text-xs text-neutral-600">
             <p>Generado: {formatDate(ACCOUNTING_TODAY, "dd MMM yyyy")}</p>
             <p>Formato carta · DEMO</p>
+            <p>Totales con equivalente contable MXN</p>
           </div>
         </header>
 
-        <section className="mt-5 grid grid-cols-4 gap-3">
+        <section className="mt-5 grid grid-cols-6 gap-3">
           <PrintMetric label="Ingresos" value={formatMXN(summary.income)} />
           <PrintMetric label="Egresos" value={formatMXN(summary.expenses)} />
           <PrintMetric label="Neto" value={formatMXN(summary.net)} />
+          <PrintMetric label="Registros USD" value={String(summary.usdHeldCount)} />
+          <PrintMetric label="USD guardados" value={formatCurrencyAmount(summary.usdHeld, "USD")} />
           <PrintMetric label="Cierre" value={`${closeControl.score}%`} />
         </section>
 
@@ -2526,7 +3085,7 @@ function PrintReportSheet({
         )}
 
         <footer className="mt-6 border-t border-neutral-300 pt-3 text-xs text-neutral-500">
-          Reporte generado con datos simulados del DEMO. No sustituye contabilidad fiscal real.
+          Reporte generado con datos simulados del DEMO. Los movimientos en USD conservan su monto original y muestran equivalente contable en MXN. No sustituye contabilidad fiscal real.
         </footer>
       </article>
     </div>
@@ -2544,26 +3103,45 @@ function PrintMetric({ label, value }: { label: string; value: string }) {
 
 function PrintTable({ entries }: { entries: AccountingEntry[] }) {
   return (
-    <table className="mt-2 w-full border-collapse text-xs">
+    <table className="mt-2 w-full border-collapse text-[10px]">
       <thead>
         <tr className="bg-neutral-100">
-          <th className="border border-neutral-300 p-2 text-left">Fecha</th>
-          <th className="border border-neutral-300 p-2 text-left">Concepto</th>
-          <th className="border border-neutral-300 p-2 text-left">Tipo</th>
-          <th className="border border-neutral-300 p-2 text-right">Monto</th>
-          <th className="border border-neutral-300 p-2 text-left">Fiscal</th>
+          <th className="border border-neutral-300 p-1.5 text-left">Fecha</th>
+          <th className="border border-neutral-300 p-1.5 text-left">Concepto</th>
+          <th className="border border-neutral-300 p-1.5 text-left">Tipo</th>
+          <th className="border border-neutral-300 p-1.5 text-left">Categoría</th>
+          <th className="border border-neutral-300 p-1.5 text-right">Monto original</th>
+          <th className="border border-neutral-300 p-1.5 text-left">Moneda</th>
+          <th className="border border-neutral-300 p-1.5 text-right">TC</th>
+          <th className="border border-neutral-300 p-1.5 text-right">Equiv. MXN</th>
+          <th className="border border-neutral-300 p-1.5 text-left">Manejo USD</th>
+          <th className="border border-neutral-300 p-1.5 text-left">Estado</th>
         </tr>
       </thead>
       <tbody>
         {entries.map((entry) => (
           <tr key={entry.id}>
-            <td className="border border-neutral-300 p-2">{formatDate(entry.date, "dd MMM")}</td>
-            <td className="border border-neutral-300 p-2">{entry.concept}</td>
-            <td className="border border-neutral-300 p-2">{TYPE_LABELS[entry.type]}</td>
-            <td className="border border-neutral-300 p-2 text-right">{formatMXN(entry.amount)}</td>
-            <td className="border border-neutral-300 p-2">
-              {entry.type === "ingreso" ? INVOICE_STATUS_LABELS[getInvoiceStatus(entry)] : DEDUCTIBLE_STATUS_LABELS[getDeductibleStatus(entry)]}
+            <td className="border border-neutral-300 p-1.5">{formatDate(entry.date, "dd MMM")}</td>
+            <td className="border border-neutral-300 p-1.5">
+              <span className="font-medium">{entry.concept}</span>
+              <span className="block text-[9px] text-neutral-500">
+                {entry.type === "ingreso" ? INVOICE_STATUS_LABELS[getInvoiceStatus(entry)] : DEDUCTIBLE_STATUS_LABELS[getDeductibleStatus(entry)]}
+              </span>
             </td>
+            <td className="border border-neutral-300 p-1.5">{TYPE_LABELS[entry.type]}</td>
+            <td className="border border-neutral-300 p-1.5">{ACCOUNTING_CATEGORY_LABELS[entry.category]}</td>
+            <td className="border border-neutral-300 p-1.5 text-right">
+              <span className="font-semibold">{formatEntryOriginalAmount(entry)}</span>
+            </td>
+            <td className="border border-neutral-300 p-1.5">{getEntryCurrency(entry)}</td>
+            <td className="border border-neutral-300 p-1.5 text-right">
+              {getEntryCurrency(entry) === "USD" ? formatNumber(getEntryExchangeRate(entry), 2) : "-"}
+            </td>
+            <td className="border border-neutral-300 p-1.5 text-right font-semibold">{formatMXN(getEntryAmountMxn(entry))}</td>
+            <td className="border border-neutral-300 p-1.5">
+              {getEntryCurrency(entry) === "USD" ? getUsdHandlingLabel(entry) : "-"}
+            </td>
+            <td className="border border-neutral-300 p-1.5">{entry.status === "conciliado" ? "Conciliado" : "Pendiente"}</td>
           </tr>
         ))}
       </tbody>

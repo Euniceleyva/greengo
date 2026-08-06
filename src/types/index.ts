@@ -208,6 +208,8 @@ export interface Trip {
 
 export type AccountingEntryType = "ingreso" | "egreso";
 
+export type MoneyCurrency = "MXN" | "USD";
+
 export type AccountingPaymentMethod =
   | "efectivo"
   | "transferencia"
@@ -239,7 +241,10 @@ export interface AccountingEntry {
   category: AccountingCategory;
   paymentMethod: AccountingPaymentMethod;
   account: AccountingAccount;
-  amount: number; // MXN
+  amount: number; // monto capturado en la moneda original
+  currency?: MoneyCurrency; // los registros antiguos del DEMO se tratan como MXN
+  exchangeRate?: number; // pesos por 1 USD cuando currency = "USD"
+  exchangedToMxn?: boolean; // true si el USD ya se cambió/depositó en pesos
   reference?: string;
   status: "conciliado" | "pendiente";
   invoiceStatus?: AccountingInvoiceStatus;
