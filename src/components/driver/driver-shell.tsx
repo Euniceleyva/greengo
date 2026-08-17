@@ -38,11 +38,11 @@ export function DriverShell({ children }: { children: React.ReactNode }) {
           <div className="flex min-w-0 items-center gap-3">
             <div className="flex h-10 w-28 shrink-0 items-center justify-center rounded-lg bg-white px-2 ring-1 ring-black/10">
               <Image
-                src="/images/logos/logo_color.png"
+                src="/images/logos/logo_anterior_color.png"
                 alt="GreenGo Transfers Cancún"
-                width={132}
-                height={58}
-                className="h-7 w-auto"
+                width={551}
+                height={453}
+                className="h-9 w-auto object-contain"
                 priority
               />
             </div>

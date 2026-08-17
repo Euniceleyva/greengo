@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Facebook, Instagram, Mail, Phone } from "lucide-react";
 import { WHATSAPP_DISPLAY } from "@/constants";
 import { Logo } from "@/components/landing/ui/logo";
@@ -56,11 +55,6 @@ export function LandingFooter() {
               </li>
               <li>
                 <a href="#destinos" className="hover:text-primary">Destinos</a>
-              </li>
-              <li>
-                <Link href="/demo" className="text-white/50 hover:text-[var(--adventure-sun)]">
-                  Acceso al panel (demo)
-                </Link>
               </li>
             </ul>
           </div>

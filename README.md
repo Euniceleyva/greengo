@@ -100,7 +100,7 @@ En este DEMO, ambas experiencias (admin y conductor) conviven en **una sola apli
 
 Los cuatro tonos están disponibles como utilidades de Tailwind (`bg-brand-green`, `bg-brand-orange`, `bg-brand-blue`, `bg-brand-lime`) y como variables CSS en `src/app/globals.css` (`--brand-green`, `--brand-orange`, `--brand-blue`, `--brand-lime`). Los tokens semánticos de shadcn (`--primary`, `--accent`, `--secondary`, `--muted`, `--border`, etc.) se recalcularon en tonos verdes/neutros para que todo el sistema (botones, tarjetas, badges, mapas) parta de la misma paleta. Los colores semánticos de estado (éxito, advertencia, peligro, información) se mantienen independientes de la marca para no perder claridad en tablas y alertas.
 
-**Logo.** `public/logo.png` (logo oficial de GreenGo) se usa en: la pantalla de selección de experiencia (`src/app/page.tsx`), el sidebar del panel administrativo (`src/components/admin/admin-shell.tsx`), el encabezado de la experiencia del conductor (`src/components/driver/driver-shell.tsx`) y como favicon/ícono de la app (`src/app/layout.tsx`).
+**Logo.** `public/images/logos/logo_anterior_color.png` es el logotipo oficial usado en la landing, reservaciones, reportes, panel administrativo, experiencia del conductor y metadatos de la app.
 
 **Tipografía.** Dos familias de Google Fonts vía `next/font`:
 

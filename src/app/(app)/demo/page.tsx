@@ -57,7 +57,7 @@ export default function DemoLoginPage() {
         <section className="w-full max-w-[440px] rounded-[1.65rem] border border-white/65 bg-white/[0.84] p-5 shadow-[0_28px_90px_rgba(8,34,29,0.34)] backdrop-blur-2xl sm:p-6">
           <div className="mb-7 text-center">
             <Image
-              src="/images/logos/logo_color.png"
+              src="/images/logos/logo_anterior_color.png"
               alt="GreenGo Transfers Cancún"
               width={210}
               height={92}

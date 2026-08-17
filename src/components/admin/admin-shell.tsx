@@ -217,11 +217,11 @@ function SidebarContent({
       <div className={cn("flex h-16 items-center gap-2 border-b border-border px-5", collapsed && "justify-center px-2")}>
         <div className={cn("flex shrink-0 items-center", collapsed ? "justify-center" : "justify-start")}>
           <Image
-            src={collapsed ? "/images/logos/favicon_greengo.png" : "/images/logos/logo_color.png"}
+            src="/images/logos/logo_anterior_color.png"
             alt="GreenGo Transfers Cancún"
-            width={collapsed ? 32 : 148}
-            height={collapsed ? 32 : 66}
-            className={cn(collapsed ? "h-8 w-8" : "h-9 w-auto")}
+            width={551}
+            height={453}
+            className={cn(collapsed ? "h-9 w-9 object-contain" : "h-12 w-auto object-contain")}
             priority
           />
         </div>

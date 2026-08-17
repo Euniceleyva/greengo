@@ -170,7 +170,7 @@ export function ConfirmationClient() {
             <Home aria-hidden /> Volver al inicio <ArrowRight aria-hidden />
           </Button>
           <p className="adventure-confirmation-demo">
-            Esta reservación ya aparece en el panel administrativo del DEMO (Servicios / Viajes).
+            Tu reservación quedó registrada correctamente.
           </p>
         </aside>
       </div>

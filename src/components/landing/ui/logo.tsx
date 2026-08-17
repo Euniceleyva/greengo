@@ -13,9 +13,9 @@ interface LogoProps {
 }
 
 const LOGO_SRC: Record<NonNullable<LogoProps["variant"]>, string> = {
-  color: "/images/logos/logo_color.png",
-  dark: "/images/logos/logo_dark.png",
-  white: "/images/logos/logo_white.png",
+  color: "/images/logos/logo_anterior_color.png",
+  dark: "/images/logos/logo_anterior_color.png",
+  white: "/images/logos/logo_anterior_color.png",
 };
 
 /** Logotipo oficial de GreenGo Transfers Cancún (public/images/logos). */
@@ -33,8 +33,8 @@ export function Logo({
       <Image
         src={src}
         alt="GreenGo Transfers Cancún"
-        width={608}
-        height={272}
+        width={551}
+        height={453}
         priority={priority}
         className={cn("h-10 w-auto", imgClassName)}
       />

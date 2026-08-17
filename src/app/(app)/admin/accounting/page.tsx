@@ -3013,10 +3013,10 @@ function PrintReportSheet({
         <header className="flex items-start justify-between border-b border-neutral-300 pb-4">
           <div className="flex items-start gap-4">
             <Image
-              src="/images/logos/logo_color.png"
+              src="/images/logos/logo_anterior_color.png"
               alt="GreenGo Transfers Cancún"
-              width={132}
-              height={56}
+              width={551}
+              height={453}
               className="h-14 w-auto object-contain"
             />
             <div>
