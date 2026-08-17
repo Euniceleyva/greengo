@@ -96,17 +96,41 @@ export const reservationStep2Schema = z.object({
 export type ReservationStep2Values = z.infer<typeof reservationStep2Schema>;
 
 export const reservationStep3Schema = z.object({
-  contactName: z.string().min(2, "Ingresa tu nombre completo"),
-  contactEmail: z.string().email("Ingresa un correo válido"),
+  contactName: z.string().trim().min(2, "Ingresa tu nombre completo").max(140, "El nombre es demasiado largo"),
+  contactEmail: z.string().trim().toLowerCase().email("Ingresa un correo válido").max(254),
   contactPhone: z
     .string()
-    .min(10, "Ingresa un teléfono a 10 dígitos")
-    .max(10, "Ingresa un teléfono a 10 dígitos")
-    .regex(/^\d{10}$/, "Solo dígitos, sin espacios ni guiones"),
-  hotel: z.string().optional(),
+    .trim()
+    .min(8, "Ingresa un teléfono válido")
+    .max(25, "El teléfono es demasiado largo")
+    .regex(/^[0-9+() .-]+$/, "Usa únicamente números y el código de país"),
+  hotel: z.string().trim().max(180).optional(),
 });
 
 export type ReservationStep3Values = z.infer<typeof reservationStep3Schema>;
+
+export const reservationSubmissionSchema = z.object({
+  submissionKey: z.string().uuid(),
+  serviceType: z.enum(["hotel_hotel", "aeropuerto", "transporte_abierto", "a_medida"]),
+  originLocationId: z.string().trim().min(1).max(100),
+  destinationLocationId: z.string().trim().min(1).max(100),
+  direction: z.enum(["sencillo", "redondo"]),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida"),
+  time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Hora inválida"),
+  passengers: z.coerce.number().int().min(1).max(60),
+  bags: z.coerce.number().int().min(0).max(80),
+  flightNumber: z.string().trim().max(30).default(""),
+  notes: z.string().trim().max(1000).default(""),
+  contactName: reservationStep3Schema.shape.contactName,
+  contactEmail: reservationStep3Schema.shape.contactEmail,
+  contactPhone: reservationStep3Schema.shape.contactPhone,
+  hotel: z.string().trim().max(180).default(""),
+}).refine((data) => data.originLocationId !== data.destinationLocationId, {
+  message: "El origen y el destino no pueden ser iguales",
+  path: ["destinationLocationId"],
+});
+
+export type ReservationSubmission = z.infer<typeof reservationSubmissionSchema>;
 
 // ---------------------------------------------------------------------------
 // Pasarela de pago simulada (/pago/checkout) — nunca procesa un pago real.

@@ -45,8 +45,15 @@ export function Step3Contact() {
           {errors.contactEmail && <p className="mt-1.5 text-xs text-destructive">{errors.contactEmail.message}</p>}
         </div>
         <div>
-          <Label htmlFor="contactPhone">Teléfono (10 dígitos)</Label>
-          <Input id="contactPhone" type="tel" inputMode="numeric" className="mt-1.5" {...register("contactPhone")} />
+          <Label htmlFor="contactPhone">Teléfono con código de país</Label>
+          <Input
+            id="contactPhone"
+            type="tel"
+            inputMode="tel"
+            placeholder="Ej. +52 998 123 4567"
+            className="mt-1.5"
+            {...register("contactPhone")}
+          />
           {errors.contactPhone && <p className="mt-1.5 text-xs text-destructive">{errors.contactPhone.message}</p>}
         </div>
         <div className="sm:col-span-2">

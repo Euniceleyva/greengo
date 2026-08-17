@@ -1,35 +1,61 @@
 "use client";
 
+import * as React from "react";
 import { useRouter } from "next/navigation";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { useReservationStore } from "@/stores/reservation-store";
 import { LOCATIONS } from "@/mocks/locations";
-import { getFareBreakdown, CUSTOM_QUOTE_LABEL } from "@/mocks/pricing";
 import { SERVICE_TYPE_LABELS } from "@/constants";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/misc";
-import { LocalizedCurrency, usePublicCurrency } from "@/components/shared/public-language";
 
 export function Step4Summary() {
   const router = useRouter();
-  const formatCurrency = usePublicCurrency();
   const draft = useReservationStore((s) => s.draft);
   const setStep = useReservationStore((s) => s.setStep);
+  const submissionKey = useReservationStore((s) => s.submissionKey);
+  const reservationReceipt = useReservationStore((s) => s.reservationReceipt);
+  const setSubmissionKey = useReservationStore((s) => s.setSubmissionKey);
+  const setReservationReceipt = useReservationStore((s) => s.setReservationReceipt);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [submitError, setSubmitError] = React.useState("");
 
   const origin = LOCATIONS.find((l) => l.id === draft.originLocationId);
   const destination = LOCATIONS.find((l) => l.id === draft.destinationLocationId);
   const serviceType = draft.serviceType ?? "aeropuerto";
 
-  const fare = getFareBreakdown({
-    serviceType,
-    originLocationId: draft.originLocationId ?? "",
-    destinationLocationId: draft.destinationLocationId ?? "",
-    passengers: draft.passengers,
-    bags: draft.bags,
-    time: draft.time,
-    isRoundTrip: draft.direction === "redondo",
-  });
+  const onContinue = async () => {
+    if (reservationReceipt) {
+      router.push("/pago/checkout");
+      return;
+    }
 
-  const onContinue = () => router.push("/pago/checkout");
+    const key = submissionKey ?? crypto.randomUUID();
+    if (!submissionKey) setSubmissionKey(key);
+
+    setIsSubmitting(true);
+    setSubmitError("");
+
+    try {
+      const response = await fetch("/api/reservations", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ ...draft, submissionKey: key }),
+      });
+      const result = await response.json();
+
+      if (!response.ok || !result.reservation) {
+        throw new Error(result.error || "No pudimos registrar la reservación.");
+      }
+
+      setReservationReceipt(result.reservation);
+      router.push("/pago/checkout");
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "No pudimos registrar la reservación.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div>
@@ -58,44 +84,15 @@ export function Step4Summary() {
       </div>
 
       <div className="adventure-fare-card mt-6 rounded-xl border border-border p-5">
-        <h3 className="font-heading text-sm font-semibold text-foreground">Desglose de tarifa (estimado)</h3>
-
-        {fare.isCustomQuote ? (
-          <p className="mt-3 text-sm text-muted-foreground">
-            {CUSTOM_QUOTE_LABEL}: nuestro equipo te contactará para confirmar el costo de tu solución a medida.
-          </p>
-        ) : (
-          <table className="mt-3 w-full text-sm">
-            <tbody>
-              {fare.hourlyRate ? (
-                <FareRow
-                  label={`Renta por hora (${fare.hours} h × ${formatCurrency(fare.hourlyRate)})`}
-                  value={fare.base}
-                />
-              ) : (
-                <FareRow label="Tarifa base (hasta 4 pasajeros)" value={fare.base} />
-              )}
-              {fare.extraPassengers > 0 && (
-                <FareRow
-                  label={`Pasajeros adicionales (${fare.extraPassengers} × ${formatCurrency(fare.extraPassengerFee)})`}
-                  value={fare.extraPassengerCost}
-                />
-              )}
-              {fare.extraBags > 0 && (
-                <FareRow label={`Maletas adicionales (${fare.extraBags})`} value={fare.bagsFee} />
-              )}
-              {fare.nightSurcharge > 0 && <FareRow label="Recargo nocturno (22:00–06:00)" value={fare.nightSurcharge} />}
-              {fare.isRoundTrip && <FareRow label="Viaje redondo (× 2)" value={fare.subtotal} />}
-            </tbody>
-          </table>
-        )}
-
+        <h3 className="font-heading text-sm font-semibold text-foreground">Validación de tarifa</h3>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Al continuar, validaremos la ruta contra las tarifas aprobadas por GreenGo. Si todavía no existe una tarifa
+          para este recorrido, quedará como solicitud de cotización y el equipo se pondrá en contacto contigo.
+        </p>
         <Separator className="my-4" />
         <div className="adventure-fare-total flex items-center justify-between">
-          <span className="font-heading text-base font-semibold text-foreground">Total estimado</span>
-          <span className="font-heading text-xl font-bold text-primary">
-            {fare.isCustomQuote ? CUSTOM_QUOTE_LABEL : <LocalizedCurrency amount={fare.total} />}
-          </span>
+          <span className="font-heading text-base font-semibold text-foreground">Importe final</span>
+          <span className="font-heading text-base font-bold text-primary">Se confirma en el siguiente paso</span>
         </div>
       </div>
 
@@ -103,10 +100,17 @@ export function Step4Summary() {
         <Button type="button" variant="outline" onClick={() => setStep(3)}>
           Atrás
         </Button>
-        <Button type="button" onClick={onContinue}>
-          Continuar al pago
+        <Button type="button" onClick={onContinue} disabled={isSubmitting}>
+          {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+          {isSubmitting ? "Registrando…" : "Continuar al pago"}
         </Button>
       </div>
+      {submitError && (
+        <div className="mt-4 flex items-start gap-2 rounded-xl border border-destructive/25 bg-destructive/5 p-3 text-sm text-destructive">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+          <p>{submitError}</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -117,14 +121,5 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
       <dt className="text-muted-foreground">{label}</dt>
       <dd className="font-medium text-foreground">{value}</dd>
     </div>
-  );
-}
-
-function FareRow({ label, value }: { label: string; value: number }) {
-  return (
-    <tr>
-      <td className="py-1 text-muted-foreground">{label}</td>
-      <td className="py-1 text-right font-medium text-foreground"><LocalizedCurrency amount={value} /></td>
-    </tr>
   );
 }

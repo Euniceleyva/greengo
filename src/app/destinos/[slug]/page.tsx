@@ -13,8 +13,9 @@ export function generateStaticParams() {
   return DESTINATIONS.map((d) => ({ slug: d.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const destination = destinationBySlug(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const destination = destinationBySlug(slug);
   if (!destination) return { title: "Destino no encontrado — GreenGo Transfers Cancún" };
   const title = `Traslado a ${destination.name} desde el Aeropuerto de Cancún`;
   const description = `Reserva transporte privado a ${destination.name} desde el Aeropuerto de Cancún o tu hotel. ${destination.shortDescription}`;
@@ -32,8 +33,9 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   };
 }
 
-export default function DestinationPage({ params }: { params: { slug: string } }) {
-  const destination = destinationBySlug(params.slug);
+export default async function DestinationPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const destination = destinationBySlug(slug);
   if (!destination) notFound();
 
   const related = DESTINATIONS.filter((d) => d.slug !== destination.slug).slice(0, 3);

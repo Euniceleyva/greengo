@@ -7,11 +7,8 @@ import { ArrowRight, Check, Home, Mail, MapPin } from "lucide-react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useReservationStore } from "@/stores/reservation-store";
-import { useDemoStore } from "@/stores/demo-store";
 import { useHydrated } from "@/lib/hooks";
 import { LOCATIONS } from "@/mocks/locations";
-import { getFareBreakdown, CUSTOM_QUOTE_LABEL } from "@/mocks/pricing";
-import { reservationDraftToTripInput } from "@/lib/reservation-to-trip";
 import { SERVICE_TYPE_LABELS } from "@/constants";
 import { LocalizedCurrency } from "@/components/shared/public-language";
 import { Card } from "@/components/ui/card";
@@ -26,25 +23,11 @@ export function ConfirmationClient() {
 
   const draft = useReservationStore((s) => s.draft);
   const confirmedFolio = useReservationStore((s) => s.confirmedFolio);
-  const setConfirmedFolio = useReservationStore((s) => s.setConfirmedFolio);
+  const receipt = useReservationStore((s) => s.reservationReceipt);
   const resetReservation = useReservationStore((s) => s.resetReservation);
-  const createTrip = useDemoStore((s) => s.createTrip);
-  const createdRef = React.useRef(false);
   const confirmationRef = React.useRef<HTMLDivElement>(null);
 
   const hasDraft = Boolean(draft.serviceType && draft.originLocationId && draft.destinationLocationId);
-
-  React.useEffect(() => {
-    if (!hydrated || createdRef.current || confirmedFolio || !hasDraft) return;
-    createdRef.current = true;
-
-    const tripInput = reservationDraftToTripInput(draft);
-    if (!tripInput) return;
-    const trip = createTrip(tripInput);
-
-    setConfirmedFolio(trip.folio);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hydrated, hasDraft, confirmedFolio]);
 
   const onBackHome = () => {
     resetReservation();
@@ -85,7 +68,7 @@ export function ConfirmationClient() {
     );
   }
 
-  if (!confirmedFolio && !hasDraft) {
+  if (!receipt || !confirmedFolio || !hasDraft) {
     return (
       <Card className="adventure-confirmation-empty p-6 text-center sm:p-8">
         <p className="font-bold text-muted-foreground">No encontramos información de una reservación reciente.</p>
@@ -100,32 +83,28 @@ export function ConfirmationClient() {
   const destination = LOCATIONS.find((l) => l.id === draft.destinationLocationId);
   const serviceType = draft.serviceType!;
 
-  const fare = getFareBreakdown({
-    serviceType,
-    originLocationId: draft.originLocationId ?? "",
-    destinationLocationId: draft.destinationLocationId ?? "",
-    passengers: draft.passengers,
-    bags: draft.bags,
-    time: draft.time,
-    isRoundTrip: draft.direction === "redondo",
-  });
+  const amount = receipt.amountMinor / 100;
 
   return (
     <div ref={confirmationRef} className="adventure-confirmation">
       <section data-confirmation-hero className="adventure-confirmation-hero">
         <div data-confirmation-stamp className="adventure-confirmation-stamp" aria-hidden>
           <Check />
-          <span>CONFIRMADO</span>
+          <span>RECIBIDA</span>
         </div>
         <div data-confirmation-copy className="adventure-confirmation-copy">
-          <p>YA ESTÁ EN EL MAPA</p>
-          <h1>¡Listo! Tu viaje ya está en marcha.</h1>
-          <p>Guardamos tu ruta y la enviamos al equipo. Conserva este folio para cualquier cambio.</p>
+          <p>SOLICITUD REGISTRADA</p>
+          <h1>¡Listo! GreenGo ya recibió tu reservación.</h1>
+          <p>
+            {receipt.requiresQuote
+              ? "El equipo confirmará la tarifa antes de solicitarte un pago."
+              : "El viaje está apartado y permanece pendiente de pago."}
+          </p>
         </div>
         <div data-confirmation-copy className="adventure-confirmation-folio">
           <span>FOLIO DE VIAJE</span>
           <strong>{confirmedFolio}</strong>
-          <small>CUN · MAREA CLUB</small>
+          <small>CUN · GREENGO TRANSFERS</small>
         </div>
       </section>
 
@@ -151,17 +130,18 @@ export function ConfirmationClient() {
           <SummaryRow label="Correo" value={draft.contactEmail} />
           </dl>
           <div className="adventure-confirmation-total">
-            <span>Total pagado</span>
-            <strong>
-            {fare.isCustomQuote ? CUSTOM_QUOTE_LABEL : <LocalizedCurrency amount={fare.total} />}
-            </strong>
+            <span>{receipt.requiresQuote ? "Importe" : "Total pendiente"}</span>
+            <strong>{receipt.requiresQuote ? "Por cotizar" : <LocalizedCurrency amount={amount} />}</strong>
           </div>
         </section>
 
         <aside data-confirmation-detail className="adventure-confirmation-next">
           <div className="adventure-confirmation-next__icon"><Mail aria-hidden /></div>
           <h2>¿Qué sigue?</h2>
-          <p>Te enviaremos la confirmación al correo proporcionado (simulado, sin envío real).</p>
+          <p>
+            El equipo verá la solicitud en su panel y se pondrá en contacto contigo. El correo automático se activará
+            antes de habilitar los pagos reales.
+          </p>
           <div className="adventure-confirmation-next__route">
             <span>Ahora sí:</span>
             <strong>maleta lista,<br />modo Caribe.</strong>
@@ -170,7 +150,7 @@ export function ConfirmationClient() {
             <Home aria-hidden /> Volver al inicio <ArrowRight aria-hidden />
           </Button>
           <p className="adventure-confirmation-demo">
-            Tu reservación quedó registrada correctamente.
+            No se realizó ningún cargo.
           </p>
         </aside>
       </div>

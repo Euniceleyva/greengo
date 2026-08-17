@@ -567,3 +567,12 @@ export interface ReservationDraft {
   contactPhone: string;
   hotel: string;
 }
+
+export interface ReservationReceipt {
+  folio: string;
+  publicReference: string;
+  status: "quote_requested" | "awaiting_payment";
+  requiresQuote: boolean;
+  amountMinor: number;
+  currency: string;
+}

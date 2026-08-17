@@ -7,7 +7,7 @@ import { Logo } from "@/components/landing/ui/logo";
 
 export const metadata: Metadata = {
   title: "Pago seguro — GreenGo Transfers Cancún",
-  description: "Pasarela de pago simulada del DEMO. No se procesa ningún pago real.",
+  description: "Revisión del estado de pago de tu reservación con GreenGo Transfers Cancún.",
 };
 
 export default function CheckoutPage() {

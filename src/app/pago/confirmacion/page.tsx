@@ -4,8 +4,8 @@ import { LanguageSwitch, PublicLanguageProvider } from "@/components/shared/publ
 import { Logo } from "@/components/landing/ui/logo";
 
 export const metadata: Metadata = {
-  title: "Reservación confirmada — GreenGo Transfers Cancún",
-  description: "Confirmación de la reservación simulada del DEMO.",
+  title: "Reservación recibida — GreenGo Transfers Cancún",
+  description: "Confirmación de recepción de tu reservación con GreenGo Transfers Cancún.",
 };
 
 export default function ConfirmacionPage() {
@@ -16,7 +16,7 @@ export default function ConfirmacionPage() {
         <div className="mx-auto flex h-[72px] max-w-6xl items-center px-4 sm:px-6">
           <Logo variant="dark" imgClassName="h-8 w-auto sm:h-9" />
           <div className="ml-auto flex items-center gap-3">
-            <span className="adventure-confirmation__status">VIAJE CONFIRMADO</span>
+            <span className="adventure-confirmation__status">SOLICITUD RECIBIDA</span>
             <LanguageSwitch compact />
           </div>
         </div>

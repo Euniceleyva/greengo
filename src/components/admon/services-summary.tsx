@@ -19,8 +19,6 @@ import {
   startOfMonth,
   startOfWeek,
 } from "date-fns";
-import { useDemoStore } from "@/stores/demo-store";
-import { useHydrated } from "@/lib/hooks";
 import { formatDate } from "@/lib/format";
 import { SERVICE_TYPE_LABELS } from "@/constants";
 import { Button } from "@/components/ui/button";
@@ -28,7 +26,24 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import type { BadgeTone } from "@/constants";
-import type { PaymentStatus, Trip } from "@/types";
+import type { BookingSource, PaymentStatus, ServiceType } from "@/types";
+
+export type AdminServiceRecord = {
+  id: string;
+  folio: string;
+  serviceType: ServiceType;
+  bookingSource: BookingSource;
+  client: string;
+  passengers: number;
+  origin: string;
+  destination: string;
+  date: string;
+  time: string;
+  amount: number;
+  paymentStatus: PaymentStatus;
+  status: "pendiente" | "confirmado" | "cancelado";
+  plannedKm: number;
+};
 
 type Period = "hoy" | "semana" | "mes" | "todos" | "personalizado";
 
@@ -102,7 +117,7 @@ function periodDescription(period: Period, from: string, to: string) {
   return "Rango seleccionado";
 }
 
-function filterTrips(trips: Trip[], period: Period, from: string, to: string) {
+function filterTrips(trips: AdminServiceRecord[], period: Period, from: string, to: string) {
   const range = getPeriodRange(period, from, to);
   return trips
     .filter((trip) => trip.bookingSource === "web")
@@ -110,10 +125,14 @@ function filterTrips(trips: Trip[], period: Period, from: string, to: string) {
     .sort((a, b) => `${b.date}T${b.time}`.localeCompare(`${a.date}T${a.time}`));
 }
 
-export function ServicesSummary({ adminEmail }: { adminEmail: string }) {
+export function ServicesSummary({
+  adminEmail,
+  trips,
+}: {
+  adminEmail: string;
+  trips: AdminServiceRecord[];
+}) {
   const router = useRouter();
-  const hydrated = useHydrated();
-  const trips = useDemoStore((state) => state.trips);
   const [period, setPeriod] = React.useState<Period>("todos");
   const [from, setFrom] = React.useState(isoDate(startOfMonth(new Date())));
   const [to, setTo] = React.useState(isoDate(new Date()));
@@ -129,8 +148,8 @@ export function ServicesSummary({ adminEmail }: { adminEmail: string }) {
   };
 
   const visibleTrips = React.useMemo(
-    () => (hydrated ? filterTrips(trips, period, from, to) : []),
-    [hydrated, trips, period, from, to],
+    () => filterTrips(trips, period, from, to),
+    [trips, period, from, to],
   );
 
   const confirmedIncome = visibleTrips
@@ -394,11 +413,7 @@ export function ServicesSummary({ adminEmail }: { adminEmail: string }) {
           </span>
         </div>
 
-        {!hydrated ? (
-          <div className="flex min-h-52 items-center justify-center gap-2 text-sm font-medium text-muted-foreground">
-            <RefreshCw className="h-4 w-4 animate-spin" /> Cargando reservaciones
-          </div>
-        ) : visibleTrips.length === 0 ? (
+        {visibleTrips.length === 0 ? (
           <div className="flex min-h-52 flex-col items-center justify-center px-5 text-center">
             <CalendarDays className="h-8 w-8 text-info" />
             <h3 className="mt-3 font-bold text-foreground">No hay servicios en este periodo</h3>
@@ -481,7 +496,7 @@ function SummaryCard({
   );
 }
 
-function ServiceRow({ trip }: { trip: Trip }) {
+function ServiceRow({ trip }: { trip: AdminServiceRecord }) {
   const payment = trip.paymentStatus ?? "pendiente";
   return (
     <tr className="align-middle transition-colors hover:bg-info-soft/45">
@@ -504,7 +519,7 @@ function ServiceRow({ trip }: { trip: Trip }) {
   );
 }
 
-function ServiceCard({ trip }: { trip: Trip }) {
+function ServiceCard({ trip }: { trip: AdminServiceRecord }) {
   const payment = trip.paymentStatus ?? "pendiente";
   return (
     <article className="p-4">

@@ -1,34 +1,22 @@
 "use client";
 
-import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Loader2, LockKeyhole, ShieldAlert } from "lucide-react";
+import { Clock3, CreditCard, Landmark, LockKeyhole, WalletCards } from "lucide-react";
 import { useReservationStore } from "@/stores/reservation-store";
 import { useHydrated } from "@/lib/hooks";
 import { LOCATIONS } from "@/mocks/locations";
-import { getFareBreakdown, CUSTOM_QUOTE_LABEL } from "@/mocks/pricing";
 import { SERVICE_TYPE_LABELS } from "@/constants";
-import { LocalizedCurrency, usePublicCurrency } from "@/components/shared/public-language";
+import { LocalizedCurrency } from "@/components/shared/public-language";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/misc";
-import { PaymentMethodSelector, type CheckoutMethod } from "./payment-method-selector";
-import { CardForm, type CardFormHandle } from "./card-form";
-
-// TODO(prod): reemplazar esta pasarela simulada por Mercado Pago Checkout Pro / Stripe.
-const SIMULATED_DELAY_MS = 2000;
 
 export function CheckoutClient() {
   const hydrated = useHydrated();
   const router = useRouter();
-  const formatCurrency = usePublicCurrency();
-  const draft = useReservationStore((s) => s.draft);
-
-  const [method, setMethod] = React.useState<CheckoutMethod>("tarjeta");
-  const [forceReject, setForceReject] = React.useState(false);
-  const [status, setStatus] = React.useState<"idle" | "loading" | "rejected">("idle");
-  const cardFormRef = React.useRef<CardFormHandle>(null);
+  const draft = useReservationStore((state) => state.draft);
+  const receipt = useReservationStore((state) => state.reservationReceipt);
 
   if (!hydrated) {
     return (
@@ -39,12 +27,10 @@ export function CheckoutClient() {
     );
   }
 
-  const hasDraft = Boolean(draft.serviceType && draft.originLocationId && draft.destinationLocationId);
-
-  if (!hasDraft) {
+  if (!receipt || !draft.serviceType) {
     return (
       <Card className="adventure-checkout-panel p-6 text-center sm:p-8">
-        <p className="font-bold text-muted-foreground">Todavía no hay una ruta lista para pagar.</p>
+        <p className="font-bold text-muted-foreground">Todavía no hay una reservación registrada.</p>
         <Link href="/reservar" className="mt-4 inline-block">
           <Button className="adventure-cta">Armar mi ruta</Button>
         </Link>
@@ -52,44 +38,19 @@ export function CheckoutClient() {
     );
   }
 
-  const origin = LOCATIONS.find((l) => l.id === draft.originLocationId);
-  const destination = LOCATIONS.find((l) => l.id === draft.destinationLocationId);
-  const serviceType = draft.serviceType!;
-
-  const fare = getFareBreakdown({
-    serviceType,
-    originLocationId: draft.originLocationId!,
-    destinationLocationId: draft.destinationLocationId!,
-    passengers: draft.passengers,
-    bags: draft.bags,
-    time: draft.time,
-    isRoundTrip: draft.direction === "redondo",
-  });
-
-  const onPay = async () => {
-    if (method === "tarjeta") {
-      const cardData = await cardFormRef.current?.submit();
-      if (!cardData) return; // formulario inválido, no avanza
-    }
-
-    setStatus("loading");
-    await new Promise((resolve) => setTimeout(resolve, SIMULATED_DELAY_MS));
-
-    if (forceReject) {
-      setStatus("rejected");
-      return;
-    }
-
-    router.push("/pago/confirmacion");
-  };
+  const origin = LOCATIONS.find((location) => location.id === draft.originLocationId);
+  const destination = LOCATIONS.find((location) => location.id === draft.destinationLocationId);
+  const amount = receipt.amountMinor / 100;
 
   return (
     <div className="adventure-checkout__layout">
       <div className="adventure-demo-notice">
-        <ShieldAlert className="h-5 w-5 shrink-0" aria-hidden />
+        <Clock3 className="h-5 w-5 shrink-0" aria-hidden />
         <p>
-          <span className="font-extrabold">Modo demostración:</span> no se procesa ningún pago real. Esta pasarela
-          simula la experiencia final.
+          <span className="font-extrabold">Reservación registrada:</span>{" "}
+          {receipt.requiresQuote
+            ? "el equipo confirmará la tarifa antes de solicitarte un pago."
+            : "el pago permanece pendiente hasta abrir la pasarela segura."}
         </p>
       </div>
 
@@ -97,26 +58,22 @@ export function CheckoutClient() {
         <div className="adventure-checkout-receipt__heading">
           <div>
             <span>RECIBO DE RUTA</span>
-            <h2>Tu reserva</h2>
+            <h2>Tu reservación</h2>
           </div>
-          <strong>CUN / 001</strong>
+          <strong>{receipt.folio}</strong>
         </div>
         <dl className="adventure-checkout-summary mt-6">
-          <SummaryRow label="Servicio" value={SERVICE_TYPE_LABELS[serviceType]} />
+          <SummaryRow label="Servicio" value={SERVICE_TYPE_LABELS[draft.serviceType]} />
           <SummaryRow label="Ruta" value={`${origin?.name ?? "—"} → ${destination?.name ?? "—"}`} />
           <SummaryRow label="Fecha y hora" value={`${draft.date} · ${draft.time}`} />
           <SummaryRow label="Pasajeros" value={String(draft.passengers)} />
         </dl>
         <div className="adventure-checkout-total">
-          <span>Total a pagar</span>
-          <strong>
-            {fare.isCustomQuote ? CUSTOM_QUOTE_LABEL : <LocalizedCurrency amount={fare.total} />}
-          </strong>
+          <span>{receipt.requiresQuote ? "Importe" : "Total pendiente"}</span>
+          <strong>{receipt.requiresQuote ? "Por cotizar" : <LocalizedCurrency amount={amount} />}</strong>
         </div>
         <p className="adventure-checkout-receipt__foot">
-          Traslado · Caribe Mexicano · Buen viaje
-          <br />
-          Tasa demo: 1 USD = 17 MXN
+          Estado: {receipt.requiresQuote ? "Solicitud de cotización" : "Esperando pago"}
         </p>
       </Card>
 
@@ -124,58 +81,26 @@ export function CheckoutClient() {
         <div className="adventure-payment-heading">
           <div>
             <span>PAGO SEGURO</span>
-            <h2>¿Cómo quieres pagar?</h2>
+            <h2>{receipt.requiresQuote ? "Primero confirmaremos tu tarifa" : "Tu pago está pendiente"}</h2>
           </div>
           <LockKeyhole className="h-6 w-6" aria-hidden />
         </div>
-        <div className="mt-4">
-          <PaymentMethodSelector value={method} onChange={setMethod} />
+
+        <p className="mt-4 text-sm leading-6 text-muted-foreground">
+          La reservación ya aparece en el panel de GreenGo. Cuando las pasarelas estén activas, podrás continuar con
+          Mercado Pago o PayPal sin que GreenGo almacene los datos de tu tarjeta.
+        </p>
+
+        <div className="mt-6 grid gap-3 sm:grid-cols-3" aria-label="Métodos próximos de pago">
+          <PaymentPreview icon={CreditCard} label="Mercado Pago" detail="Tarjetas y Amex" />
+          <PaymentPreview icon={WalletCards} label="PayPal" detail="México y EE. UU." />
+          <PaymentPreview icon={Landmark} label="SPEI" detail="Transferencia" />
         </div>
-
-        <div className="mt-6">
-          {method === "tarjeta" && <CardForm ref={cardFormRef} />}
-          {method === "oxxo" && (
-            <p className="adventure-payment-note">
-              Al confirmar, generaremos una referencia de pago para liquidar en cualquier tienda OXXO (simulado).
-            </p>
-          )}
-          {method === "spei" && (
-            <p className="adventure-payment-note">
-              Al confirmar, generaremos una CLABE interbancaria para realizar tu transferencia SPEI (simulado).
-            </p>
-          )}
-        </div>
-
-        <label className="mt-6 flex min-h-[44px] items-center gap-2 text-sm text-muted-foreground">
-          <input
-            type="checkbox"
-            className="h-4 w-4"
-            checked={forceReject}
-            onChange={(e) => setForceReject(e.target.checked)}
-          />
-          Forzar escenario de pago rechazado (demo)
-        </label>
-
-        {status === "rejected" && (
-          <div className="adventure-payment-error mt-4 flex items-start gap-3 p-4 text-sm text-destructive">
-            <AlertTriangle className="h-5 w-5 shrink-0" aria-hidden />
-            <div>
-              <p className="font-semibold">Tu pago fue rechazado.</p>
-              <p className="mt-1">Verifica los datos e inténtalo de nuevo, o elige otro método de pago.</p>
-            </div>
-          </div>
-        )}
 
         <div className="adventure-payment-action mt-7">
-          <p><LockKeyhole aria-hidden /> Tus datos se usan solo para esta simulación.</p>
-          <Button onClick={onPay} disabled={status === "loading"} className="adventure-cta min-w-[168px]">
-            {status === "loading" ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Procesando…
-              </>
-            ) : (
-              `Pagar ${fare.isCustomQuote ? "" : formatCurrency(fare.total)}`
-            )}
+          <p><LockKeyhole aria-hidden /> No se procesó ningún cargo.</p>
+          <Button onClick={() => router.push("/pago/confirmacion")} className="adventure-cta min-w-[190px]">
+            Ver confirmación
           </Button>
         </div>
       </Card>
@@ -188,6 +113,24 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
     <div>
       <dt>{label}</dt>
       <dd>{value}</dd>
+    </div>
+  );
+}
+
+function PaymentPreview({
+  icon: Icon,
+  label,
+  detail,
+}: {
+  icon: typeof CreditCard;
+  label: string;
+  detail: string;
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-surface-soft p-4">
+      <Icon className="h-5 w-5 text-primary" aria-hidden />
+      <p className="mt-2 text-sm font-bold text-foreground">{label}</p>
+      <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
     </div>
   );
 }
