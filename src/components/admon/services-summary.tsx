@@ -2,12 +2,14 @@
 
 import * as React from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   CalendarDays,
   CircleDollarSign,
   Download,
   FileText,
   MapPinned,
+  LogOut,
   RefreshCw,
 } from "lucide-react";
 import {
@@ -24,6 +26,7 @@ import { SERVICE_TYPE_LABELS } from "@/constants";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 import type { BadgeTone } from "@/constants";
 import type { PaymentStatus, Trip } from "@/types";
 
@@ -107,13 +110,23 @@ function filterTrips(trips: Trip[], period: Period, from: string, to: string) {
     .sort((a, b) => `${b.date}T${b.time}`.localeCompare(`${a.date}T${a.time}`));
 }
 
-export function ServicesSummary() {
+export function ServicesSummary({ adminEmail }: { adminEmail: string }) {
+  const router = useRouter();
   const hydrated = useHydrated();
   const trips = useDemoStore((state) => state.trips);
   const [period, setPeriod] = React.useState<Period>("todos");
   const [from, setFrom] = React.useState(isoDate(startOfMonth(new Date())));
   const [to, setTo] = React.useState(isoDate(new Date()));
   const [isCreatingPdf, setIsCreatingPdf] = React.useState(false);
+  const [isSigningOut, setIsSigningOut] = React.useState(false);
+
+  const signOut = async () => {
+    setIsSigningOut(true);
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.replace("/admon/acceso");
+    router.refresh();
+  };
 
   const visibleTrips = React.useMemo(
     () => (hydrated ? filterTrips(trips, period, from, to) : []),
@@ -278,7 +291,8 @@ export function ServicesSummary() {
             </div>
           </div>
         </div>
-        <div className="flex w-full items-center gap-4 rounded-xl border border-white/10 bg-white/[0.04] p-2 sm:w-auto sm:pl-4">
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:items-end">
+          <div className="flex w-full items-center gap-4 rounded-xl border border-white/10 bg-white/[0.04] p-2 sm:w-auto sm:pl-4">
           <div className="hidden text-right lg:block">
             <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/40">Reporte del periodo</p>
             <p className="mt-0.5 text-xs font-medium text-white/70">Tabla y totales incluidos</p>
@@ -291,6 +305,19 @@ export function ServicesSummary() {
             {isCreatingPdf ? <RefreshCw className="animate-spin" /> : <Download />}
             {isCreatingPdf ? "Preparando PDF" : "Descargar PDF"}
           </Button>
+          </div>
+          <div className="flex w-full items-center justify-between gap-3 px-1 text-[11px] text-white/55 sm:justify-end">
+            <span className="max-w-52 truncate" title={adminEmail}>{adminEmail}</span>
+            <button
+              type="button"
+              onClick={signOut}
+              disabled={isSigningOut}
+              className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 font-bold text-white/70 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-50"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              {isSigningOut ? "Saliendo" : "Cerrar sesión"}
+            </button>
+          </div>
         </div>
         </div>
       </header>
