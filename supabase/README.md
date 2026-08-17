@@ -29,7 +29,7 @@ La tabla `pricing_rules` queda vacía intencionalmente. Las tarifas de `src/mock
 1. Ejecutar en orden las migraciones `202608170001`, `202608170002` y `202608170003` en el SQL Editor de Supabase.
 2. Crear el usuario administrativo en Supabase Auth.
 3. Insertar ese usuario en `app_users` como `owner`.
-4. Configurar `SUPABASE_SERVICE_ROLE_KEY` únicamente en Vercel y en el entorno local del servidor; nunca usar el prefijo `NEXT_PUBLIC_`.
+4. Configurar `SUPABASE_SECRET_KEY` con una clave `sb_secret_...` únicamente en Vercel y en el entorno local del servidor; nunca usar el prefijo `NEXT_PUBLIC_`. La aplicación también acepta temporalmente la clave heredada `SUPABASE_SERVICE_ROLE_KEY`.
 5. Verificar que una reservación pública se registre una sola vez y aparezca en `/admon`.
 6. Integrar Mercado Pago Checkout Pro y PayPal Checkout en modo de prueba y validar sus webhooks.
 7. Configurar el proveedor de correo transaccional.
