@@ -27,7 +27,7 @@ export const OPEN_TRANSPORT_HOURLY_RATE = 450;
 // "Soluciones a medida" siempre se cotizan por separado con el equipo comercial.
 export const CUSTOM_QUOTE_LABEL = "Cotización personalizada";
 
-export const NIGHT_SURCHARGE = 150; // 22:00–06:00
+export const NIGHT_SURCHARGE = 150; // 22:00–05:00
 export const EXTRA_BAG_FEE = 40; // por maleta adicional después de 2 por pasajero
 
 export function findRate(
@@ -62,7 +62,7 @@ function isNightTime(time: string): boolean {
   if (!time) return false;
   const [hoursStr] = time.split(":");
   const hours = Number(hoursStr);
-  return hours >= 22 || hours < 6;
+  return hours >= 22 || hours < 5;
 }
 
 /** Desglose de tarifa mock usado en el paso 4 de /reservar. Solo para el DEMO. */

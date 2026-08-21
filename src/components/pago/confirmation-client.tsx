@@ -17,7 +17,18 @@ import { Skeleton } from "@/components/ui/misc";
 
 gsap.registerPlugin(useGSAP);
 
-export function ConfirmationClient() {
+type PublicPaymentStatus = {
+  paymentStatus: "created" | "pending" | "action_required" | "approved" | "rejected" | "cancelled" | "expired" | "refunded" | "charged_back" | null;
+  provider: "mercado_pago" | "paypal" | null;
+};
+
+export function ConfirmationClient({
+  paymentReference,
+  paymentReturn,
+}: {
+  paymentReference?: string;
+  paymentReturn?: string;
+}) {
   const hydrated = useHydrated();
   const router = useRouter();
 
@@ -26,8 +37,41 @@ export function ConfirmationClient() {
   const receipt = useReservationStore((s) => s.reservationReceipt);
   const resetReservation = useReservationStore((s) => s.resetReservation);
   const confirmationRef = React.useRef<HTMLDivElement>(null);
+  const [serverPayment, setServerPayment] = React.useState<PublicPaymentStatus | null>(null);
 
   const hasDraft = Boolean(draft.serviceType && draft.originLocationId && draft.destinationLocationId);
+  const reference = paymentReference ?? receipt?.publicReference;
+
+  React.useEffect(() => {
+    if (!reference) return;
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let attempts = 0;
+
+    const refresh = async () => {
+      try {
+        const response = await fetch(`/api/payments/status?reference=${encodeURIComponent(reference)}`, {
+          cache: "no-store",
+        });
+        if (!response.ok) return;
+        const status = (await response.json()) as PublicPaymentStatus;
+        if (stopped) return;
+        setServerPayment(status);
+        attempts += 1;
+        if (status.paymentStatus !== "approved" && attempts < 8) {
+          timer = setTimeout(refresh, 2000);
+        }
+      } catch {
+        // La reservación sigue visible aunque la consulta temporal del webhook falle.
+      }
+    };
+
+    refresh();
+    return () => {
+      stopped = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [reference]);
 
   const onBackHome = () => {
     resetReservation();
@@ -84,21 +128,28 @@ export function ConfirmationClient() {
   const serviceType = draft.serviceType!;
 
   const amount = receipt.amountMinor / 100;
+  const isPaid = serverPayment?.paymentStatus === "approved";
+  const paymentFailed = paymentReturn === "failure" || ["rejected", "cancelled", "expired"].includes(serverPayment?.paymentStatus ?? "");
+  const providerLabel = serverPayment?.provider === "paypal" ? "PayPal" : "Mercado Pago";
 
   return (
     <div ref={confirmationRef} className="adventure-confirmation">
       <section data-confirmation-hero className="adventure-confirmation-hero">
         <div data-confirmation-stamp className="adventure-confirmation-stamp" aria-hidden>
           <Check />
-          <span>RECIBIDA</span>
+          <span>{isPaid ? "PAGADA" : "RECIBIDA"}</span>
         </div>
         <div data-confirmation-copy className="adventure-confirmation-copy">
-          <p>SOLICITUD REGISTRADA</p>
-          <h1>¡Listo! GreenGo ya recibió tu reservación.</h1>
+          <p>{isPaid ? "PAGO CONFIRMADO" : "SOLICITUD REGISTRADA"}</p>
+          <h1>{isPaid ? "¡Listo! Tu pago y tu viaje están confirmados." : "¡Listo! GreenGo ya recibió tu reservación."}</h1>
           <p>
-            {receipt.requiresQuote
+            {paymentFailed
+              ? "El pago no pudo completarse. Tu reservación permanece registrada para que puedas intentarlo nuevamente."
+              : isPaid
+                ? `La confirmación de ${providerLabel} fue validada de forma segura.`
+                : receipt.requiresQuote
               ? "El equipo confirmará la tarifa antes de solicitarte un pago."
-              : "El viaje está apartado y permanece pendiente de pago."}
+              : "Estamos validando la confirmación del proveedor. Este proceso puede tardar unos segundos."}
           </p>
         </div>
         <div data-confirmation-copy className="adventure-confirmation-folio">
@@ -130,17 +181,20 @@ export function ConfirmationClient() {
           <SummaryRow label="Correo" value={draft.contactEmail} />
           </dl>
           <div className="adventure-confirmation-total">
-            <span>{receipt.requiresQuote ? "Importe" : "Total pendiente"}</span>
+            <span>{receipt.requiresQuote ? "Importe" : isPaid ? "Total pagado" : "Total pendiente"}</span>
             <strong>{receipt.requiresQuote ? "Por cotizar" : <LocalizedCurrency amount={amount} />}</strong>
           </div>
         </section>
 
         <aside data-confirmation-detail className="adventure-confirmation-next">
           <div className="adventure-confirmation-next__icon"><Mail aria-hidden /></div>
-          <h2>¿Qué sigue?</h2>
+          <h2>{isPaid ? "Viaje confirmado" : "¿Qué sigue?"}</h2>
           <p>
-            El equipo verá la solicitud en su panel y se pondrá en contacto contigo. El correo automático se activará
-            antes de habilitar los pagos reales.
+            {isPaid
+              ? "El equipo de GreenGo ya puede ver el pago aprobado en su panel y dará seguimiento a los detalles del traslado."
+              : paymentFailed
+                ? "Puedes volver al checkout y elegir nuevamente Mercado Pago o PayPal. No confirmamos cargos desde esta pantalla."
+                : "El equipo verá la solicitud en su panel. El estado se actualizará automáticamente cuando llegue la confirmación segura del proveedor."}
           </p>
           <div className="adventure-confirmation-next__route">
             <span>Ahora sí:</span>
@@ -150,7 +204,7 @@ export function ConfirmationClient() {
             <Home aria-hidden /> Volver al inicio <ArrowRight aria-hidden />
           </Button>
           <p className="adventure-confirmation-demo">
-            No se realizó ningún cargo.
+            {isPaid ? `Pago verificado por ${providerLabel}.` : "Esperando confirmación segura del pago."}
           </p>
         </aside>
       </div>

@@ -528,9 +528,11 @@
 .adventure-payment-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .adventure-payment-heading > svg { width: 2.6rem; height: 2.6rem; border: 2px solid var(--adventure-night); border-radius: 50%; padding: .55rem; background: var(--adventure-sun); }
 .adventure-payment-methods { display: grid; grid-template-columns: repeat(3,1fr); gap: .75rem; }
+.adventure-payment-methods--providers { grid-template-columns: repeat(2,1fr); }
 .adventure-payment-method { display: flex; min-height: 74px; align-items: center; justify-content: center; gap: .55rem; border: 2px solid var(--adventure-night); border-radius: 4px; padding: .8rem; background: var(--adventure-foam); font-size: .82rem; font-weight: 900; box-shadow: 2px 2px 0 var(--adventure-night); transition: transform 160ms cubic-bezier(.22,1,.36,1), background 160ms ease, box-shadow 160ms ease; }
 .adventure-payment-method:hover { transform: translateY(-2px); box-shadow: 3px 4px 0 var(--adventure-night); }
 .adventure-payment-method:active { transform: translateY(1px); box-shadow: 1px 1px 0 var(--adventure-night); }
+.adventure-payment-method:disabled { cursor: not-allowed; opacity: .55; transform: none; box-shadow: 2px 2px 0 var(--adventure-night); }
 .adventure-payment-method--selected { background: var(--adventure-caribbean); color: var(--adventure-night); }
 .adventure-payment-method svg { width: 1.15rem; }
 .adventure-checkout-panel input:not([type="checkbox"]) { border: 2px solid var(--adventure-night) !important; border-radius: 4px !important; background: white !important; box-shadow: 2px 2px 0 color-mix(in srgb, var(--adventure-night) 25%, transparent); font-weight: 750; }

@@ -4,7 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { useReservationStore } from "@/stores/reservation-store";
-import { LOCATIONS } from "@/mocks/locations";
+import { getBookingZone } from "@/data/booking-zones";
 import { SERVICE_TYPE_LABELS } from "@/constants";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/misc";
@@ -20,8 +20,8 @@ export function Step4Summary() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [submitError, setSubmitError] = React.useState("");
 
-  const origin = LOCATIONS.find((l) => l.id === draft.originLocationId);
-  const destination = LOCATIONS.find((l) => l.id === draft.destinationLocationId);
+  const origin = getBookingZone(draft.originLocationId);
+  const destination = getBookingZone(draft.destinationLocationId);
   const serviceType = draft.serviceType ?? "aeropuerto";
 
   const onContinue = async () => {
@@ -65,9 +65,18 @@ export function Step4Summary() {
           <SummaryRow label="Servicio" value={SERVICE_TYPE_LABELS[serviceType]} />
           <SummaryRow label="Sentido" value={draft.direction === "redondo" ? "Redondo" : "Sencillo"} />
           <SummaryRow label="Origen" value={origin?.name ?? "—"} />
+          {draft.originHotelId && <SummaryRow label="Hotel de origen" value={selectedHotelName(origin, draft.originHotelId, draft.originHotelName)} />}
           <SummaryRow label="Destino" value={destination?.name ?? "—"} />
+          {draft.destinationHotelId && <SummaryRow label="Hotel de destino" value={selectedHotelName(destination, draft.destinationHotelId, draft.destinationHotelName)} />}
           <SummaryRow label="Fecha y hora" value={draft.date && draft.time ? `${draft.date} · ${draft.time}` : "—"} />
+          {draft.direction === "redondo" && (
+            <SummaryRow label="Regreso" value={draft.returnDate && draft.returnTime ? `${draft.returnDate} · ${draft.returnTime}` : "—"} />
+          )}
           <SummaryRow label="Pasajeros" value={String(draft.passengers)} />
+          <SummaryRow
+            label="Camionetas requeridas"
+            value={String(Math.ceil(draft.passengers / 8))}
+          />
           <SummaryRow label="Maletas" value={String(draft.bags)} />
           <SummaryRow label="Vuelo" value={draft.flightNumber || "—"} />
           <SummaryRow label="Contacto" value={draft.contactName || "—"} />
@@ -122,4 +131,14 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
       <dd className="font-medium text-foreground">{value}</dd>
     </div>
   );
+}
+
+function selectedHotelName(
+  zone: ReturnType<typeof getBookingZone>,
+  hotelId: string,
+  customName: string,
+) {
+  return zone?.hotels.find((hotel) => hotel.id === hotelId)?.name.startsWith("Otro hotel")
+    ? customName || "Otro alojamiento"
+    : zone?.hotels.find((hotel) => hotel.id === hotelId)?.name ?? customName ?? "—";
 }

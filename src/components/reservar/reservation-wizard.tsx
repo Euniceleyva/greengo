@@ -12,6 +12,7 @@ import { Step4Summary } from "./step4-summary";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/misc";
 import type { ServiceType } from "@/types";
+import { getBookingZone } from "@/data/booking-zones";
 
 const VALID_SERVICE_TYPES: ServiceType[] = ["hotel_hotel", "aeropuerto", "transporte_abierto", "a_medida"];
 
@@ -47,8 +48,8 @@ export function ReservationWizard() {
 
     if (origin || destination || date || time || passengers || serviceTypeParam || hotel || notes) {
       updateDraft({
-        ...(origin ? { originLocationId: origin } : {}),
-        ...(destination ? { destinationLocationId: destination } : {}),
+        ...(origin && getBookingZone(origin) ? { originLocationId: origin } : {}),
+        ...(destination && getBookingZone(destination) ? { destinationLocationId: destination } : {}),
         ...(date ? { date } : {}),
         ...(time ? { time } : {}),
         ...(passengers ? { passengers: Number(passengers) } : {}),

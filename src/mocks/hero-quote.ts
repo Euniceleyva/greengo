@@ -23,7 +23,7 @@ const EXTRA_PASSENGER_FEE_MXN = 80;
 function isNightTime(time: string): boolean {
   if (!time) return false;
   const hours = Number(time.split(":")[0]);
-  return hours >= 22 || hours < 6;
+  return hours >= 22 || hours < 5;
 }
 
 export function transferKindToServiceType(kind: TransferKind): ServiceType {

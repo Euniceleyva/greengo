@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
+import { resolveHotelSelection } from "@/data/booking-zones";
 import type { ReservationSubmission } from "@/lib/schemas";
 import type { ReservationReceipt } from "@/types";
 
@@ -18,26 +19,35 @@ type DbPricingRule = {
   origin_location_id: string | null;
   destination_location_id: string | null;
   bidirectional: boolean;
+  pricing_model: "legacy" | "capacity_tiers";
+  vehicle_capacity: number;
   base_amount_minor: number | string;
   included_passengers: number;
   extra_passenger_amount_minor: number | string;
   included_bags_per_passenger: number;
   extra_bag_amount_minor: number | string;
   night_surcharge_minor: number | string;
-  hourly_amount_minor: number | string | null;
-  minimum_hours: number | null;
-  round_trip_multiplier: number | string;
+  day_amount_1_4_minor: number | string | null;
+  night_amount_1_4_minor: number | string | null;
+  day_amount_5_8_minor: number | string | null;
+  night_amount_5_8_minor: number | string | null;
   currency: string;
   priority: number;
+  valid_from: string | null;
+  valid_to: string | null;
 };
 
 function numeric(value: number | string | null | undefined) {
   return Number(value ?? 0);
 }
 
-function isNightTime(time: string) {
+export function isNightTime(time: string) {
   const hour = Number(time.slice(0, 2));
-  return hour >= 22 || hour < 6;
+  return hour >= 22 || hour < 5;
+}
+
+function isRuleValidOn(rule: DbPricingRule, date: string) {
+  return (!rule.valid_from || rule.valid_from <= date) && (!rule.valid_to || rule.valid_to >= date);
 }
 
 function selectRule(
@@ -45,12 +55,14 @@ function selectRule(
   serviceType: ReservationSubmission["serviceType"],
   originId: string,
   destinationId: string,
+  date: string,
 ) {
   if (serviceType === "a_medida" || serviceType === "transporte_abierto") return null;
 
   return (
     rules
       .filter((rule) => {
+        if (!isRuleValidOn(rule, date)) return false;
         const direct = rule.origin_location_id === originId && rule.destination_location_id === destinationId;
         const reverse =
           rule.bidirectional &&
@@ -62,23 +74,57 @@ function selectRule(
   );
 }
 
-function calculatePrice(rule: DbPricingRule, input: ReservationSubmission) {
+export function splitPassengersIntoVans(passengers: number, capacity = 8) {
+  const groups: number[] = [];
+  let remaining = passengers;
+  while (remaining > 0) {
+    const group = Math.min(capacity, remaining);
+    groups.push(group);
+    remaining -= group;
+  }
+  return groups;
+}
+
+function calculateLeg(rule: DbPricingRule, passengers: number, bags: number, time: string) {
+  const night = isNightTime(time);
+
+  if (rule.pricing_model === "capacity_tiers") {
+    const passengerGroups = splitPassengersIntoVans(passengers, rule.vehicle_capacity);
+    const groupAmountsMinor = passengerGroups.map((group) => {
+      if (group <= 4) {
+        return numeric(night ? rule.night_amount_1_4_minor : rule.day_amount_1_4_minor);
+      }
+      return numeric(night ? rule.night_amount_5_8_minor : rule.day_amount_5_8_minor);
+    });
+    const totalMinor = groupAmountsMinor.reduce((sum, amount) => sum + amount, 0);
+
+    return {
+      totalMinor,
+      snapshot: {
+        pricingRuleId: rule.id,
+        pricingModel: rule.pricing_model,
+        period: night ? "night_22_00_to_05_00" : "day_05_00_to_22_00",
+        passengerGroups,
+        groupAmountsMinor,
+        vehicleCount: passengerGroups.length,
+      },
+    };
+  }
+
   const base = numeric(rule.base_amount_minor);
-  const extraPassengers = Math.max(0, input.passengers - rule.included_passengers);
+  const extraPassengers = Math.max(0, passengers - rule.included_passengers);
   const extraPassengerCost = extraPassengers * numeric(rule.extra_passenger_amount_minor);
-  const includedBags = input.passengers * rule.included_bags_per_passenger;
-  const extraBags = Math.max(0, input.bags - includedBags);
+  const includedBags = passengers * rule.included_bags_per_passenger;
+  const extraBags = Math.max(0, bags - includedBags);
   const extraBagCost = extraBags * numeric(rule.extra_bag_amount_minor);
-  const nightSurcharge = isNightTime(input.time) ? numeric(rule.night_surcharge_minor) : 0;
-  const oneWaySubtotal = base + extraPassengerCost + extraBagCost + nightSurcharge;
-  const multiplier = input.direction === "redondo" ? numeric(rule.round_trip_multiplier) : 1;
-  const total = Math.round(oneWaySubtotal * multiplier);
+  const nightSurcharge = night ? numeric(rule.night_surcharge_minor) : 0;
+  const totalMinor = base + extraPassengerCost + extraBagCost + nightSurcharge;
 
   return {
-    subtotalMinor: total,
-    totalMinor: total,
+    totalMinor,
     snapshot: {
       pricingRuleId: rule.id,
+      pricingModel: rule.pricing_model,
       baseAmountMinor: base,
       includedPassengers: rule.included_passengers,
       extraPassengers,
@@ -89,8 +135,7 @@ function calculatePrice(rule: DbPricingRule, input: ReservationSubmission) {
       extraBagAmountMinor: numeric(rule.extra_bag_amount_minor),
       extraBagCostMinor: extraBagCost,
       nightSurchargeMinor: nightSurcharge,
-      roundTripMultiplier: multiplier,
-      currency: rule.currency,
+      vehicleCount: Math.ceil(passengers / Math.max(1, rule.vehicle_capacity)),
     },
   };
 }
@@ -126,30 +171,59 @@ export async function createReservation(input: ReservationSubmission): Promise<R
   const locationMap = new Map((locations as DbLocation[] | null)?.map((location) => [location.code, location]));
   const origin = locationMap.get(input.originLocationId);
   const destination = locationMap.get(input.destinationLocationId);
+  if (!origin || !destination) throw new Error("Una de las ubicaciones seleccionadas ya no está disponible.");
 
-  if (!origin || !destination) {
-    throw new Error("Una de las ubicaciones seleccionadas ya no está disponible.");
-  }
+  const originHotel = resolveHotelSelection(origin.code, input.originHotelId, input.originHotelName);
+  const destinationHotel = resolveHotelSelection(
+    destination.code,
+    input.destinationHotelId,
+    input.destinationHotelName,
+  );
 
   const { data: rules, error: rulesError } = await supabase
     .from("pricing_rules")
     .select(
-      "id, service_type, origin_location_id, destination_location_id, bidirectional, base_amount_minor, included_passengers, extra_passenger_amount_minor, included_bags_per_passenger, extra_bag_amount_minor, night_surcharge_minor, hourly_amount_minor, minimum_hours, round_trip_multiplier, currency, priority",
+      "id, service_type, origin_location_id, destination_location_id, bidirectional, pricing_model, vehicle_capacity, base_amount_minor, included_passengers, extra_passenger_amount_minor, included_bags_per_passenger, extra_bag_amount_minor, night_surcharge_minor, day_amount_1_4_minor, night_amount_1_4_minor, day_amount_5_8_minor, night_amount_5_8_minor, currency, priority, valid_from, valid_to",
     )
     .eq("service_type", input.serviceType)
-    .eq("active", true)
-    .or(`valid_from.is.null,valid_from.lte.${input.date}`)
-    .or(`valid_to.is.null,valid_to.gte.${input.date}`);
-
+    .eq("active", true);
   if (rulesError) throw rulesError;
 
-  const rule = selectRule((rules as DbPricingRule[] | null) ?? [], input.serviceType, origin.id, destination.id);
-  const requiresQuote = !rule;
-  const price = rule
-    ? calculatePrice(rule, input)
-    : { subtotalMinor: 0, totalMinor: 0, snapshot: { reason: "missing_approved_pricing_rule" } };
-  const status = requiresQuote ? "quote_requested" : "awaiting_payment";
+  const availableRules = (rules as DbPricingRule[] | null) ?? [];
+  const departureRule = selectRule(availableRules, input.serviceType, origin.id, destination.id, input.date);
+  const returnRule =
+    input.direction === "redondo"
+      ? selectRule(
+          availableRules,
+          input.serviceType,
+          destination.id,
+          origin.id,
+          input.returnDate,
+        )
+      : null;
+  const requiresQuote = !departureRule || (input.direction === "redondo" && !returnRule);
 
+  let subtotalMinor = 0;
+  let snapshot: Record<string, unknown> = { reason: "missing_approved_pricing_rule" };
+  if (!requiresQuote && departureRule) {
+    const departure = calculateLeg(departureRule, input.passengers, input.bags, input.time);
+    const returnLeg =
+      input.direction === "redondo" && returnRule
+        ? calculateLeg(returnRule, input.passengers, input.bags, input.returnTime)
+        : null;
+    subtotalMinor = departure.totalMinor + (returnLeg?.totalMinor ?? 0);
+    snapshot = {
+      calculation: "sum_of_directional_legs",
+      passengers: input.passengers,
+      vehicleCount: Math.ceil(input.passengers / 8),
+      departure: departure.snapshot,
+      ...(returnLeg ? { return: returnLeg.snapshot } : {}),
+      currency: departureRule.currency,
+    };
+  }
+
+  const status = requiresQuote ? "quote_requested" : "awaiting_payment";
+  const vehicleCount = Math.ceil(input.passengers / 8);
   const reservation = {
     submission_key: input.submissionKey,
     service_type: input.serviceType,
@@ -164,25 +238,32 @@ export async function createReservation(input: ReservationSubmission): Promise<R
     origin_name: origin.name,
     origin_latitude: numeric(origin.latitude),
     origin_longitude: numeric(origin.longitude),
+    origin_hotel_code: originHotel?.id ?? null,
+    origin_hotel_name: originHotel?.name ?? null,
     destination_location_id: destination.id,
     destination_code: destination.code,
     destination_name: destination.name,
     destination_latitude: numeric(destination.latitude),
     destination_longitude: numeric(destination.longitude),
+    destination_hotel_code: destinationHotel?.id ?? null,
+    destination_hotel_name: destinationHotel?.name ?? null,
     service_date: input.date,
     pickup_time: input.time,
+    return_date: input.direction === "redondo" ? input.returnDate : null,
+    return_time: input.direction === "redondo" ? input.returnTime : null,
     passengers: input.passengers,
+    vehicle_count: vehicleCount,
     bags: input.bags,
     flight_number: input.flightNumber || null,
-    hotel: input.hotel || null,
+    hotel: input.hotel || destinationHotel?.name || originHotel?.name || null,
     customer_notes: input.notes || null,
-    currency: rule?.currency ?? "MXN",
-    subtotal_minor: price.subtotalMinor,
+    currency: departureRule?.currency ?? "MXN",
+    subtotal_minor: subtotalMinor,
     discount_minor: 0,
-    total_minor: price.totalMinor,
+    total_minor: subtotalMinor,
     requires_quote: requiresQuote,
-    pricing_rule_id: rule?.id ?? null,
-    pricing_snapshot: price.snapshot,
+    pricing_rule_id: departureRule?.id ?? null,
+    pricing_snapshot: snapshot,
   };
 
   const { data, error } = await supabase

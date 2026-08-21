@@ -1,8 +1,8 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Clock3, CreditCard, Landmark, LockKeyhole, WalletCards } from "lucide-react";
+import { Clock3, CreditCard, Loader2, LockKeyhole, WalletCards } from "lucide-react";
 import { useReservationStore } from "@/stores/reservation-store";
 import { useHydrated } from "@/lib/hooks";
 import { LOCATIONS } from "@/mocks/locations";
@@ -14,9 +14,16 @@ import { Skeleton } from "@/components/ui/misc";
 
 export function CheckoutClient() {
   const hydrated = useHydrated();
-  const router = useRouter();
   const draft = useReservationStore((state) => state.draft);
   const receipt = useReservationStore((state) => state.reservationReceipt);
+  const [processing, setProcessing] = React.useState<"mercado-pago" | "paypal" | null>(null);
+  const [paymentError, setPaymentError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const returned = new URLSearchParams(window.location.search).get("return");
+    if (returned === "failure") setPaymentError("El pago no fue aprobado. Puedes intentarlo nuevamente.");
+    if (returned === "cancelled") setPaymentError("Cancelaste el proceso de PayPal. No se realizó ningún cargo.");
+  }, []);
 
   if (!hydrated) {
     return (
@@ -41,6 +48,26 @@ export function CheckoutClient() {
   const origin = LOCATIONS.find((location) => location.id === draft.originLocationId);
   const destination = LOCATIONS.find((location) => location.id === draft.destinationLocationId);
   const amount = receipt.amountMinor / 100;
+
+  const openCheckout = async (provider: "mercado-pago" | "paypal") => {
+    setPaymentError(null);
+    setProcessing(provider);
+    try {
+      const response = await fetch(`/api/payments/${provider}/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reservationReference: receipt.publicReference }),
+      });
+      const result = (await response.json()) as { checkoutUrl?: string; error?: string };
+      if (!response.ok || !result.checkoutUrl) {
+        throw new Error(result.error || "No pudimos abrir la pasarela.");
+      }
+      window.location.assign(result.checkoutUrl);
+    } catch (error) {
+      setPaymentError(error instanceof Error ? error.message : "No pudimos abrir la pasarela.");
+      setProcessing(null);
+    }
+  };
 
   return (
     <div className="adventure-checkout__layout">
@@ -87,21 +114,47 @@ export function CheckoutClient() {
         </div>
 
         <p className="mt-4 text-sm leading-6 text-muted-foreground">
-          La reservación ya aparece en el panel de GreenGo. Cuando las pasarelas estén activas, podrás continuar con
-          Mercado Pago o PayPal sin que GreenGo almacene los datos de tu tarjeta.
+          Elige una pasarela segura. GreenGo nunca recibe ni almacena los datos de tu tarjeta.
         </p>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-3" aria-label="Métodos próximos de pago">
-          <PaymentPreview icon={CreditCard} label="Mercado Pago" detail="Tarjetas y Amex" />
-          <PaymentPreview icon={WalletCards} label="PayPal" detail="México y EE. UU." />
-          <PaymentPreview icon={Landmark} label="SPEI" detail="Transferencia" />
+        {paymentError && (
+          <div className="adventure-payment-note adventure-payment-error mt-5" role="alert">
+            {paymentError}
+          </div>
+        )}
+
+        <div className="adventure-payment-methods adventure-payment-methods--providers mt-6" aria-label="Pasarelas de pago">
+          <button
+            type="button"
+            className="adventure-payment-method"
+            onClick={() => openCheckout("mercado-pago")}
+            disabled={Boolean(processing) || receipt.requiresQuote}
+          >
+            {processing === "mercado-pago" ? <Loader2 className="animate-spin" aria-hidden /> : <CreditCard aria-hidden />}
+            <span className="text-left">
+              <strong className="block">Mercado Pago</strong>
+              <small className="block font-medium">Visa, Mastercard, American Express, OXXO y SPEI</small>
+            </span>
+          </button>
+          <button
+            type="button"
+            className="adventure-payment-method"
+            onClick={() => openCheckout("paypal")}
+            disabled={Boolean(processing) || receipt.requiresQuote}
+          >
+            {processing === "paypal" ? <Loader2 className="animate-spin" aria-hidden /> : <WalletCards aria-hidden />}
+            <span className="text-left">
+              <strong className="block">PayPal</strong>
+              <small className="block font-medium">Saldo PayPal y opciones habilitadas en tu cuenta</small>
+            </span>
+          </button>
         </div>
 
         <div className="adventure-payment-action mt-7">
-          <p><LockKeyhole aria-hidden /> No se procesó ningún cargo.</p>
-          <Button onClick={() => router.push("/pago/confirmacion")} className="adventure-cta min-w-[190px]">
-            Ver confirmación
-          </Button>
+          <p><LockKeyhole aria-hidden /> El pago se confirma únicamente después de validar la notificación del proveedor.</p>
+          <span className="text-xs font-bold text-muted-foreground">
+            {receipt.requiresQuote ? "Pago deshabilitado hasta confirmar la tarifa" : "Importe protegido por el servidor"}
+          </span>
         </div>
       </Card>
     </div>
@@ -113,24 +166,6 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
     <div>
       <dt>{label}</dt>
       <dd>{value}</dd>
-    </div>
-  );
-}
-
-function PaymentPreview({
-  icon: Icon,
-  label,
-  detail,
-}: {
-  icon: typeof CreditCard;
-  label: string;
-  detail: string;
-}) {
-  return (
-    <div className="rounded-xl border border-border bg-surface-soft p-4">
-      <Icon className="h-5 w-5 text-primary" aria-hidden />
-      <p className="mt-2 text-sm font-bold text-foreground">{label}</p>
-      <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
     </div>
   );
 }

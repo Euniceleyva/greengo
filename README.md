@@ -63,7 +63,7 @@ Por decisión explícita, en este DEMO **no** se implementa nada de lo siguiente
 
 > Cuando una función dependa de backend, se **simula localmente** y se deja un comentario `// TODO(prod): ...` indicando que se reemplazará en producción.
 
-> **Nota sobre la Landing Page.** La pasarela de pago (`/pago/checkout`) y el chatbot guiado del sitio público son **simulaciones locales adicionales**, construidas bajo el mismo principio que el resto del DEMO: no procesan pagos reales ni se conectan a ningún motor conversacional. No representan una excepción al alcance descrito arriba.
+> **Actualización del sitio público.** El panel interno conserva módulos de demostración, pero el flujo `/reservar` → `/pago/*` ya cuenta con backend en Supabase, tarifas del cliente directo e integraciones preparadas para Mercado Pago Checkout Pro y PayPal Checkout. Los cobros permanecen inactivos hasta aplicar las migraciones y configurar credenciales y webhooks; consulta `PAYMENTS_SETUP.md`.
 
 ---
 
@@ -241,8 +241,8 @@ Requisitos: **Node.js 18.18+**.
 |------|-------------|
 | `/` | Landing Page comercial: header, hero con cotización rápida, carrusel, servicios, destinos, cómo funciona, testimonios, FAQ y footer. |
 | `/reservar` | Formulario de reserva multi-paso (servicio, detalles, contacto, resumen). Acepta query params (`origin`, `destination`, `date`, `time`, `passengers`, `serviceType`, `hotel`, `notes`) para prellenar desde el mini-cotizador de la LP. |
-| `/pago/checkout` | Pasarela de pago simulada (tarjeta con validación Luhn, OXXO, SPEI). No procesa pagos reales. |
-| `/pago/confirmacion` | Confirmación de la reserva; genera folio y escribe el viaje en el store de Zustand (aparece en `/admin/trips`). |
+| `/pago/checkout` | Checkout seguro con redirección a Mercado Pago (incluye Amex cuando esté disponible) o PayPal. |
+| `/pago/confirmacion` | Confirmación de la reservación y consulta del estado validado por webhook. |
 | `/destinos/[slug]` | Página individual por destino (6 páginas estáticas). |
 | `/demo` | Selección de experiencia (administrador / conductor) con usuarios simulados — antes vivía en `/`. |
 | `/admin` | Redirige al dashboard administrativo. |
@@ -280,8 +280,8 @@ src/
 │   ├── page.tsx                 # Landing Page comercial
 │   ├── reservar/                # Formulario de reserva multi-paso
 │   ├── pago/
-│   │   ├── checkout/            # Pasarela de pago simulada
-│   │   └── confirmacion/        # Confirmación + alta de viaje en el store
+│   │   ├── checkout/            # Selector de Mercado Pago / PayPal
+│   │   └── confirmacion/        # Estado de reservación y pago
 │   ├── destinos/[slug]/         # Páginas de destino individuales (SSG)
 │   └── (app)/                   # Grupo de rutas del panel (no afecta URLs)
 │       ├── layout.tsx           # Toaster (específico del panel)
@@ -293,7 +293,7 @@ src/
 │   ├── driver/                 # Componentes del conductor
 │   ├── landing/                 # Componentes de la Landing Page
 │   ├── reservar/                 # Pasos del formulario de reserva
-│   ├── pago/                     # Pasarela simulada y confirmación
+│   ├── pago/                     # Checkout y confirmación de pago
 │   ├── maps/                    # Leaflet / mapas
 │   ├── charts/                  # Recharts
 │   ├── shared/                   # Reutilizables (KPI, tablas, WA sticky, chatbot…)
@@ -345,12 +345,12 @@ src/
 - **Mocks y tipos nuevos** para la LP: `destinations.ts` (extiende `locations.ts`, no lo duplica), `testimonials.ts`, `faq.ts`, `pricing.ts` (con `getFareBreakdown`), `gallery.ts` y `chatbot.ts`. Tipos correspondientes agregados a `src/types`.
 - **Componentes de la LP**: header sticky con menú móvil, hero con mini-cotizador, carrusel (Embla, cargado de forma diferida), tipos de servicio, destinos, cómo funciona, testimonios, FAQ (acordeón propio) y footer con enlace discreto a `/demo`. Primitivas UI nuevas: `Accordion` y `Carousel`, mismo estilo shadcn del proyecto.
 - **Formulario de reserva multi-paso** (`/reservar`): React Hook Form + Zod por paso, estado en Zustand persistido en `localStorage` (`greengo-reservation-draft`), prellenado desde query params del mini-cotizador del hero.
-- **Pasarela de pago simulada** (`/pago/checkout`): selector tarjeta/OXXO/SPEI, validación Luhn real sobre el número de tarjeta, toggle de demo para forzar pago rechazado, loading simulado (~2s). `/pago/confirmacion` genera folio y escribe el viaje en `useDemoStore` (aparece en `/admin/trips`), reutilizando el tipo `Trip` existente.
+- **Pagos preparados para producción** (`/pago/checkout`): Mercado Pago Checkout Pro y PayPal Orders v2, creación de pagos en servidor, redirección al proveedor, captura de PayPal, webhooks firmados e idempotentes y conciliación contra el importe almacenado en Supabase. No se recopilan datos de tarjeta en GreenGo.
 - **WhatsApp sticky y chatbot guiado**: componentes propios (sin librerías nuevas), ocultos en `/admin` y `/driver`. El chatbot usa un árbol de decisión 100% predefinido (sin IA) con delay de "escribiendo…" simulado.
 - **Páginas de destino** (`/destinos/[slug]`): 6 páginas estáticas (SSG) con `generateMetadata` y `notFound()` para slugs inválidos.
 - **Pulido de accesibilidad:** `Input`/`Select` (`src/components/ui/input.tsx`) pasaron de `h-10` (40px) a `h-11` (44px) para cumplir el área táctil mínima en toda la app (incluye admin/driver, mejora sin regresiones). Foco gestionado en la apertura del chatbot. Padding inferior agregado en `/reservar`, `/pago/*` y el footer de la LP para que el CTA final no quede permanentemente tapado por los botones flotantes en móvil.
 - **Rendimiento:** `/` reportaba ~113 kB de First Load JS (presupuesto original: ≤120 kB). Carrusel y chatbot se cargan con `next/dynamic({ ssr: false })`. Tras agregar el catálogo de ~1,390 hoteles al mini-cotizador (ver más abajo), `/` subió a ~138 kB — se excede el presupuesto original; si esto es un problema, `hotels.ts` puede cargarse de forma diferida (`dynamic import`) para bajar el First Load JS inicial.
-- Verificado en navegador: flujo completo LP → cotización rápida → `/reservar` (4 pasos) → `/pago/checkout` (pago aceptado y rechazado) → `/pago/confirmacion` → viaje visible en `/admin/trips`; responsive en 375px y escritorio; `/admin` y `/driver` sin cambios de comportamiento. `npm run lint` y `npm run build` sin errores en cada fase.
+- El flujo histórico simulado fue sustituido por integraciones externas; las pruebas de extremo a extremo de pagos requieren las credenciales sandbox y webhooks descritos en `PAYMENTS_SETUP.md`.
 - **Mini-cotizador ampliado** (hero de la LP, `src/components/landing/landing-hero.tsx`): el select "Tipo de traslado" ahora ofrece Hotel-Hotel, Hotel-Aeropuerto, Aeropuerto-Hotel y Tour, cada uno con sus propios campos condicionales — dos selectores de hotel (Hotel-Hotel), hotel + aeropuerto (Hotel-Aeropuerto / Aeropuerto-Hotel), o radio "Salida desde" (Aeropuerto/Hotel) + destino de tour (Tour). Se agregó un campo "Horario". El selector de hotel usa un nuevo componente `Combobox` (`src/components/ui/combobox.tsx`) con filtro de búsqueda, necesario porque el catálogo de hoteles (`src/mocks/hotels.ts`) tiene ~1,390 entradas. Al enviar el formulario se calcula un estimado ilustrativo (`src/mocks/hero-quote.ts`, MXN u USD según el tipo) que se muestra inline; un botón "Continuar con mi reserva" navega a `/reservar` con query params (incluye `time`, `hotel` y `notes`, que `reservation-wizard.tsx` ahora también prellena) reutilizando el multi-step existente sin tocar su lógica de precios (los hoteles/aeropuertos elegidos se mapean a ubicaciones genéricas de `locations.ts` para la tarifa, conservando el nombre real elegido en `hotel`/`notes`). Todo es mock de frontend; no se tocó backend ni base de datos.
 
 ---

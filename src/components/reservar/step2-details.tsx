@@ -15,12 +15,15 @@ export function Step2Details() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<ReservationStep2Values>({
     resolver: zodResolver(reservationStep2Schema),
     defaultValues: {
       date: draft.date,
       time: draft.time,
+      returnDate: draft.returnDate,
+      returnTime: draft.returnTime,
       passengers: draft.passengers,
       bags: draft.bags,
       flightNumber: draft.flightNumber,
@@ -29,8 +32,19 @@ export function Step2Details() {
   });
 
   const onSubmit = (data: ReservationStep2Values) => {
+    if (draft.direction === "redondo") {
+      if (!data.returnDate) setError("returnDate", { message: "Selecciona la fecha de regreso" });
+      if (!data.returnTime) setError("returnTime", { message: "Selecciona la hora de regreso" });
+      if (!data.returnDate || !data.returnTime) return;
+      if (data.returnDate < data.date) {
+        setError("returnDate", { message: "El regreso no puede ser anterior a la salida" });
+        return;
+      }
+    }
     updateDraft({
       ...data,
+      returnDate: data.returnDate ?? "",
+      returnTime: data.returnTime ?? "",
       flightNumber: data.flightNumber ?? "",
       notes: data.notes ?? "",
     });
@@ -50,6 +64,31 @@ export function Step2Details() {
           <Input id="time" type="time" className="mt-1.5" {...register("time")} />
           {errors.time && <p className="mt-1.5 text-xs text-destructive">{errors.time.message}</p>}
         </div>
+        {draft.direction === "redondo" && (
+          <>
+            <div>
+              <Label htmlFor="returnDate">Fecha de regreso</Label>
+              <Input
+                id="returnDate"
+                type="date"
+                min={draft.date || undefined}
+                className="mt-1.5"
+                {...register("returnDate", { required: "Selecciona la fecha de regreso" })}
+              />
+              {errors.returnDate && <p className="mt-1.5 text-xs text-destructive">{errors.returnDate.message}</p>}
+            </div>
+            <div>
+              <Label htmlFor="returnTime">Hora de regreso</Label>
+              <Input
+                id="returnTime"
+                type="time"
+                className="mt-1.5"
+                {...register("returnTime", { required: "Selecciona la hora de regreso" })}
+              />
+              {errors.returnTime && <p className="mt-1.5 text-xs text-destructive">{errors.returnTime.message}</p>}
+            </div>
+          </>
+        )}
         <div>
           <Label htmlFor="passengers">Pasajeros</Label>
           <Input id="passengers" type="number" min={1} max={60} className="mt-1.5" {...register("passengers")} />

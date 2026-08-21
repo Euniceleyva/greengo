@@ -22,15 +22,15 @@ No crea tablas para el antiguo demo de conductores, vehículos, combustible o co
 
 ## Antes de cobrar
 
-La tabla `pricing_rules` queda vacía intencionalmente. Las tarifas de `src/mocks/pricing.ts` están documentadas como valores ilustrativos y no deben migrarse a producción. El cliente debe aprobar las tarifas reales antes de habilitar pagos.
+La migración `202608200001_direct_client_tariffs.sql` carga las tarifas del **Tarifario cliente directo (29/07/2026)**. Usa cuatro importes por ruta (1–4 y 5–8 pasajeros, diurno y nocturno), capacidad máxima de 8 pasajeros por camioneta y rutas direccionales. Antes de habilitar producción confirma las dos celdas marcadas con `review_note` en `pricing_rules.metadata`.
 
 ## Orden de despliegue
 
-1. Ejecutar en orden las migraciones `202608170001`, `202608170002` y `202608170003` en el SQL Editor de Supabase.
+1. Ejecutar en orden todas las migraciones de `supabase/migrations`, incluida `202608200001_direct_client_tariffs.sql`, en el SQL Editor de Supabase o con `supabase db push`.
 2. Crear el usuario administrativo en Supabase Auth.
 3. Insertar ese usuario en `app_users` como `owner`.
 4. Configurar `SUPABASE_SECRET_KEY` con una clave `sb_secret_...` únicamente en Vercel y en el entorno local del servidor; nunca usar el prefijo `NEXT_PUBLIC_`. La aplicación también acepta temporalmente la clave heredada `SUPABASE_SERVICE_ROLE_KEY`.
 5. Verificar que una reservación pública se registre una sola vez y aparezca en `/admon`.
-6. Integrar Mercado Pago Checkout Pro y PayPal Checkout en modo de prueba y validar sus webhooks.
+6. Configurar las credenciales y webhooks de Mercado Pago Checkout Pro y PayPal Checkout siguiendo `PAYMENTS_SETUP.md`.
 7. Configurar el proveedor de correo transaccional.
-8. Cargar las tarifas reales aprobadas y ejecutar pruebas de extremo a extremo.
+8. Revisar y aprobar las tarifas migradas, especialmente las dos celdas con `review_note`, y ejecutar pruebas de extremo a extremo.

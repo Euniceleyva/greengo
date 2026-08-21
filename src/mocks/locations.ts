@@ -1,19 +1,14 @@
 import type { LatLng, NamedLocation } from "@/types";
+import { BOOKING_ZONES } from "@/data/booking-zones";
 
 // Coordenadas aproximadas de lugares reales de Cancún y alrededores.
 // Se usan solo como referencia visual del DEMO (OpenStreetMap / Leaflet).
 
 export const LOCATIONS: NamedLocation[] = [
-  { id: "loc-aeropuerto", name: "Aeropuerto Internacional de Cancún", coord: [21.0417, -86.874], category: "aeropuerto" },
-  { id: "loc-zona-hotelera", name: "Zona Hotelera", coord: [21.1329, -86.7466], category: "hotel" },
+  ...BOOKING_ZONES,
   { id: "loc-puerto-cancun", name: "Puerto Cancún", coord: [21.1743, -86.8121], category: "puerto" },
-  { id: "loc-playa-carmen", name: "Playa del Carmen", coord: [20.6296, -87.0739], category: "destino" },
-  { id: "loc-tulum", name: "Tulum", coord: [20.2114, -87.4654], category: "destino" },
-  { id: "loc-puerto-morelos", name: "Puerto Morelos", coord: [20.8481, -86.8757], category: "puerto" },
   { id: "loc-riu-cancun", name: "Hotel Riu Cancún", coord: [21.111, -86.7649], category: "hotel" },
   { id: "loc-moon-palace", name: "Moon Palace", coord: [20.9741, -86.809], category: "hotel" },
-  { id: "loc-xcaret", name: "Xcaret", coord: [20.5808, -87.1189], category: "destino" },
-  { id: "loc-puerto-juarez", name: "Terminal de ferry de Puerto Juárez", coord: [21.1858, -86.7975], category: "terminal" },
   { id: "loc-isla-mujeres", name: "Isla Mujeres", coord: [21.227, -86.73], category: "destino" },
   { id: "loc-cozumel", name: "Cozumel", coord: [20.4229, -86.9223], category: "destino" },
 ];

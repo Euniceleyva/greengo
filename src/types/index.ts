@@ -553,10 +553,16 @@ export interface ReservationDraft {
   serviceType: ServiceType | null;
   originLocationId: string | null;
   destinationLocationId: string | null;
+  originHotelId: string;
+  originHotelName: string;
+  destinationHotelId: string;
+  destinationHotelName: string;
   direction: TripDirection;
   // Paso 2 — Detalles
   date: string; // yyyy-MM-dd
   time: string; // HH:mm
+  returnDate: string;
+  returnTime: string;
   passengers: number;
   bags: number;
   flightNumber: string;

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { isValidLuhn } from "@/lib/utils";
 
 export const tripSchema = z
   .object({
@@ -75,6 +74,10 @@ export const reservationStep1Schema = z
     }),
     originLocationId: z.string().min(1, "Selecciona el origen"),
     destinationLocationId: z.string().min(1, "Selecciona el destino"),
+    originHotelId: z.string().max(100).default(""),
+    originHotelName: z.string().trim().max(180).default(""),
+    destinationHotelId: z.string().max(100).default(""),
+    destinationHotelName: z.string().trim().max(180).default(""),
     direction: z.enum(["sencillo", "redondo"]),
   })
   .refine((data) => data.originLocationId !== data.destinationLocationId, {
@@ -87,6 +90,8 @@ export type ReservationStep1Values = z.infer<typeof reservationStep1Schema>;
 export const reservationStep2Schema = z.object({
   date: z.string().min(1, "Selecciona una fecha"),
   time: z.string().min(1, "Selecciona una hora"),
+  returnDate: z.string().optional(),
+  returnTime: z.string().optional(),
   passengers: z.coerce.number().int().min(1, "Mínimo 1 pasajero").max(60, "Máximo 60 pasajeros"),
   bags: z.coerce.number().int().min(0, "Cantidad inválida").max(60),
   flightNumber: z.string().optional(),
@@ -114,9 +119,15 @@ export const reservationSubmissionSchema = z.object({
   serviceType: z.enum(["hotel_hotel", "aeropuerto", "transporte_abierto", "a_medida"]),
   originLocationId: z.string().trim().min(1).max(100),
   destinationLocationId: z.string().trim().min(1).max(100),
+  originHotelId: z.string().trim().max(100).default(""),
+  originHotelName: z.string().trim().max(180).default(""),
+  destinationHotelId: z.string().trim().max(100).default(""),
+  destinationHotelName: z.string().trim().max(180).default(""),
   direction: z.enum(["sencillo", "redondo"]),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida"),
   time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Hora inválida"),
+  returnDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha de regreso inválida").or(z.literal("")).default(""),
+  returnTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Hora de regreso inválida").or(z.literal("")).default(""),
   passengers: z.coerce.number().int().min(1).max(60),
   bags: z.coerce.number().int().min(0).max(80),
   flightNumber: z.string().trim().max(30).default(""),
@@ -125,32 +136,26 @@ export const reservationSubmissionSchema = z.object({
   contactEmail: reservationStep3Schema.shape.contactEmail,
   contactPhone: reservationStep3Schema.shape.contactPhone,
   hotel: z.string().trim().max(180).default(""),
-}).refine((data) => data.originLocationId !== data.destinationLocationId, {
-  message: "El origen y el destino no pueden ser iguales",
-  path: ["destinationLocationId"],
-});
+})
+  .refine((data) => data.originLocationId !== data.destinationLocationId, {
+    message: "El origen y el destino no pueden ser iguales",
+    path: ["destinationLocationId"],
+  })
+  .refine((data) => data.direction !== "redondo" || Boolean(data.returnDate), {
+    message: "Selecciona la fecha de regreso",
+    path: ["returnDate"],
+  })
+  .refine((data) => data.direction !== "redondo" || Boolean(data.returnTime), {
+    message: "Selecciona la hora de regreso",
+    path: ["returnTime"],
+  })
+  .refine((data) => data.direction !== "redondo" || !data.returnDate || data.returnDate >= data.date, {
+    message: "El regreso no puede ser anterior a la salida",
+    path: ["returnDate"],
+  });
 
 export type ReservationSubmission = z.infer<typeof reservationSubmissionSchema>;
 
-// ---------------------------------------------------------------------------
-// Pasarela de pago simulada (/pago/checkout) — nunca procesa un pago real.
-// ---------------------------------------------------------------------------
-
-export const cardPaymentSchema = z.object({
-  cardNumber: z
-    .string()
-    .min(1, "Ingresa el número de tarjeta")
-    .refine((v) => isValidLuhn(v), "Número de tarjeta inválido"),
-  cardName: z.string().min(2, "Ingresa el nombre como aparece en la tarjeta"),
-  expiry: z
-    .string()
-    .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Formato MM/AA")
-    .refine((v) => {
-      const [month, year] = v.split("/").map(Number);
-      const expDate = new Date(2000 + year, month);
-      return expDate > new Date();
-    }, "Tarjeta vencida"),
-  cvv: z.string().regex(/^\d{3,4}$/, "CVV inválido"),
+export const paymentCheckoutSchema = z.object({
+  reservationReference: z.string().uuid("Referencia de reservación inválida"),
 });
-
-export type CardPaymentValues = z.infer<typeof cardPaymentSchema>;
