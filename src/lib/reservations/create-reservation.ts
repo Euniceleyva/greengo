@@ -280,7 +280,7 @@ export async function createReservation(input: ReservationSubmission): Promise<R
     throw error;
   }
 
-  void enqueueReservationConfirmation(data);
+  await enqueueReservationConfirmation(data);
 
   return {
     folio: data.folio,
