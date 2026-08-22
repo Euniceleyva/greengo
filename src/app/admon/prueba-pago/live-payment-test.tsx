@@ -67,9 +67,14 @@ export function LivePaymentTest({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ buyerEmail }),
       });
-      const result = (await response.json()) as { checkoutUrl?: string; error?: string };
+      const result = (await response.json()) as {
+        checkoutUrl?: string;
+        error?: string;
+        diagnosticCode?: string;
+      };
       if (!response.ok || !result.checkoutUrl) {
-        throw new Error(result.error || "No pudimos abrir Mercado Pago.");
+        const message = result.error || "No pudimos abrir Mercado Pago.";
+        throw new Error(result.diagnosticCode ? `${message} Código: ${result.diagnosticCode}.` : message);
       }
       window.location.assign(result.checkoutUrl);
     } catch (caught) {
