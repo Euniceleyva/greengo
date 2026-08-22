@@ -2,6 +2,7 @@ import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { resolveHotelSelection } from "@/data/booking-zones";
+import { enqueueReservationConfirmation } from "@/lib/notifications/queue";
 import type { ReservationSubmission } from "@/lib/schemas";
 import type { ReservationReceipt } from "@/types";
 
@@ -269,13 +270,17 @@ export async function createReservation(input: ReservationSubmission): Promise<R
   const { data, error } = await supabase
     .from("reservations")
     .insert(reservation)
-    .select("folio, public_reference, status, requires_quote, total_minor, currency")
+    .select(
+      "id, folio, public_reference, status, requires_quote, total_minor, currency, contact_name, contact_email, origin_name, destination_name, service_type, direction, origin_hotel_name, destination_hotel_name, service_date, pickup_time, return_date, return_time, passengers, vehicle_count, bags, flight_number",
+    )
     .single();
 
   if (error) {
     if (error.code === "23505") return createReservation(input);
     throw error;
   }
+
+  void enqueueReservationConfirmation(data);
 
   return {
     folio: data.folio,
