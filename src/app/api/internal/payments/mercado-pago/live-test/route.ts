@@ -24,6 +24,9 @@ export async function POST(request: Request) {
     if (process.env.MERCADO_PAGO_ENV?.toLowerCase() !== "production") {
       return NextResponse.json({ error: "La prueba real requiere Mercado Pago productivo." }, { status: 409 });
     }
+    if (!request.headers.get("cookie")?.includes("sb-")) {
+      return NextResponse.json({ error: "Inicia sesión como administrador." }, { status: 401 });
+    }
 
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
