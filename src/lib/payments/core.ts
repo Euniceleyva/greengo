@@ -48,8 +48,9 @@ export type PaymentAttempt = {
 };
 
 export function getSiteUrl() {
-  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (!configured) throw new Error("NEXT_PUBLIC_SITE_URL no está configurado.");
+  const configured =
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+    "https://www.greengotransferscancun.com";
 
   const url = new URL(configured);
   if (url.protocol !== "https:" && url.hostname !== "localhost" && url.hostname !== "127.0.0.1") {
