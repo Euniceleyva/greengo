@@ -1,6 +1,8 @@
 import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
+import { enqueuePaymentNotification } from "@/lib/notifications/queue";
+import type { NotificationKind } from "@/lib/notifications/templates";
 
 export type PaymentProvider = "mercado_pago" | "paypal";
 export type PaymentMethod = "card" | "oxxo" | "spei" | "paypal";
@@ -224,7 +226,37 @@ export async function applyProviderPayment(input: {
     .eq("id", payment.reservation_id);
   if (reservationError) throw reservationError;
 
+  await notifyPaymentOutcome(supabase, payment.reservation_id, payment.id as string, input.status);
+
   return payment.id as string;
+}
+
+async function notifyPaymentOutcome(
+  supabase: ReturnType<typeof createAdminClient>,
+  reservationId: string,
+  paymentId: string,
+  status: PaymentStatus,
+) {
+  const kind: Extract<NotificationKind, "payment_pending" | "payment_confirmed" | "payment_failed" | "refund"> | null =
+    status === "approved"
+      ? "payment_confirmed"
+      : ["created", "pending", "action_required"].includes(status)
+        ? "payment_pending"
+        : ["rejected", "cancelled", "expired"].includes(status)
+          ? "payment_failed"
+          : status === "refunded" || status === "charged_back"
+            ? "refund"
+            : null;
+  if (!kind) return;
+
+  const { data: reservation, error } = await supabase
+    .from("reservations")
+    .select("contact_email")
+    .eq("id", reservationId)
+    .maybeSingle();
+  if (error || !reservation?.contact_email) return;
+
+  await enqueuePaymentNotification(reservationId, paymentId, reservation.contact_email, kind);
 }
 
 export async function beginWebhookEvent(input: {

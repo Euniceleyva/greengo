@@ -2,7 +2,7 @@ import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { resolveHotelSelection } from "@/data/booking-zones";
-import { enqueueReservationConfirmation } from "@/lib/notifications/queue";
+import { enqueueReservationNotifications } from "@/lib/notifications/queue";
 import type { ReservationSubmission } from "@/lib/schemas";
 import type { ReservationReceipt } from "@/types";
 
@@ -280,7 +280,7 @@ export async function createReservation(input: ReservationSubmission): Promise<R
     throw error;
   }
 
-  await enqueueReservationConfirmation(data);
+  await enqueueReservationNotifications(data);
 
   return {
     folio: data.folio,
