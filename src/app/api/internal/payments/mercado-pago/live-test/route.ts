@@ -15,6 +15,7 @@ const TEST_AMOUNT_MINOR = 900;
 const requestSchema = z.object({ buyerEmail: z.string().trim().toLowerCase().email().max(254) });
 
 export async function POST(request: Request) {
+  let diagnosticStage = "CONFIGURATION";
   try {
     const siteUrl = getSiteUrl();
     const origin = request.headers.get("origin");
@@ -24,7 +25,11 @@ export async function POST(request: Request) {
     if (process.env.MERCADO_PAGO_ENV?.toLowerCase() !== "production") {
       return NextResponse.json({ error: "La prueba real requiere Mercado Pago productivo." }, { status: 409 });
     }
+    if (!request.headers.get("cookie")?.includes("sb-")) {
+      return NextResponse.json({ error: "Inicia sesión como administrador." }, { status: 401 });
+    }
 
+    diagnosticStage = "AUTHORIZATION";
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Inicia sesión como administrador." }, { status: 401 });
@@ -38,6 +43,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No tienes permiso para crear pagos de prueba." }, { status: 403 });
     }
 
+    diagnosticStage = "REQUEST";
     const contentLength = Number(request.headers.get("content-length") ?? 0);
     if (contentLength > 1_000) {
       return NextResponse.json({ error: "La solicitud es demasiado grande." }, { status: 413 });
@@ -47,13 +53,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Usa un correo de comprador distinto al vendedor." }, { status: 400 });
     }
 
+    diagnosticStage = "RESERVATION";
     const admin = createAdminClient();
-    const today = new Intl.DateTimeFormat("en-CA", {
+    const dateParts = new Intl.DateTimeFormat("en-US", {
       timeZone: "America/Cancun",
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
-    }).format(new Date());
+    }).formatToParts(new Date());
+    const dateValues = Object.fromEntries(
+      dateParts.map(({ type, value }) => [type, value]),
+    );
+    const today = `${dateValues.year}-${dateValues.month}-${dateValues.day}`;
     const { data, error } = await admin
       .from("reservations")
       .insert({
@@ -82,6 +93,7 @@ export async function POST(request: Request) {
       .single();
     if (error) throw error;
 
+    diagnosticStage = "PAYMENT_ATTEMPT";
     const reservation = data as PayableReservation;
     const payment = await getOrCreatePaymentAttempt(reservation, "mercado_pago", "card");
     const successUrl = new URL("/admon/prueba-pago", siteUrl);
@@ -93,6 +105,7 @@ export async function POST(request: Request) {
     failureUrl.searchParams.set("reference", reservation.public_reference);
     failureUrl.searchParams.set("return", "failure");
 
+    diagnosticStage = "MERCADO_PAGO_PREFERENCE";
     const preference = await createMercadoPagoPreference({
       items: [{
         id: reservation.folio,
@@ -111,6 +124,7 @@ export async function POST(request: Request) {
       metadata: { reservation_reference: reservation.public_reference, reservation_folio: reservation.folio, test_payment: true },
     }, payment.idempotency_key);
 
+    diagnosticStage = "PAYMENT_PERSISTENCE";
     const checkoutUrl = mercadoPagoCheckoutUrl(preference);
     await updatePaymentAttempt(payment.id, {
       status: "pending",
@@ -124,7 +138,11 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: "Ingresa un correo de comprador válido." }, { status: 400 });
     }
+    console.error("Live Mercado Pago test failed", { diagnosticStage, error });
     const publicError = publicPaymentError(error);
-    return NextResponse.json({ error: publicError.message }, { status: publicError.status });
+    return NextResponse.json(
+      { error: publicError.message, diagnosticCode: diagnosticStage },
+      { status: publicError.status },
+    );
   }
 }

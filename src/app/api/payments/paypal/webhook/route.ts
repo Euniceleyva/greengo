@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Firma inválida." }, { status: 401 });
     }
   } catch (error) {
-    console.error("Unable to verify PayPal webhook", error);
+    console.error("Unable to verify PayPal webhook", error instanceof Error ? error.message : "unknown error");
     return NextResponse.json({ error: "No se pudo validar la firma." }, { status: 503 });
   }
 
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
   } catch (error) {
     const message = error instanceof Error ? error.message : "No se pudo procesar el evento.";
     await finishWebhookEvent(webhookEventId, message);
-    console.error("Unable to process PayPal webhook", error);
+    console.error("Unable to process PayPal webhook", error instanceof Error ? error.message : "unknown error");
     return NextResponse.json({ error: "No se pudo procesar el evento." }, { status: 500 });
   }
 }

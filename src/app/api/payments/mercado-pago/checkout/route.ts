@@ -12,10 +12,17 @@ import {
   createMercadoPagoPreference,
   mercadoPagoCheckoutUrl,
 } from "@/lib/payments/mercado-pago";
+import { PayloadTooLargeError, rateLimitResponse, readJsonBody } from "@/lib/http-guards";
+
+const MAX_BODY_BYTES = 2_000;
 
 export async function POST(request: Request) {
+  const limited = rateLimitResponse(request, "payments:mercado-pago:checkout", 10, 300);
+  if (limited) return limited;
+
   try {
-    const { reservationReference } = paymentCheckoutSchema.parse(await request.json());
+    const body = await readJsonBody(request, MAX_BODY_BYTES);
+    const { reservationReference } = paymentCheckoutSchema.parse(body);
     const reservation = await getPayableReservation(reservationReference);
     const payment = await getOrCreatePaymentAttempt(reservation, "mercado_pago", "card");
 
@@ -78,6 +85,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ checkoutUrl });
   } catch (error) {
+    if (error instanceof PayloadTooLargeError) {
+      return NextResponse.json({ error: error.message }, { status: 413 });
+    }
     if (error instanceof ZodError) {
       return NextResponse.json({ error: "Referencia de reservación inválida." }, { status: 400 });
     }

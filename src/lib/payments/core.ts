@@ -1,6 +1,8 @@
 import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
+import { enqueuePaymentNotification } from "@/lib/notifications/queue";
+import type { NotificationKind } from "@/lib/notifications/templates";
 
 export type PaymentProvider = "mercado_pago" | "paypal";
 export type PaymentMethod = "card" | "oxxo" | "spei" | "paypal";
@@ -48,8 +50,9 @@ export type PaymentAttempt = {
 };
 
 export function getSiteUrl() {
-  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (!configured) throw new Error("NEXT_PUBLIC_SITE_URL no está configurado.");
+  const configured =
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+    "https://www.greengotransferscancun.com";
 
   const url = new URL(configured);
   if (url.protocol !== "https:" && url.hostname !== "localhost" && url.hostname !== "127.0.0.1") {
@@ -223,7 +226,37 @@ export async function applyProviderPayment(input: {
     .eq("id", payment.reservation_id);
   if (reservationError) throw reservationError;
 
+  await notifyPaymentOutcome(supabase, payment.reservation_id, payment.id as string, input.status);
+
   return payment.id as string;
+}
+
+async function notifyPaymentOutcome(
+  supabase: ReturnType<typeof createAdminClient>,
+  reservationId: string,
+  paymentId: string,
+  status: PaymentStatus,
+) {
+  const kind: Extract<NotificationKind, "payment_pending" | "payment_confirmed" | "payment_failed" | "refund"> | null =
+    status === "approved"
+      ? "payment_confirmed"
+      : ["created", "pending", "action_required"].includes(status)
+        ? "payment_pending"
+        : ["rejected", "cancelled", "expired"].includes(status)
+          ? "payment_failed"
+          : status === "refunded" || status === "charged_back"
+            ? "refund"
+            : null;
+  if (!kind) return;
+
+  const { data: reservation, error } = await supabase
+    .from("reservations")
+    .select("contact_email")
+    .eq("id", reservationId)
+    .maybeSingle();
+  if (error || !reservation?.contact_email) return;
+
+  await enqueuePaymentNotification(reservationId, paymentId, reservation.contact_email, kind);
 }
 
 export async function beginWebhookEvent(input: {
@@ -286,6 +319,6 @@ export function publicPaymentError(error: unknown) {
   if (error instanceof PaymentRequestError) {
     return { message: error.message, status: error.status };
   }
-  console.error("Payment integration error", error);
+  console.error("Payment integration error", error instanceof Error ? error.message : "unknown error");
   return { message: "No pudimos abrir la pasarela de pago. Inténtalo nuevamente.", status: 500 };
 }

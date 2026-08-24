@@ -36,7 +36,7 @@ export default async function AdmonPage() {
     .order("service_date", { ascending: false })
     .order("pickup_time", { ascending: false });
 
-  if (error) console.error("Unable to load admin reservations", error);
+  if (error) console.error("Unable to load admin reservations", error.message);
 
   const trips: AdminServiceRecord[] = (reservations ?? []).map((reservation) => {
     const hasCoordinates =

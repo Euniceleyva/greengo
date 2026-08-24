@@ -1,11 +1,14 @@
 "use client";
 
 // Borrador del formulario de reserva multi-paso (/reservar). Se persiste en
-// localStorage para no perder los datos si el usuario recarga a mitad del
-// proceso. No representa una reservación real hasta pasar por /pago.
+// sessionStorage (no localStorage) para no conservar datos de contacto del
+// cliente más allá de la sesión del navegador: sessionStorage sobrevive a la
+// redirección de ida y vuelta a Mercado Pago/PayPal (misma pestaña), pero se
+// borra al cerrar la pestaña o el navegador. No representa una reservación
+// real hasta pasar por /pago.
 
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 import type { ReservationDraft, ReservationReceipt } from "@/types";
 
 const EMPTY_DRAFT: ReservationDraft = {
@@ -79,6 +82,25 @@ export const useReservationStore = create<ReservationState>()(
           reservationReceipt: null,
         }),
     }),
-    { name: "greengo-reservation-draft" },
+    {
+      name: "greengo-reservation-draft",
+      storage: createJSONStorage(() => sessionStorage),
+      version: 1,
+      migrate: () => {
+        // Cualquier borrador de una versión anterior (persistido en
+        // localStorage, con alcance indefinido) se descarta en vez de
+        // migrarse: no vale la pena conservar datos de contacto antiguos.
+        if (typeof window !== "undefined") {
+          window.localStorage.removeItem("greengo-reservation-draft");
+        }
+        return {
+          step: 1,
+          draft: EMPTY_DRAFT,
+          confirmedFolio: null,
+          submissionKey: null,
+          reservationReceipt: null,
+        };
+      },
+    },
   ),
 );

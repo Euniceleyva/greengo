@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { rateLimitResponse } from "@/lib/http-guards";
 
 const querySchema = z.string().uuid();
 
 export async function GET(request: Request) {
+  const limited = rateLimitResponse(request, "payments:status", 30, 60);
+  if (limited) return limited;
+
   const reference = new URL(request.url).searchParams.get("reference");
   const parsed = querySchema.safeParse(reference);
   if (!parsed.success) {
@@ -18,7 +22,7 @@ export async function GET(request: Request) {
     .eq("public_reference", parsed.data)
     .maybeSingle();
   if (error) {
-    console.error("Unable to read public payment status", error);
+    console.error("Unable to read public payment status", error.message);
     return NextResponse.json({ error: "No pudimos consultar el pago." }, { status: 500 });
   }
   if (!reservation) return NextResponse.json({ error: "Reservación no encontrada." }, { status: 404 });
@@ -33,7 +37,7 @@ export async function GET(request: Request) {
   }
   const { data: latestPayment, error: paymentError } = await paymentQuery.limit(1).maybeSingle();
   if (paymentError) {
-    console.error("Unable to read latest public payment", paymentError);
+    console.error("Unable to read latest public payment", paymentError.message);
     return NextResponse.json({ error: "No pudimos consultar el pago." }, { status: 500 });
   }
 

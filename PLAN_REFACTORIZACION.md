@@ -1,10 +1,16 @@
 # Plan de acción para refactorizar GreenGo Transfers
 
-> **Estado de ejecución (2026-08-21):** Fases 0, 2 y 3 completadas en la rama `codex/refactor-eliminar-prototipo`. Fase 1 (pruebas Playwright/Vitest) se dejó pendiente a propósito para una sesión posterior — no formaba parte del alcance aprobado de esta pasada. Fases 4-9 siguen pendientes. Ver detalle de lo ejecutado al final de cada fase correspondiente y en `README.md` §9.
+> **Estado de ejecución (actualizado 2026-08-21, segunda pasada):** Fases 0, 1, 2, 3, 4, 5, 6, 8 y 9 completadas o completadas con partes explícitamente pendientes de credenciales externas, en la rama `codex/refactor-eliminar-prototipo`. Fase 7 se dejó intacta (solo lectura) por decisión explícita — ninguna acción administrativa adicional se implementó por inferencia. Ver detalle de lo ejecutado al final de cada fase y en `README.md` §9.
 >
-> Decisiones tomadas para esta ejecución:
+> Decisiones tomadas en la primera pasada:
 > - `/destinos/[slug]` se conserva como apoyo SEO de la LP.
-> - Alcance de `/admon` para esta versión: solo lectura y reporte (listado de reservaciones, estado de pago, exportación PDF). Cambiar estados, cancelar, reembolsar, editar tarifas, reenviar correos y notas internas siguen pendientes de aprobación explícita (Fase 7).
+> - Alcance de `/admon`: solo lectura y reporte (listado de reservaciones, estado de pago, exportación PDF). Cambiar estados, cancelar, reembolsar, editar tarifas, reenviar correos y notas internas siguen pendientes de aprobación explícita (Fase 7).
+>
+> Decisiones tomadas en la segunda pasada:
+> - Fase 7: se mantiene `/admon` de solo lectura; no se agregó ninguna acción administrativa opcional.
+> - Fase 6 (correo): código listo con Resend, sin credenciales reales — las notificaciones quedan encoladas en `notification_deliveries` sin enviarse hasta configurar `RESEND_API_KEY`/`RESEND_FROM_EMAIL`.
+> - Fase 6 (pagos/seguridad): rate limiting, límites de tamaño y redacción de logs implementados; las pruebas de webhook en sandbox real y el Security Advisor de Supabase requieren credenciales que no están disponibles en este entorno de trabajo.
+> - Fase 8: se autoalojaron las fuentes; la carga diferida del catálogo de hoteles se identificó pero no se implementó, para no arriesgar una regresión en un componente comercial sin verificación visual disponible.
 
 ## 1. Objetivo
 
@@ -171,7 +177,7 @@ No se eliminará ningún archivo compartido únicamente por su ubicación. Antes
 
 ---
 
-### Fase 1 — Crear pruebas de protección (pendiente)
+### Fase 1 — Crear pruebas de protección ✅ Completada
 
 ### Acciones
 
@@ -196,6 +202,8 @@ No se eliminará ningún archivo compartido únicamente por su ubicación. Antes
 - Los recorridos principales cuentan con pruebas repetibles.
 - Las pruebas fallan si se rompe una ruta conservada.
 - Las integraciones externas no son necesarias para ejecutar las pruebas locales ordinarias.
+
+**Ejecutado:** Vitest (`vitest.config.ts`, `npm run test`) con 33 pruebas sobre `src/lib/reservations/pricing.ts` (tarifas legacy y por capacidad, recargo nocturno, reparto en camionetas) y `src/lib/schemas.ts` (validación de la reservación: fechas, teléfono, correo, idempotencia). Playwright (`playwright.config.ts`, `npm run test:e2e`, levanta `next dev` en `:3100`) con 10 pruebas: carga de la LP y verificación de que no quedan enlaces a `/admin`/`/driver`/`/demo`; navegación desde query params del mini-cotizador; validación de los 4 pasos de `/reservar`; creación idempotente de una reservación (red mockeada con `page.route`, sin escribir en Supabase); manejo del error del servidor; acceso no autenticado a `/admon` (redirige a `/admon/acceso`); 404 en `/admin`/`/driver`/`/demo`; rechazo de una referencia de pago con formato inválido; 404 de una referencia bien formada pero inexistente; y el estado vacío de `/pago/confirmacion` sin un borrador de reservación en sesión. No se cubrieron "acceso autenticado con rol permitido/denegado" ni "generación del reporte PDF" (requieren credenciales reales de Supabase Auth y no se creó un usuario de prueba); tampoco se probaron sandboxes reales de Mercado Pago/PayPal, según lo previsto por esta misma fase ("reservar los sandbox reales para E2E de integración").
 
 ---
 
@@ -258,7 +266,7 @@ No se eliminará ningún archivo compartido únicamente por su ubicación. Antes
 
 ---
 
-### Fase 4 — Reorganizar el dominio productivo (pendiente)
+### Fase 4 — Reorganizar el dominio productivo ✅ Completada
 
 ### Acciones
 
@@ -284,9 +292,11 @@ No se eliminará ningún archivo compartido únicamente por su ubicación. Antes
 - Una recarga o cambio de navegador no puede alterar el importe de una reservación existente.
 - Los estados de pago solo se actualizan a partir de respuestas verificadas de los proveedores.
 
+**Ejecutado:** se extrajo `src/lib/reservations/pricing.ts` (funciones puras: `calculateLeg`, `selectRule`, `splitPassengersIntoVans`, `isNightTime`) de `create-reservation.ts`, que ahora solo orquesta Supabase y llama a `pricing.ts` — separación que además hizo posible testear las tarifas con Vitest sin mockear la base de datos. Se creó `src/lib/notifications/` (`queue.ts`, `templates.ts`, `resend-client.ts`) como módulo de notificaciones transaccionales. Los módulos de pagos (`src/lib/payments/core.ts`, `mercado-pago.ts`, `paypal.ts`) y de consulta administrativa (`src/app/admon/page.tsx`, `src/components/admon/services-summary.tsx`) ya estaban separados desde la primera pasada. Se documentaron estados y transiciones de reservación, pago y notificación en [`docs/ESTADOS.md`](docs/ESTADOS.md). De paso se eliminó código muerto detectado durante la reorganización: `tripSchema`/`fuelSchema`/`incidentSchema` en `schemas.ts` (leftovers del demo sin consumidores) y `routeLengthKm`/`interpolateRoute` (`geo.ts`), `formatDateTime`/`timeAgo` (`format.ts`). Los precios ya se calculaban exclusivamente en servidor desde la primera pasada (no se modificó esa lógica, solo se reorganizó).
+
 ---
 
-### Fase 5 — Reducir y proteger el estado del navegador (pendiente)
+### Fase 5 — Reducir y proteger el estado del navegador ✅ Completada
 
 ### Acciones
 
@@ -305,9 +315,11 @@ No se eliminará ningún archivo compartido únicamente por su ubicación. Antes
 - El usuario puede recargar durante el formulario sin provocar reservaciones duplicadas.
 - La confirmación se reconstruye desde una referencia segura y datos del servidor.
 
+**Ejecutado:** `reservation-store.ts` cambió de `localStorage` a `sessionStorage` (estrategia 2 de las listadas): el borrador ya no sobrevive al cierre del navegador, pero sí sobrevive a la redirección de ida y vuelta a Mercado Pago/PayPal porque ocurre en la misma pestaña. Se añadió `version: 1` con una función `migrate` que descarta cualquier borrador antiguo persistido en `localStorage` bajo la misma clave (`greengo-reservation-draft`) en vez de migrarlo, para no arrastrar datos de contacto guardados antes de este cambio. No se implementó la opción de "persistir solo servicio/ruta/fecha/pasajeros" por separado ni un borrador en servidor: se consideró que `sessionStorage` ya cumple el criterio de aceptación ("no persistencia indefinida") sin necesitar una llamada de red adicional en cada tecleo del formulario, y sin romper la lectura del resumen en `/pago/confirmacion` (que sí necesita nombre/correo/teléfono para mostrarse). La idempotencia ante recargas ya existía desde la primera pasada vía `submissionKey` + `submission_key` único en la tabla `reservations`.
+
 ---
 
-### Fase 6 — Completar la preparación para producción (pendiente)
+### Fase 6 — Completar la preparación para producción (parcial — ver detalle por bloque)
 
 ### Seguridad y abuso
 
@@ -353,9 +365,17 @@ No se eliminará ningún archivo compartido únicamente por su ubicación. Antes
 - El cliente y el administrador reciben las notificaciones esperadas.
 - Los errores operativos pueden detectarse y diagnosticarse.
 
+**Ejecutado — Seguridad y abuso:** rate limiting en memoria por IP (`src/lib/rate-limit.ts`, aplicado en `/api/reservations` 8/5min, `/api/payments/*/checkout` 10/5min, `/api/payments/status` 30/min) y límite de tamaño de body JSON (`src/lib/http-guards.ts`, 20 KB en reservaciones, 2 KB en checkout). Los `console.error` de las rutas de servidor ya no imprimen el objeto de error completo, solo `error.message`. `SUPABASE_SECRET_KEY` solo se lee en módulos con `"server-only"` (`src/lib/supabase/admin.ts`), sin cambios necesarios porque ya era así desde la primera pasada. **Pendiente:** protección anti-bot/CAPTCHA en el envío final (requiere elegir y contratar un proveedor, p. ej. Turnstile o hCaptcha) y ejecutar el Security Advisor de Supabase (requiere acceso al proyecto de producción). El rate limiting es en memoria por proceso: si se despliega en múltiples instancias/regiones, el límite efectivo puede ser más alto que el configurado — documentado como advertencia en el propio archivo.
+
+**Ejecutado — Pagos:** ninguna verificación con sandbox real de Mercado Pago/PayPal se pudo ejecutar en este entorno de trabajo (no hay credenciales de prueba disponibles). El código ya cubre `pendiente`/`aprobado`/`rechazado`/`cancelado`/`reembolsado` desde la primera pasada (`applyProviderPayment`), incluyendo idempotencia ante reenvío del mismo webhook (`beginWebhookEvent` con restricción única `provider + provider_event_id + action`) — ver `docs/ESTADOS.md`. **Pendiente:** aprobar las dos tarifas con `review_note`, pruebas reales en sandbox, y decidir explícitamente qué hacer ante un pago aprobado sin reservación confirmada (o viceversa) más allá de lo que ya hace `applyProviderPayment` — no se tomó una decisión de producto nueva sobre este caso en esta pasada.
+
+**Ejecutado — Correos:** proveedor elegido y codificado: Resend (`src/lib/notifications/resend-client.ts`, vía `fetch`, sin SDK adicional). `processNotificationQueue()` procesa hasta 20 filas de `notification_deliveries` por ejecución, con reintentos (máximo 5 intentos) e idempotencia (cada fila se marca `sent` una sola vez). Las 5 plantillas de `notification_kind` están en `src/lib/notifications/templates.ts`. Sin `RESEND_API_KEY`/`RESEND_FROM_EMAIL` reales, la cola quedó sin probarse de extremo a extremo con envíos reales — ver `EMAIL_SETUP.md` para la prueba mínima pendiente.
+
+**Ejecutado — Observabilidad:** no se implementó en esta pasada. Los errores se registran con `console.error` (mensaje, sin correlación entre solicitudes) y no hay alertas ni métricas configuradas; requiere elegir una herramienta (p. ej. Sentry, Vercel Observability) y no se tomó esa decisión por inferencia.
+
 ---
 
-### Fase 7 — Ajustar `/admon` al alcance aprobado (pendiente)
+### Fase 7 — Ajustar `/admon` al alcance aprobado (decisión explícita: mantener solo lectura)
 
 ### Funcionalidad mínima recomendada
 
@@ -386,9 +406,11 @@ No se implementarán estas acciones por inferencia. Cada una afecta operación, 
 - Los usuarios inactivos o sin rol permitido no pueden consultar reservaciones.
 - Toda acción que cambie información sensible queda registrada en `audit_log`.
 
+**Ejecutado:** ninguna acción de la lista opcional se agregó — decisión explícita confirmada para esta pasada (no se implementa por inferencia, tal como pide esta misma fase). La funcionalidad mínima recomendada ya estaba completa desde la primera pasada (login real con Supabase Auth, listado/filtro, datos de cliente y recorrido, importe y estado de pago, estado de reservación, exportación PDF, cierre de sesión) y no se modificó. La tabla `audit_log` existe en el esquema desde la primera pasada pero no tiene escritores todavía porque no hay acciones que auditar sin las funciones opcionales de esta fase.
+
 ---
 
-### Fase 8 — Rendimiento, SEO y construcción reproducible (pendiente)
+### Fase 8 — Rendimiento, SEO y construcción reproducible (parcial)
 
 ### Acciones
 
@@ -406,9 +428,11 @@ No se implementarán estas acciones por inferencia. Cada una afecta operación, 
 - La LP conserva metadatos y páginas de adquisición aprobadas.
 - No se cargan librerías del panel o pagos antes de necesitarlas.
 
+**Ejecutado:** las 4 familias tipográficas (Poppins, Inter, Fredoka, Lexend) se descargaron una sola vez del subset `latin` de Google Fonts y se autoalojan desde `public/fonts/` vía `next/font/local` en `src/app/layout.tsx`; `npm run build` ya no hace ninguna solicitud a `fonts.googleapis.com`/`fonts.gstatic.com`. Metadatos, sitemap y robots no cambiaron respecto a la primera pasada (ya estaban correctos). **Pendiente:** cargar diferidamente `src/mocks/hotels.ts` (~1400 líneas) en el mini-cotizador de la LP — se identificó como la optimización de mayor impacto restante (ver nota en README §3), pero no se implementó por el riesgo de regresión en un componente comercial sin poder verificarlo visualmente en un navegador en este entorno de trabajo; revisar el peso de imágenes/video del hero; y ejecutar Lighthouse en móvil, que requiere un navegador real.
+
 ---
 
-### Fase 9 — Reescribir documentación y preparar entrega (parcial)
+### Fase 9 — Reescribir documentación y preparar entrega ✅ Completada
 
 ### Acciones
 
@@ -435,20 +459,22 @@ No se implementarán estas acciones por inferencia. Cada una afecta operación, 
 - La documentación no menciona módulos eliminados.
 - Los procedimientos de pago y despliegue coinciden con el código vigente.
 
+**Ejecutado:** README reescrito íntegramente para el producto real desde la primera pasada, y ampliado en esta segunda con secciones de pruebas (§11), variables de entorno (§12) y despliegue/rollback (§13). `package.json` ahora declara `"engines": { "node": ">=20.9.0" }` y el README pide Node 20.9+. Se documentaron arquitectura, rutas, migraciones (`supabase/README.md`), pagos (`PAYMENTS_SETUP.md`), correo (`EMAIL_SETUP.md`, nuevo) y estados/transiciones (`docs/ESTADOS.md`, nuevo). No quedan usuarios ni credenciales simuladas en la documentación (la sección de "Credenciales simuladas" del README original se eliminó en la primera pasada). `.env.example` sigue sin valores secretos reales, solo placeholders. Checklist de lanzamiento creado en [`CHECKLIST_LANZAMIENTO.md`](CHECKLIST_LANZAMIENTO.md).
+
 ---
 
 ## 6. Orden recomendado de ejecución
 
-1. Confirmar alcance y capacidades de `/admon`.
-2. Crear pruebas de protección.
-3. Eliminar rutas y componentes del demo.
-4. Eliminar stores, mocks, tipos y dependencias huérfanas.
-5. Reorganizar los dominios productivos.
-6. Reducir datos persistidos en el navegador.
-7. Completar seguridad, correo, pagos y observabilidad.
-8. Optimizar rendimiento y fuentes.
-9. Reescribir documentación.
-10. Ejecutar pruebas sandbox y checklist de lanzamiento.
+1. ✅ Confirmar alcance y capacidades de `/admon`.
+2. ✅ Crear pruebas de protección.
+3. ✅ Eliminar rutas y componentes del demo.
+4. ✅ Eliminar stores, mocks, tipos y dependencias huérfanas.
+5. ✅ Reorganizar los dominios productivos.
+6. ✅ Reducir datos persistidos en el navegador.
+7. ⚠️ Completar seguridad, correo, pagos y observabilidad — código listo; sandbox de pagos, envío real de correo, Security Advisor y observabilidad quedan pendientes de credenciales/decisiones que no correspondía tomar por inferencia.
+8. ⚠️ Optimizar rendimiento y fuentes — fuentes autoalojadas; carga diferida del catálogo de hoteles y Lighthouse pendientes.
+9. ✅ Reescribir documentación.
+10. ⚠️ Ejecutar pruebas sandbox y checklist de lanzamiento — el checklist existe (`CHECKLIST_LANZAMIENTO.md`); ejecutarlo con credenciales reales queda para quien las tenga.
 
 No se recomienda mezclar en un mismo cambio la eliminación masiva, una migración de Tailwind y cambios funcionales de pagos. Cada grupo debe poder revisarse y revertirse de forma independiente.
 
@@ -495,29 +521,29 @@ Los scripts de pruebas se añadirán en la Fase 1. Además, realizar un recorrid
 
 ## 9. Definición de terminado
 
-La refactorización estará completa cuando:
+Estado de cada criterio al cierre de esta segunda pasada:
 
-- Solo existan las rutas aprobadas.
-- No quede código funcional del demo operativo.
-- No queden dependencias sin uso.
-- LP, reservación, checkout, confirmación y `/admon` estén cubiertos por pruebas.
-- Los importes se calculen y validen en servidor.
-- Los webhooks sean firmados, idempotentes y estén probados.
-- El flujo de correo transaccional esté activo.
-- La información personal no se conserve indefinidamente en el navegador.
-- Lint, pruebas y build terminen sin errores.
-- El README describa el producto real.
-- Exista un checklist aprobado para desplegar a producción.
+- ✅ Solo existen las rutas aprobadas.
+- ✅ No queda código funcional del demo operativo.
+- ✅ No quedan dependencias sin uso (`leaflet`, `react-leaflet`, `recharts`, `motion` removidas; `jspdf`/`gsap`/`embla-carousel-react`/`zustand` confirmadas en uso).
+- ✅ LP, reservación, checkout, confirmación y `/admon` (acceso) están cubiertos por pruebas automatizadas (Vitest + Playwright con red mockeada). ⚠️ No cubierto: generación real del PDF ni acceso autenticado con rol permitido/denegado (requieren un usuario de prueba real en Supabase Auth).
+- ✅ Los importes se calculan y validan en servidor (desde la primera pasada; reorganizado en `src/lib/reservations/pricing.ts` en esta pasada).
+- ⚠️ Los webhooks son firmados e idempotentes en el código, pero **no están probados contra un sandbox real** en este entorno de trabajo (sin credenciales de Mercado Pago/PayPal disponibles).
+- ⚠️ El flujo de correo transaccional está **codificado y encolando correctamente**, pero no está activo de extremo a extremo sin `RESEND_API_KEY`/`RESEND_FROM_EMAIL` reales.
+- ✅ La información personal no se conserva indefinidamente en el navegador (`sessionStorage` en vez de `localStorage`).
+- ✅ Lint, pruebas (`npm run test`, `npm run test:e2e`) y build terminan sin errores.
+- ✅ El README describe el producto real, incluyendo las partes pendientes de credenciales.
+- ✅ Existe un checklist para desplegar a producción ([`CHECKLIST_LANZAMIENTO.md`](CHECKLIST_LANZAMIENTO.md)), pendiente de que alguien con las credenciales reales lo ejecute y lo apruebe.
 
 ---
 
 ## 10. Entregables esperados
 
-1. Repositorio sin el prototipo de operación, conductores y flota.
-2. `package.json` y lockfile depurados.
-3. Suite mínima de pruebas unitarias y end-to-end.
-4. Flujo de reservación y pagos endurecido.
-5. Panel `/admon` ajustado al alcance aprobado.
-6. Proveedor y plantillas de correo transaccional configurados.
-7. README actualizado.
-8. Checklist de despliegue, sandbox, producción y rollback.
+1. ✅ Repositorio sin el prototipo de operación, conductores y flota.
+2. ✅ `package.json` y lockfile depurados.
+3. ✅ Suite mínima de pruebas unitarias y end-to-end (Vitest + Playwright).
+4. ✅ Flujo de reservación y pagos endurecido (rate limiting, límites de tamaño, logs sin PII); ⚠️ pendiente de prueba contra sandbox real.
+5. ✅ Panel `/admon` — se mantiene deliberadamente en el alcance mínimo aprobado (solo lectura), sin acciones administrativas adicionales.
+6. ⚠️ Proveedor de correo transaccional codificado (Resend) y plantillas implementadas; **configuración de credenciales reales pendiente** (`EMAIL_SETUP.md`).
+7. ✅ README actualizado.
+8. ✅ Checklist de despliegue, sandbox, producción y rollback (`CHECKLIST_LANZAMIENTO.md`), pendiente de ejecución con credenciales reales.

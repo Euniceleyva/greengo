@@ -46,7 +46,7 @@ export async function GET(request: Request) {
     });
     destination.searchParams.set("return", "processing");
   } catch (error) {
-    console.error("Unable to capture PayPal order", error);
+    console.error("Unable to capture PayPal order", error instanceof Error ? error.message : "unknown error");
     destination.searchParams.set("return", "failure");
   }
 

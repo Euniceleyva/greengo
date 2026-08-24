@@ -20,6 +20,13 @@ const otherHotel = (zoneId: string): BookingHotel => ({
 // Los nombres corrigen únicamente errores ortográficos evidentes del PDF.
 export const BOOKING_ZONES: BookingZone[] = [
   {
+    id: "loc-viaje-prueba",
+    name: "🧪 Viaje de prueba interno (no reservar)",
+    category: "destino",
+    coord: [21.0417, -86.874],
+    hotels: [otherHotel("loc-viaje-prueba")],
+  },
+  {
     id: "loc-aeropuerto",
     name: "Aeropuerto Internacional de Cancún",
     category: "aeropuerto",

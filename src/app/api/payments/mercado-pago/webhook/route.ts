@@ -71,7 +71,7 @@ export async function POST(request: Request) {
   } catch (error) {
     const message = error instanceof Error ? error.message : "No se pudo procesar el evento.";
     await finishWebhookEvent(webhookEventId, message);
-    console.error("Unable to process Mercado Pago webhook", error);
+    console.error("Unable to process Mercado Pago webhook", error instanceof Error ? error.message : "unknown error");
     return NextResponse.json({ error: "No se pudo procesar el evento." }, { status: 500 });
   }
 }

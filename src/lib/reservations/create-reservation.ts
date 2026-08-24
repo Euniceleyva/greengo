@@ -2,6 +2,8 @@ import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { resolveHotelSelection } from "@/data/booking-zones";
+import { calculateLeg, numeric, selectRule, type PricingRule } from "@/lib/reservations/pricing";
+import { enqueueReservationNotifications } from "@/lib/notifications/queue";
 import type { ReservationSubmission } from "@/lib/schemas";
 import type { ReservationReceipt } from "@/types";
 
@@ -12,133 +14,6 @@ type DbLocation = {
   latitude: number | string;
   longitude: number | string;
 };
-
-type DbPricingRule = {
-  id: string;
-  service_type: ReservationSubmission["serviceType"];
-  origin_location_id: string | null;
-  destination_location_id: string | null;
-  bidirectional: boolean;
-  pricing_model: "legacy" | "capacity_tiers";
-  vehicle_capacity: number;
-  base_amount_minor: number | string;
-  included_passengers: number;
-  extra_passenger_amount_minor: number | string;
-  included_bags_per_passenger: number;
-  extra_bag_amount_minor: number | string;
-  night_surcharge_minor: number | string;
-  day_amount_1_4_minor: number | string | null;
-  night_amount_1_4_minor: number | string | null;
-  day_amount_5_8_minor: number | string | null;
-  night_amount_5_8_minor: number | string | null;
-  currency: string;
-  priority: number;
-  valid_from: string | null;
-  valid_to: string | null;
-};
-
-function numeric(value: number | string | null | undefined) {
-  return Number(value ?? 0);
-}
-
-export function isNightTime(time: string) {
-  const hour = Number(time.slice(0, 2));
-  return hour >= 22 || hour < 5;
-}
-
-function isRuleValidOn(rule: DbPricingRule, date: string) {
-  return (!rule.valid_from || rule.valid_from <= date) && (!rule.valid_to || rule.valid_to >= date);
-}
-
-function selectRule(
-  rules: DbPricingRule[],
-  serviceType: ReservationSubmission["serviceType"],
-  originId: string,
-  destinationId: string,
-  date: string,
-) {
-  if (serviceType === "a_medida" || serviceType === "transporte_abierto") return null;
-
-  return (
-    rules
-      .filter((rule) => {
-        if (!isRuleValidOn(rule, date)) return false;
-        const direct = rule.origin_location_id === originId && rule.destination_location_id === destinationId;
-        const reverse =
-          rule.bidirectional &&
-          rule.origin_location_id === destinationId &&
-          rule.destination_location_id === originId;
-        return direct || reverse;
-      })
-      .sort((a, b) => a.priority - b.priority)[0] ?? null
-  );
-}
-
-export function splitPassengersIntoVans(passengers: number, capacity = 8) {
-  const groups: number[] = [];
-  let remaining = passengers;
-  while (remaining > 0) {
-    const group = Math.min(capacity, remaining);
-    groups.push(group);
-    remaining -= group;
-  }
-  return groups;
-}
-
-function calculateLeg(rule: DbPricingRule, passengers: number, bags: number, time: string) {
-  const night = isNightTime(time);
-
-  if (rule.pricing_model === "capacity_tiers") {
-    const passengerGroups = splitPassengersIntoVans(passengers, rule.vehicle_capacity);
-    const groupAmountsMinor = passengerGroups.map((group) => {
-      if (group <= 4) {
-        return numeric(night ? rule.night_amount_1_4_minor : rule.day_amount_1_4_minor);
-      }
-      return numeric(night ? rule.night_amount_5_8_minor : rule.day_amount_5_8_minor);
-    });
-    const totalMinor = groupAmountsMinor.reduce((sum, amount) => sum + amount, 0);
-
-    return {
-      totalMinor,
-      snapshot: {
-        pricingRuleId: rule.id,
-        pricingModel: rule.pricing_model,
-        period: night ? "night_22_00_to_05_00" : "day_05_00_to_22_00",
-        passengerGroups,
-        groupAmountsMinor,
-        vehicleCount: passengerGroups.length,
-      },
-    };
-  }
-
-  const base = numeric(rule.base_amount_minor);
-  const extraPassengers = Math.max(0, passengers - rule.included_passengers);
-  const extraPassengerCost = extraPassengers * numeric(rule.extra_passenger_amount_minor);
-  const includedBags = passengers * rule.included_bags_per_passenger;
-  const extraBags = Math.max(0, bags - includedBags);
-  const extraBagCost = extraBags * numeric(rule.extra_bag_amount_minor);
-  const nightSurcharge = night ? numeric(rule.night_surcharge_minor) : 0;
-  const totalMinor = base + extraPassengerCost + extraBagCost + nightSurcharge;
-
-  return {
-    totalMinor,
-    snapshot: {
-      pricingRuleId: rule.id,
-      pricingModel: rule.pricing_model,
-      baseAmountMinor: base,
-      includedPassengers: rule.included_passengers,
-      extraPassengers,
-      extraPassengerAmountMinor: numeric(rule.extra_passenger_amount_minor),
-      extraPassengerCostMinor: extraPassengerCost,
-      includedBags,
-      extraBags,
-      extraBagAmountMinor: numeric(rule.extra_bag_amount_minor),
-      extraBagCostMinor: extraBagCost,
-      nightSurchargeMinor: nightSurcharge,
-      vehicleCount: Math.ceil(passengers / Math.max(1, rule.vehicle_capacity)),
-    },
-  };
-}
 
 export async function createReservation(input: ReservationSubmission): Promise<ReservationReceipt> {
   const supabase = createAdminClient();
@@ -189,7 +64,7 @@ export async function createReservation(input: ReservationSubmission): Promise<R
     .eq("active", true);
   if (rulesError) throw rulesError;
 
-  const availableRules = (rules as DbPricingRule[] | null) ?? [];
+  const availableRules = (rules as PricingRule[] | null) ?? [];
   const departureRule = selectRule(availableRules, input.serviceType, origin.id, destination.id, input.date);
   const returnRule =
     input.direction === "redondo"
@@ -269,13 +144,17 @@ export async function createReservation(input: ReservationSubmission): Promise<R
   const { data, error } = await supabase
     .from("reservations")
     .insert(reservation)
-    .select("folio, public_reference, status, requires_quote, total_minor, currency")
+    .select(
+      "id, folio, public_reference, status, requires_quote, total_minor, currency, contact_name, contact_email, origin_name, destination_name, service_type, direction, origin_hotel_name, destination_hotel_name, service_date, pickup_time, return_date, return_time, passengers, vehicle_count, bags, flight_number",
+    )
     .single();
 
   if (error) {
     if (error.code === "23505") return createReservation(input);
     throw error;
   }
+
+  await enqueueReservationNotifications(data);
 
   return {
     folio: data.folio,
