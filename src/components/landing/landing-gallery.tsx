@@ -1,27 +1,30 @@
+"use client";
+
 import Image from "next/image";
 import { Check } from "lucide-react";
 import { Carousel } from "@/components/ui/carousel";
+import { usePublicLanguage } from "@/components/shared/public-language";
 import { GALLERY_IMAGES } from "@/mocks/gallery";
 
 const REASONS: { text: string; tone: "green" | "blue" }[] = [
   { text: "Recepción en el Aeropuerto de Cancún", tone: "green" },
   { text: "Seguimiento de vuelo para ajustar tu pickup", tone: "blue" },
   { text: "Conductores locales para rutas en Riviera Maya", tone: "green" },
-  { text: "Vehículos privados, limpios y verificados", tone: "blue" },
-  { text: "Tarifa clara antes de confirmar tu reserva", tone: "green" },
-  { text: "Seguro de pasajero incluido", tone: "blue" },
+  { text: "Unidades privadas, limpias y verificadas", tone: "blue" },
 ];
 
 export function LandingGallery() {
+  const { language } = usePublicLanguage();
   const slides = GALLERY_IMAGES.map((img, i) => (
-    <div key={img.id} className="relative aspect-[16/9] w-full">
+    <div key={img.id} className="relative aspect-[4/3] w-full">
       <Image
         src={img.src}
-        alt={img.alt}
+        alt={language === "en" ? img.altEn : img.alt}
         fill
         priority={i === 0}
         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 90vw, 560px"
         className="object-cover"
+        style={{ objectPosition: img.objectPosition }}
       />
     </div>
   ));
@@ -41,8 +44,11 @@ export function LandingGallery() {
         <div className="adventure-gallery-split mt-12">
           <div data-reveal-item data-postcard className="adventure-carousel-frame">
             <div className="adventure-tape" aria-hidden />
-            <Carousel slides={slides} ariaLabel="Galería de fotos de Cancún y la Riviera Maya" />
-            <span className="adventure-photo-caption">Kilómetro cero: Caribe Mexicano</span>
+            <Carousel
+              slides={slides}
+              language={language}
+              ariaLabel={language === "en" ? "Cancún and Riviera Maya photo gallery" : "Galería de fotos de Cancún y la Riviera Maya"}
+            />
           </div>
 
           <div data-reveal-item className="adventure-reasons">

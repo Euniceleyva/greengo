@@ -42,7 +42,7 @@ export function AccordionItem({ id, question, answer }: { id: string; question: 
   const buttonId = `accordion-trigger-${id}`;
 
   return (
-    <div>
+    <div data-state={isOpen ? "open" : "closed"}>
       <h3>
         <button
           id={buttonId}
@@ -63,10 +63,16 @@ export function AccordionItem({ id, question, answer }: { id: string; question: 
         id={panelId}
         role="region"
         aria-labelledby={buttonId}
-        hidden={!isOpen}
-        className="px-5 pb-4 text-sm text-muted-foreground"
+        aria-hidden={!isOpen}
+        data-state={isOpen ? "open" : "closed"}
+        className={cn(
+          "grid transition-[grid-template-rows] duration-200 ease-out",
+          isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+        )}
       >
-        {answer}
+        <div className="overflow-hidden">
+          <div className="accordion-answer px-5 pb-4 text-sm text-muted-foreground">{answer}</div>
+        </div>
       </div>
     </div>
   );

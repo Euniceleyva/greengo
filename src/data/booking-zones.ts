@@ -20,13 +20,6 @@ const otherHotel = (zoneId: string): BookingHotel => ({
 // Los nombres corrigen únicamente errores ortográficos evidentes del PDF.
 export const BOOKING_ZONES: BookingZone[] = [
   {
-    id: "loc-viaje-prueba",
-    name: "🧪 Viaje de prueba interno (no reservar)",
-    category: "destino",
-    coord: [21.0417, -86.874],
-    hotels: [otherHotel("loc-viaje-prueba")],
-  },
-  {
     id: "loc-aeropuerto",
     name: "Aeropuerto Internacional de Cancún",
     category: "aeropuerto",
@@ -52,28 +45,79 @@ export const BOOKING_ZONES: BookingZone[] = [
     name: "Zona Costa Mujeres",
     category: "hotel",
     coord: [21.2327, -86.8024],
-    hotels: [otherHotel("loc-costa-mujeres")],
+    hotels: [
+      { id: "hotel-grand-palladium-costa-mujeres", name: "Grand Palladium Costa Mujeres Resort & Spa" },
+      { id: "hotel-trs-coral", name: "TRS Coral Hotel" },
+      { id: "hotel-riu-latino", name: "Riu Latino" },
+      { id: "hotel-majestic-mirage-costa-mujeres", name: "Majestic Mirage Costa Mujeres" },
+      { id: "hotel-majestic-elegance-costa-mujeres", name: "Majestic Elegance Costa Mujeres" },
+      { id: "hotel-catalonia-grand-costa-mujeres", name: "Catalonia Grand Costa Mujeres" },
+      { id: "hotel-allure-costa-mujeres", name: "Allure Costa Mujeres" },
+      { id: "hotel-secrets-playa-blanca", name: "Secrets Playa Blanca Costa Mujeres" },
+      { id: "hotel-planet-hollywood-cancun", name: "Planet Hollywood Cancún" },
+      { id: "hotel-riu-dunamar", name: "Riu Dunamar" },
+      { id: "hotel-riu-palace-costa-mujeres", name: "Riu Palace Costa Mujeres" },
+      otherHotel("loc-costa-mujeres"),
+    ],
   },
   {
     id: "loc-playa-mujeres",
     name: "Zona Playa Mujeres",
     category: "hotel",
     coord: [21.2451, -86.8039],
-    hotels: [otherHotel("loc-playa-mujeres")],
+    hotels: [
+      { id: "hotel-beloved-playa-mujeres", name: "Beloved Playa Mujeres" },
+      { id: "hotel-excellence-playa-mujeres", name: "Excellence Playa Mujeres" },
+      { id: "hotel-finest-playa-mujeres", name: "Finest Playa Mujeres" },
+      { id: "hotel-atelier-playa-mujeres", name: "Atelier Playa Mujeres" },
+      { id: "hotel-excellence-coral-playa-mujeres", name: "Excellence Coral Playa Mujeres" },
+      { id: "hotel-dreams-playa-mujeres", name: "Dreams Playa Mujeres Golf & Spa Resort" },
+      { id: "hotel-secrets-playa-mujeres", name: "Secrets Playa Mujeres Golf & Spa Resort" },
+      otherHotel("loc-playa-mujeres"),
+    ],
   },
   {
     id: "loc-bahia-petempich",
     name: "Bahía Petempich",
     category: "hotel",
     coord: [20.9065, -86.8505],
-    hotels: [otherHotel("loc-bahia-petempich")],
+    hotels: [
+      { id: "hotel-desire-riviera-maya", name: "Desire Riviera Maya Resort" },
+      { id: "hotel-margaritaville-riviera-maya", name: "Margaritaville Island Reserve Riviera Maya" },
+      { id: "hotel-margaritaville-riviera-cancun", name: "Margaritaville Island Reserve Riviera Cancún" },
+      { id: "hotel-breathless-riviera-cancun", name: "Breathless Riviera Cancún Resort & Spa" },
+      { id: "hotel-zoetry-paraiso-bonita", name: "Zoëtry Paraíso de la Bonita" },
+      { id: "hotel-sensira-riviera-maya", name: "Sensira Resort & Spa Riviera Maya" },
+      otherHotel("loc-bahia-petempich"),
+    ],
+  },
+  {
+    id: "loc-crococun",
+    name: "Zona CrocoCun",
+    category: "hotel",
+    coord: [20.8481, -86.8757],
+    hotels: [
+      { id: "hotel-excellence-riviera-cancun", name: "Excellence Riviera Cancún" },
+      { id: "hotel-dreams-riviera-cancun-resort-spa", name: "Dreams Riviera Cancún Resort & Spa" },
+      { id: "hotel-desire-riviera-maya-pearl-resort", name: "Desire Riviera Maya Pearl Resort" },
+      { id: "hotel-dreams-sapphire-riviera-cancun", name: "Dreams Sapphire Resort & Spa" },
+      { id: "hotel-ocean-coral-turquesa", name: "Ocean Coral & Turquesa" },
+      otherHotel("loc-crococun"),
+    ],
   },
   {
     id: "loc-puerto-morelos",
-    name: "Zona CrocoCun y Puerto Morelos",
+    name: "Zona Puerto Morelos",
     category: "hotel",
     coord: [20.8481, -86.8757],
-    hotels: [otherHotel("loc-puerto-morelos")],
+    hotels: [
+      { id: "hotel-the-fives-oceanfront-puerto-morelos", name: "The Fives Oceanfront Puerto Morelos" },
+      { id: "hotel-marina-el-cid-spa-beach-resort", name: "Hotel Marina El Cid Spa & Beach Resort" },
+      { id: "hotel-dreams-jade-puerto-morelos", name: "Dreams Jade Resort & Spa" },
+      { id: "hotel-ventus-at-marina-el-cid-spa-beach", name: "Ventus at Marina El Cid Spa & Beach" },
+      { id: "hotel-grand-residences-riviera-cancun", name: "Grand Residences Riviera Cancún" },
+      otherHotel("loc-puerto-morelos"),
+    ],
   },
   {
     id: "loc-zona-2",
@@ -167,6 +211,7 @@ export const BOOKING_ZONES: BookingZone[] = [
 ];
 
 export const BOOKING_ZONE_OPTIONS = BOOKING_ZONES.map(({ id, name }) => ({ id, name }));
+export const HOTEL_BOOKING_ZONES = BOOKING_ZONES.filter((zone) => zone.category !== "aeropuerto");
 
 export function getBookingZone(id: string | null | undefined) {
   return BOOKING_ZONES.find((zone) => zone.id === id);

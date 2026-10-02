@@ -1,6 +1,8 @@
-import { Facebook, Instagram, Mail, Phone } from "lucide-react";
-import { WHATSAPP_DISPLAY } from "@/constants";
+import Link from "next/link";
+import { Mail, Phone } from "lucide-react";
+import { WHATSAPP_DISPLAY, WHATSAPP_PHONE } from "@/constants";
 import { Logo } from "@/components/landing/ui/logo";
+import { DESTINATIONS } from "@/mocks/destinations";
 
 export function LandingFooter() {
   return (
@@ -19,42 +21,39 @@ export function LandingFooter() {
             <h3>Contacto</h3>
             <ul className="mt-3 space-y-2 text-sm text-white/70">
               <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 shrink-0" aria-hidden /> {WHATSAPP_DISPLAY}
+                <Phone className="h-4 w-4 shrink-0" aria-hidden />
+                <a href={`https://wa.me/${WHATSAPP_PHONE}`} target="_blank" rel="noopener noreferrer">{WHATSAPP_DISPLAY}</a>
               </li>
               <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 shrink-0" aria-hidden /> hola@greengotransfers.com
+                <Mail className="h-4 w-4 shrink-0" aria-hidden />
+                <a href="mailto:hola@greengotransfers.com">hola@greengotransfers.com</a>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3>Síguenos</h3>
-            <div className="mt-3 flex items-center gap-3">
-              <a
-                href="#"
-                aria-label="Facebook de GreenGo Transfers Cancún"
-                className="adventure-social"
-              >
-                <Facebook className="h-5 w-5" aria-hidden />
-              </a>
-              <a
-                href="#"
-                aria-label="Instagram de GreenGo Transfers Cancún"
-                className="adventure-social"
-              >
-                <Instagram className="h-5 w-5" aria-hidden />
-              </a>
-            </div>
+            <h3>Destinos</h3>
+            <ul className="mt-3 space-y-2 text-sm text-white/70">
+              {DESTINATIONS.slice(0, 4).map((destination) => (
+                <li key={destination.slug}><Link href={`/destinos/${destination.slug}`}>{destination.name}</Link></li>
+              ))}
+            </ul>
           </div>
 
           <div>
             <h3>Enlaces</h3>
             <ul className="mt-3 space-y-2 text-sm text-white/70">
               <li>
-                <a href="#servicios" className="hover:text-primary">Servicios</a>
+                <a href="/reservar" className="hover:text-primary">Reservar</a>
               </li>
               <li>
-                <a href="#destinos" className="hover:text-primary">Destinos</a>
+                <a href="#como-funciona" className="hover:text-primary">Cómo funciona</a>
+              </li>
+              <li>
+                <a href="#resenas" className="hover:text-primary">Reseñas</a>
+              </li>
+              <li>
+                <a href="#preguntas" className="hover:text-primary">Preguntas frecuentes</a>
               </li>
             </ul>
           </div>

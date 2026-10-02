@@ -33,12 +33,6 @@ export const FAQ_ITEMS: FaqItem[] = [
       "Puedes solicitar silla para bebé o asiento elevador para niños en las notas del formulario de reserva, sujeto a disponibilidad y sin costo adicional.",
   },
   {
-    id: "faq-06",
-    question: "¿Cuánto equipaje puedo llevar en mi traslado?",
-    answer:
-      "Cada pasajero puede llevar una maleta grande y un artículo de mano sin costo extra. Si viajas con equipaje adicional o especial (tablas de surf, equipo de buceo), indícalo en el paso de detalles.",
-  },
-  {
     id: "faq-07",
     question: "¿La tarifa del traslado incluye casetas y estacionamiento?",
     answer:
@@ -48,6 +42,6 @@ export const FAQ_ITEMS: FaqItem[] = [
     id: "faq-08",
     question: "¿Ofrecen transporte privado para grupos en Cancún?",
     answer:
-      "Sí, contamos con unidades tipo van y sprinter para grupos. Selecciona \"Soluciones a medida\" en el formulario y nuestro equipo te contactará con una propuesta personalizada.",
+      "Sí, contamos con unidades tipo van y sprinter para grupos. Selecciona \"Transfer\" y agrega los detalles de tu grupo en las notas para recibir una propuesta personalizada.",
   },
 ];

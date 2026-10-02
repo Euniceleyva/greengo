@@ -11,6 +11,13 @@ export const metadata: Metadata = {
 };
 
 export default function CheckoutPage() {
+  const mercadoPagoEnabled = Boolean(
+    process.env.MERCADO_PAGO_ACCESS_TOKEN && process.env.MERCADO_PAGO_WEBHOOK_SECRET,
+  );
+  const paypalEnabled = Boolean(
+    process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET && process.env.PAYPAL_WEBHOOK_ID,
+  );
+
   return (
     <PublicLanguageProvider>
     <div className="adventure-theme adventure-checkout min-h-screen bg-surface-soft">
@@ -35,7 +42,7 @@ export default function CheckoutPage() {
           </div>
           <span className="adventure-stamp adventure-stamp--passport">CUN<br />PAGO</span>
         </div>
-        <CheckoutClient />
+        <CheckoutClient mercadoPagoEnabled={mercadoPagoEnabled} paypalEnabled={paypalEnabled} />
       </main>
     </div>
     </PublicLanguageProvider>

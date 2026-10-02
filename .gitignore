@@ -25,3 +25,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Original high-resolution photos kept locally; optimized WebP files live in public/images.
+/source-assets/

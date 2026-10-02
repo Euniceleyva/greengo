@@ -22,12 +22,15 @@ export function Step3Contact() {
       contactName: draft.contactName,
       contactEmail: draft.contactEmail,
       contactPhone: draft.contactPhone,
-      hotel: draft.hotel,
     },
   });
 
   const onSubmit = (data: ReservationStep3Values) => {
-    updateDraft({ ...data, hotel: data.hotel ?? "" });
+    updateDraft({
+      contactName: data.contactName,
+      contactEmail: data.contactEmail,
+      contactPhone: data.contactPhone,
+    });
     setStep(4);
   };
 
@@ -37,12 +40,12 @@ export function Step3Contact() {
         <div className="sm:col-span-2">
           <Label htmlFor="contactName">Nombre completo</Label>
           <Input id="contactName" className="mt-1.5" {...register("contactName")} />
-          {errors.contactName && <p className="mt-1.5 text-xs text-destructive">{errors.contactName.message}</p>}
+          {errors.contactName && <p role="alert" className="mt-1.5 text-xs text-destructive">{errors.contactName.message}</p>}
         </div>
         <div>
           <Label htmlFor="contactEmail">Correo electrónico</Label>
           <Input id="contactEmail" type="email" className="mt-1.5" {...register("contactEmail")} />
-          {errors.contactEmail && <p className="mt-1.5 text-xs text-destructive">{errors.contactEmail.message}</p>}
+          {errors.contactEmail && <p role="alert" className="mt-1.5 text-xs text-destructive">{errors.contactEmail.message}</p>}
         </div>
         <div>
           <Label htmlFor="contactPhone">Teléfono con código de país</Label>
@@ -54,11 +57,7 @@ export function Step3Contact() {
             className="mt-1.5"
             {...register("contactPhone")}
           />
-          {errors.contactPhone && <p className="mt-1.5 text-xs text-destructive">{errors.contactPhone.message}</p>}
-        </div>
-        <div className="sm:col-span-2">
-          <Label htmlFor="hotel">Hotel (opcional)</Label>
-          <Input id="hotel" placeholder="Ej. Hotel Riu Cancún" className="mt-1.5" {...register("hotel")} />
+          {errors.contactPhone && <p role="alert" className="mt-1.5 text-xs text-destructive">{errors.contactPhone.message}</p>}
         </div>
       </div>
 

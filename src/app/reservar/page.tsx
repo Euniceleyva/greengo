@@ -27,7 +27,7 @@ export default function ReservarPage() {
       <main className="mx-auto grid max-w-5xl gap-8 px-4 py-10 pb-32 sm:px-6 sm:py-14 sm:pb-32 lg:grid-cols-[260px_1fr]">
         <aside className="adventure-reservation__aside">
           <span>BOARDING PASS</span>
-          <h1>Tu próximo plan empieza aquí.</h1>
+          <h1>Tu próximo viaje empieza aquí.</h1>
           <p>Completa la ruta a tu ritmo. Guardamos los detalles mientras avanzas.</p>
           <div className="adventure-stamp adventure-stamp--sun">CUN<br />READY</div>
         </aside>

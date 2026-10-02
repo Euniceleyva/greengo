@@ -12,6 +12,8 @@ const ES_TO_EN: Record<string, string> = {
   "Servicios": "Services",
   "Destinos": "Destinations",
   "Cómo funciona": "How it works",
+  "Reseñas": "Reviews",
+  "Preguntas": "Questions",
   "Contacto": "Contact",
   "Reservar": "Book now",
   "Reservar ahora": "Book now",
@@ -35,6 +37,26 @@ const ES_TO_EN: Record<string, string> = {
   "Desde": "From",
   "Hotel de origen": "Pickup hotel",
   "Hotel de destino": "Destination hotel",
+  "Hotel o alojamiento": "Hotel or accommodation",
+  "Nombre del hotel o alojamiento": "Hotel or accommodation name",
+  "Selecciona un hotel": "Select a hotel",
+  "Escribe el nombre del alojamiento": "Enter the accommodation name",
+  "Otro hotel o alojamiento de esta zona": "Another hotel or accommodation in this area",
+  "Aeropuerto Internacional de Cancún": "Cancún International Airport",
+  "Cancún centro y Zona Hotelera": "Downtown Cancún and Hotel Zone",
+  "Ferry Puerto Juárez y Punta Sam": "Puerto Juárez and Punta Sam ferry terminals",
+  "Zona Costa Mujeres": "Costa Mujeres area",
+  "Zona Playa Mujeres": "Playa Mujeres area",
+  "Bahía Petempich": "Petempich Bay",
+  "Zona CrocoCun": "CrocoCun area",
+  "Zona Puerto Morelos": "Puerto Morelos area",
+  "Zona 2 · Riviera Maya": "Zone 2 · Riviera Maya",
+  "Riviera Maya Norte · Mayakoba y Xcalacoco": "Northern Riviera Maya · Mayakoba and Xcalacoco",
+  "Playa del Carmen centro y Playacar": "Downtown Playa del Carmen and Playacar",
+  "Zona Xcaret": "Xcaret area",
+  "Zona Puerto Aventuras y Kantenah": "Puerto Aventuras and Kantenah area",
+  "Zona Akumal": "Akumal area",
+  "Tulum centro y Zona Hotelera": "Downtown Tulum and Hotel Zone",
   "Hotel a hotel": "Hotel to hotel",
   "Hotel a aeropuerto": "Hotel to airport",
   "Aeropuerto a hotel": "Airport to hotel",
@@ -49,7 +71,10 @@ const ES_TO_EN: Record<string, string> = {
   "Pasajeros": "Passengers",
   "Ver precio de mi ruta": "See my route price",
   "Continuar a reservar": "Continue to booking",
-  "Estimado ilustrativo, sujeto a confirmación en tu reservación.": "Illustrative estimate, subject to confirmation when booking.",
+  "Tarifa vigente para tu ruta": "Current fare for your route",
+  "Precio calculado según ruta, horario y pasajeros. El servidor lo verificará antes del pago.": "Price calculated from your route, time and passenger count. The server will verify it before payment.",
+  "Cotización personalizada": "Custom quote",
+  "Enviaremos la ruta al equipo sin realizar ningún cobro. Te confirmaremos la tarifa por WhatsApp.": "We’ll send the route to our team without charging you. We’ll confirm the fare by WhatsApp.",
   "La ventana ya es parte del viaje.": "The view is already part of the trip.",
   "Mar turquesa, selva y carretera. Estos son algunos de los paisajes que empiezan antes de llegar.": "Turquoise water, jungle and open road. The scenery starts long before you arrive.",
   "Vistas reales de nuestras rutas favoritas.": "Real views from our favorite routes.",
@@ -86,6 +111,14 @@ const ES_TO_EN: Record<string, string> = {
   "Antes de subir, despeja la ruta.": "Clear up the details before you ride.",
   "Equipaje, vuelos, horarios y cambios: aquí están las respuestas rápidas.": "Luggage, flights, schedules and changes: find the quick answers here.",
   "Preguntas frecuentes": "Frequently asked questions",
+  "7 preguntas": "7 questions",
+  "Respuestas claras antes de viajar.": "Clear answers before you travel.",
+  "Reservas, vuelos, pagos y cambios: lo esencial antes de confirmar tu traslado.": "Bookings, flights, payments and changes: the essentials before confirming your transfer.",
+  "Respuestas para tu ruta": "Answers for your route",
+  "CUN / AYUDA 001": "CUN / HELP 001",
+  "¿No encontraste tu respuesta?": "Still have a question?",
+  "Escríbenos por WhatsApp": "Message us on WhatsApp",
+  "Galería continua de experiencias GreenGo": "Continuous gallery of GreenGo experiences",
   "¿Cómo reservo un traslado?": "How do I book a transfer?",
   "¿Qué pasa si mi vuelo se retrasa?": "What happens if my flight is delayed?",
   "¿Puedo cancelar o cambiar mi reservación?": "Can I cancel or change my booking?",
@@ -106,6 +139,7 @@ const ES_TO_EN: Record<string, string> = {
   "Enlaces": "Links",
   "Traslados turísticos en Cancún y la Riviera Maya.": "Tourist transfers in Cancún and the Riviera Maya.",
   "Tu próximo plan empieza aquí.": "Your next plan starts here.",
+  "Tu próximo viaje empieza aquí.": "Your next trip starts here.",
   "Completa la ruta a tu ritmo. Guardamos los detalles mientras avanzas.": "Complete the route at your pace. We save the details as you go.",
   "Elige tu servicio": "Choose your service",
   "Detalles del viaje": "Trip details",
@@ -135,8 +169,44 @@ const ES_TO_EN: Record<string, string> = {
   "Tarifa base (hasta 4 pasajeros)": "Base fare (up to 4 passengers)",
   "Total estimado": "Estimated total",
   "Continuar al pago": "Continue to payment",
+  "Enviar solicitud": "Send request",
+  "Fecha de regreso": "Return date",
+  "Hora de regreso": "Return time",
+  "Camionetas requeridas": "Vehicles required",
+  "Vuelo": "Flight",
+  "Hotel": "Hotel",
+  "Estado": "Status",
+  "Importe": "Amount",
+  "Ruta": "Route",
+  "Progreso de la reservación": "Booking progress",
+  "Pasarelas de pago": "Payment providers",
+  "El origen o el destino debe ser el Aeropuerto de Cancún": "Either the origin or destination must be Cancún Airport",
+  "Selecciona dos zonas de hotel para este servicio": "Select two hotel areas for this service",
+  "Si regresas el mismo día, la hora de regreso debe ser posterior a la salida": "For a same-day return, the return time must be later than departure",
+  "El número de vuelo es demasiado largo": "The flight number is too long",
+  "Las notas no pueden superar 1000 caracteres": "Notes cannot exceed 1,000 characters",
+  "El pago en línea no está disponible temporalmente. Tu reservación permanece registrada y el equipo te contactará.": "Online payment is temporarily unavailable. Your booking remains saved and our team will contact you.",
+  "Selecciona la fecha de regreso": "Select the return date",
+  "Selecciona la hora de regreso": "Select the return time",
+  "El regreso no puede ser anterior a la salida": "The return cannot be earlier than departure",
+  "Selecciona una fecha de hoy en adelante": "Select today or a future date",
+  "Mínimo 1 pasajero": "At least one passenger is required",
+  "Máximo 60 pasajeros": "Maximum 60 passengers",
+  "Cantidad inválida": "Invalid quantity",
+  "Ingresa tu nombre completo": "Enter your full name",
+  "Ingresa un correo válido": "Enter a valid email",
+  "Ingresa un teléfono válido": "Enter a valid phone number",
+  "El teléfono es demasiado largo": "The phone number is too long",
+  "Usa únicamente números y el código de país": "Use only numbers and the country code",
+  "El origen y el destino no pueden ser iguales": "Origin and destination cannot be the same",
+  "Selecciona una ubicación disponible": "Select an available location",
+  "Ej. AM-482": "E.g. AM-482",
+  "Silla para bebé, equipaje especial, etc.": "Child seat, special luggage, etc.",
   "Registrando…": "Saving…",
   "Validación de tarifa": "Fare validation",
+  "Tarifa de tu ruta": "Your route fare",
+  "Tarifa calculada con el tarifario vigente según ruta, horario y número de pasajeros.": "Fare calculated from the current rate card based on route, time and passenger count.",
+  "Esta ruta requiere atención personalizada. Registraremos la solicitud sin cobrar y el equipo te confirmará la tarifa por WhatsApp.": "This route requires personal assistance. We’ll save the request without charging you and confirm the fare by WhatsApp.",
   "Al continuar, validaremos la ruta contra las tarifas aprobadas por GreenGo. Si todavía no existe una tarifa para este recorrido, quedará como solicitud de cotización y el equipo se pondrá en contacto contigo.": "When you continue, we’ll validate the route against GreenGo’s approved fares. If this route does not have an approved fare yet, it will be saved as a quote request and our team will contact you.",
   "Importe final": "Final amount",
   "Se confirma en el siguiente paso": "Confirmed in the next step",
@@ -270,8 +340,11 @@ const ES_TO_EN: Record<string, string> = {
   "sin sorpresas.": "no surprises.",
   "Traslados privados en Cancún, sin esperas ni sorpresas": "Private transfers in Cancún, no waiting or surprises",
   "Aterriza. Sube. Disfruta.": "Land. Hop in. Enjoy.",
+  "Aborda. Viaja. Disfruta.": "Board. Ride. Enjoy.",
   "ATERRIZA.": "LAND.",
   "SUBE.": "HOP IN.",
+  "ABORDA.": "BOARD.",
+  "VIAJA.": "RIDE.",
   "DISFRUTA.": "ENJOY.",
   "Reserva transporte privado desde el Aeropuerto de Cancún hacia tu hotel, parque, playa o experiencia en la Riviera Maya. Viaja cómodo, seguro y sin esperas innecesarias.": "Book private transportation from Cancún Airport to your hotel, park, beach or Riviera Maya experience. Travel comfortably, safely and without unnecessary waits.",
   "Reserva transporte privado desde el Aeropuerto de Cancún hacia tu hotel, tour o destino en la Riviera Maya. Seguimos tu vuelo, cuidamos tu equipaje y te mostramos la tarifa antes de confirmar.": "Book private transportation from Cancún Airport to your hotel, tour or Riviera Maya destination. We track your flight, take care of your luggage and show you the fare before confirming.",
@@ -324,6 +397,7 @@ const ES_TO_EN: Record<string, string> = {
   "Seguimiento de vuelo para ajustar tu pickup": "Flight tracking to adjust your pickup",
   "Conductores locales para rutas en Riviera Maya": "Local drivers for Riviera Maya routes",
   "Vehículos privados, limpios y verificados": "Private, clean and checked vehicles",
+  "Unidades privadas, limpias y verificadas": "Private, clean and checked vehicles",
   "Tarifa clara antes de confirmar tu reserva": "Clear fare before confirming your booking",
   "Atención por WhatsApp antes y durante el traslado": "WhatsApp support before and during the transfer",
   "Seguro de pasajero incluido": "Passenger insurance included",
@@ -351,10 +425,13 @@ const ES_TO_EN: Record<string, string> = {
   "Confirma con tarifa clara": "Confirm with a clear fare",
   "Revisa los detalles del servicio antes de reservar y evita sorpresas al llegar a Cancún.": "Review the service details before booking and avoid surprises when you arrive in Cancún.",
   "Tu conductor te espera": "Your driver waits for you",
+  "Disfruta el trayecto": "Enjoy the ride",
   "Te recibimos en el aeropuerto, hotel o punto acordado, con seguimiento de vuelo cuando aplica.": "We meet you at the airport, hotel or agreed point, with flight tracking when applicable.",
   "Reserva en línea": "Book online",
   "Cómo reservar tu traslado privado en Cancún.": "How to book your private transfer in Cancún.",
   "Un proceso simple para viajar del Aeropuerto de Cancún a tu hotel, tour o destino con conductor asignado y soporte por WhatsApp.": "A simple process to travel from Cancún Airport to your hotel, tour or destination with an assigned driver and WhatsApp support.",
+  "¿Por qué viajar con nosotros?": "Why travel with us?",
+  "Tarifa nocturna aplicada (10:00 p. m.–5:00 a. m.).": "Night fare applied (10:00 p.m.–5:00 a.m.).",
   "Traslados privados que viajeros y grupos eligen en Cancún.": "Private transfers travelers and groups choose in Cancún.",
   "Rutas frecuentes al aeropuerto, hoteles, parques y destinos de la Riviera Maya con atención clara desde la reserva.": "Frequent routes to the airport, hotels, parks and Riviera Maya destinations with clear support from booking.",
   "Preguntas frecuentes sobre traslados privados en Cancún.": "Frequently asked questions about private transfers in Cancún.",
@@ -392,6 +469,7 @@ const ES_TO_EN: Record<string, string> = {
   "¿Cuánto equipaje puedo llevar en mi traslado?": "How much luggage can I bring on my transfer?",
   "¿La tarifa del traslado incluye casetas y estacionamiento?": "Does the transfer fare include tolls and parking?",
   "¿Ofrecen transporte privado para grupos en Cancún?": "Do you offer private transportation for groups in Cancún?",
+  "Sí, contamos con unidades tipo van y sprinter para grupos. Selecciona \"Transfer\" y agrega los detalles de tu grupo en las notas para recibir una propuesta personalizada.": "Yes, we have vans and Sprinters for groups. Select \"Transfer\" and add your group details in the notes to receive a personalized proposal.",
   "Revisa la tarifa antes de pagar, comparte tus datos de contacto y recibe los detalles del servicio.": "Review the fare before paying, share your contact details and receive the service information.",
   "Tu conductor te espera en el punto acordado, con seguimiento de vuelo cuando aplica.": "Your driver waits at the agreed pickup point, with flight tracking when applicable.",
   "Un proceso claro para llegar del Aeropuerto de Cancún a tu hotel o destino con tarifa visible, conductor asignado y soporte por WhatsApp.": "A clear process to get from Cancún Airport to your hotel or destination with a visible fare, assigned driver and WhatsApp support.",
@@ -416,6 +494,9 @@ const ES_TO_EN: Record<string, string> = {
   "Ver todos los destinos": "See all destinations",
   "Ver detalle de servicios": "See service details",
   "Abrir WhatsApp": "Open WhatsApp",
+  "Continuar por WhatsApp": "Continue on WhatsApp",
+  "Ayuda": "Help",
+  "Cerrar": "Close",
   "Volver al inicio del chat": "Back to chat start",
 };
 
@@ -438,11 +519,15 @@ function translateValue(value: string, language: PublicLanguage) {
   if (!translated && language === "en") {
     if (clean.startsWith("Pagar ")) translated = clean.replace(/^Pagar /, "Pay ");
     else if (clean.startsWith("Desde ")) translated = clean.replace(/^Desde /, "From ");
+    else if (clean.startsWith("Hotel o alojamiento en ")) translated = clean.replace(/^Hotel o alojamiento en /, "Hotel or accommodation in ");
+    else if (clean.startsWith("Selecciona el hotel o alojamiento de ")) translated = clean.replace(/^Selecciona el hotel o alojamiento de /, "Select the hotel or accommodation in ");
     else if (clean.endsWith(" min desde el aeropuerto")) translated = clean.replace(" min desde el aeropuerto", " min from the airport");
   }
   if (!translated && language === "es") {
     if (clean.startsWith("Pay ")) translated = clean.replace(/^Pay /, "Pagar ");
     else if (clean.startsWith("From ")) translated = clean.replace(/^From /, "Desde ");
+    else if (clean.startsWith("Hotel or accommodation in ")) translated = clean.replace(/^Hotel or accommodation in /, "Hotel o alojamiento en ");
+    else if (clean.startsWith("Select the hotel or accommodation in ")) translated = clean.replace(/^Select the hotel or accommodation in /, "Selecciona el hotel o alojamiento de ");
     else if (clean.endsWith(" min from the airport")) translated = clean.replace(" min from the airport", " min desde el aeropuerto");
   }
   return translated ? `${leading}${translated}${trailing}` : value;
@@ -462,8 +547,8 @@ function translateRoot(root: ParentNode, language: PublicLanguage) {
     node = walker.nextNode();
   }
 
-  root.querySelectorAll<HTMLElement>("[placeholder], [aria-label], [title]").forEach((element) => {
-    ["placeholder", "aria-label", "title"].forEach((attribute) => {
+  root.querySelectorAll<HTMLElement>("[placeholder], [aria-label], [title], [alt]").forEach((element) => {
+    ["placeholder", "aria-label", "title", "alt"].forEach((attribute) => {
       const value = element.getAttribute(attribute);
       if (value) element.setAttribute(attribute, translateValue(value, language));
     });

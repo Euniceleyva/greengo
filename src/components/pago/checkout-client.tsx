@@ -6,13 +6,19 @@ import { Clock3, CreditCard, Loader2, LockKeyhole, WalletCards } from "lucide-re
 import { useReservationStore } from "@/stores/reservation-store";
 import { useHydrated } from "@/lib/hooks";
 import { LOCATIONS } from "@/mocks/locations";
-import { SERVICE_TYPE_LABELS } from "@/constants";
+import { PUBLIC_SERVICE_TYPE_LABELS } from "@/constants";
 import { LocalizedCurrency } from "@/components/shared/public-language";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/misc";
 
-export function CheckoutClient() {
+export function CheckoutClient({
+  mercadoPagoEnabled,
+  paypalEnabled,
+}: {
+  mercadoPagoEnabled: boolean;
+  paypalEnabled: boolean;
+}) {
   const hydrated = useHydrated();
   const draft = useReservationStore((state) => state.draft);
   const receipt = useReservationStore((state) => state.reservationReceipt);
@@ -90,7 +96,7 @@ export function CheckoutClient() {
           <strong>{receipt.folio}</strong>
         </div>
         <dl className="adventure-checkout-summary mt-6">
-          <SummaryRow label="Servicio" value={SERVICE_TYPE_LABELS[draft.serviceType]} />
+          <SummaryRow label="Servicio" value={PUBLIC_SERVICE_TYPE_LABELS[draft.serviceType]} />
           <SummaryRow label="Ruta" value={`${origin?.name ?? "—"} → ${destination?.name ?? "—"}`} />
           <SummaryRow label="Fecha y hora" value={`${draft.date} · ${draft.time}`} />
           <SummaryRow label="Pasajeros" value={String(draft.passengers)} />
@@ -124,30 +130,39 @@ export function CheckoutClient() {
         )}
 
         <div className="adventure-payment-methods adventure-payment-methods--providers mt-6" aria-label="Pasarelas de pago">
-          <button
-            type="button"
-            className="adventure-payment-method"
-            onClick={() => openCheckout("mercado-pago")}
-            disabled={Boolean(processing) || receipt.requiresQuote}
-          >
-            {processing === "mercado-pago" ? <Loader2 className="animate-spin" aria-hidden /> : <CreditCard aria-hidden />}
-            <span className="text-left">
-              <strong className="block">Mercado Pago</strong>
-              <small className="block font-medium">Visa, Mastercard, American Express, OXXO y SPEI</small>
-            </span>
-          </button>
-          <button
-            type="button"
-            className="adventure-payment-method"
-            onClick={() => openCheckout("paypal")}
-            disabled={Boolean(processing) || receipt.requiresQuote}
-          >
-            {processing === "paypal" ? <Loader2 className="animate-spin" aria-hidden /> : <WalletCards aria-hidden />}
-            <span className="text-left">
-              <strong className="block">PayPal</strong>
-              <small className="block font-medium">Saldo PayPal y opciones habilitadas en tu cuenta</small>
-            </span>
-          </button>
+          {mercadoPagoEnabled && (
+            <button
+              type="button"
+              className="adventure-payment-method"
+              onClick={() => openCheckout("mercado-pago")}
+              disabled={Boolean(processing) || receipt.requiresQuote}
+            >
+              {processing === "mercado-pago" ? <Loader2 className="animate-spin" aria-hidden /> : <CreditCard aria-hidden />}
+              <span className="text-left">
+                <strong className="block">Mercado Pago</strong>
+                <small className="block font-medium">Visa, Mastercard, American Express, OXXO y SPEI</small>
+              </span>
+            </button>
+          )}
+          {paypalEnabled && (
+            <button
+              type="button"
+              className="adventure-payment-method"
+              onClick={() => openCheckout("paypal")}
+              disabled={Boolean(processing) || receipt.requiresQuote}
+            >
+              {processing === "paypal" ? <Loader2 className="animate-spin" aria-hidden /> : <WalletCards aria-hidden />}
+              <span className="text-left">
+                <strong className="block">PayPal</strong>
+                <small className="block font-medium">Saldo PayPal y opciones habilitadas en tu cuenta</small>
+              </span>
+            </button>
+          )}
+          {!mercadoPagoEnabled && !paypalEnabled && !receipt.requiresQuote && (
+            <div className="adventure-payment-note" role="status">
+              El pago en línea no está disponible temporalmente. Tu reservación permanece registrada y el equipo te contactará.
+            </div>
+          )}
         </div>
 
         <div className="adventure-payment-action mt-7">

@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { useReservationStore } from "@/stores/reservation-store";
 import { getBookingZone } from "@/data/booking-zones";
-import { SERVICE_TYPE_LABELS } from "@/constants";
+import { PUBLIC_SERVICE_TYPE_LABELS } from "@/constants";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/misc";
+import { LocalizedCurrency } from "@/components/shared/public-language";
+import { getPublicFareQuote } from "@/lib/public-fares";
 
 export function Step4Summary() {
   const router = useRouter();
@@ -23,6 +25,16 @@ export function Step4Summary() {
   const origin = getBookingZone(draft.originLocationId);
   const destination = getBookingZone(draft.destinationLocationId);
   const serviceType = draft.serviceType ?? "aeropuerto";
+  const fare = serviceType === "aeropuerto"
+    ? getPublicFareQuote({
+        originLocationId: draft.originLocationId ?? "",
+        destinationLocationId: draft.destinationLocationId ?? "",
+        passengers: draft.passengers,
+        time: draft.time,
+        direction: draft.direction,
+        returnTime: draft.returnTime,
+      })
+    : null;
 
   const onContinue = async () => {
     if (reservationReceipt) {
@@ -62,7 +74,7 @@ export function Step4Summary() {
       <div className="adventure-summary-card rounded-xl border border-border bg-surface-soft p-5">
         <h3 className="font-heading text-sm font-semibold text-foreground">Resumen del viaje</h3>
         <dl className="mt-3 grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
-          <SummaryRow label="Servicio" value={SERVICE_TYPE_LABELS[serviceType]} />
+          <SummaryRow label="Servicio" value={PUBLIC_SERVICE_TYPE_LABELS[serviceType]} />
           <SummaryRow label="Sentido" value={draft.direction === "redondo" ? "Redondo" : "Sencillo"} />
           <SummaryRow label="Origen" value={origin?.name ?? "—"} />
           {draft.originHotelId && <SummaryRow label="Hotel de origen" value={selectedHotelName(origin, draft.originHotelId, draft.originHotelName)} />}
@@ -93,15 +105,30 @@ export function Step4Summary() {
       </div>
 
       <div className="adventure-fare-card mt-6 rounded-xl border border-border p-5">
-        <h3 className="font-heading text-sm font-semibold text-foreground">Validación de tarifa</h3>
-        <p className="mt-3 text-sm text-muted-foreground">
-          Al continuar, validaremos la ruta contra las tarifas aprobadas por GreenGo. Si todavía no existe una tarifa
-          para este recorrido, quedará como solicitud de cotización y el equipo se pondrá en contacto contigo.
-        </p>
+        <h3 className="font-heading text-sm font-semibold text-foreground">
+          {fare ? "Tarifa de tu ruta" : "Solicitud de cotización"}
+        </h3>
+        {fare ? (
+          <div className="mt-3 space-y-2 text-sm text-muted-foreground">
+            <p>Tarifa calculada con el tarifario vigente según ruta, horario y número de pasajeros.</p>
+            <p>
+              {fare.vehicleCount} {fare.vehicleCount === 1 ? "camioneta" : "camionetas"} · hasta 8 pasajeros por unidad
+            </p>
+            {(fare.departure.isNight || fare.returnLeg?.isNight) && (
+              <p className="font-bold text-foreground">Tarifa nocturna aplicada (10:00 p. m.–5:00 a. m.).</p>
+            )}
+          </div>
+        ) : (
+          <p className="mt-3 text-sm text-muted-foreground">
+            Esta ruta requiere atención personalizada. Registraremos la solicitud sin cobrar y el equipo te confirmará la tarifa por WhatsApp.
+          </p>
+        )}
         <Separator className="my-4" />
         <div className="adventure-fare-total flex items-center justify-between">
-          <span className="font-heading text-base font-semibold text-foreground">Importe final</span>
-          <span className="font-heading text-base font-bold text-primary">Se confirma en el siguiente paso</span>
+          <span className="font-heading text-base font-semibold text-foreground">{fare ? "Total" : "Estado"}</span>
+          <span className="font-heading text-base font-bold text-primary">
+            {fare ? <LocalizedCurrency amount={fare.total} sourceCurrency={fare.currency} /> : "Por cotizar"}
+          </span>
         </div>
       </div>
 
@@ -111,7 +138,7 @@ export function Step4Summary() {
         </Button>
         <Button type="button" onClick={onContinue} disabled={isSubmitting}>
           {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
-          {isSubmitting ? "Registrando…" : "Continuar al pago"}
+          {isSubmitting ? "Registrando…" : fare ? "Continuar al pago" : "Enviar solicitud"}
         </Button>
       </div>
       {submitError && (

@@ -4,7 +4,7 @@ import { SERVICE_TYPE_LABELS } from "@/constants";
 
 export function LandingTestimonials() {
   return (
-    <section data-adventure-reveal className="adventure-testimonials px-4 py-20 sm:px-6 sm:py-28 lg:px-10">
+    <section id="resenas" data-adventure-reveal className="adventure-testimonials scroll-mt-20 px-4 py-20 sm:px-6 sm:py-28 lg:px-10">
       <div className="mx-auto max-w-[1280px]">
       <div className="adventure-testimonials__heading">
         <h2 data-reveal-item>Traslados privados que viajeros y grupos eligen en Cancún.</h2>

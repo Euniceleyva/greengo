@@ -34,6 +34,15 @@ export const SERVICE_TYPE_LABELS: Record<ServiceType, string> = {
   a_medida: "Solución a medida",
 };
 
+// Etiquetas simplificadas para las superficies públicas. Los valores internos
+// se conservan para mantener compatibilidad con tarifas y reservaciones.
+export const PUBLIC_SERVICE_TYPE_LABELS: Record<ServiceType, string> = {
+  aeropuerto: "Aeropuerto / hotel",
+  hotel_hotel: "Hotel a hotel",
+  transporte_abierto: "Transfer",
+  a_medida: "Tour",
+};
+
 export const TRIP_STATUS_LABELS: Record<TripStatus, string> = {
   pendiente: "Pendiente",
   asignado: "Asignado",

@@ -6,19 +6,12 @@ import { ArrowRight, MapPin, Search } from "lucide-react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { Button } from "@/components/ui/button";
-import { Select, Label } from "@/components/ui/input";
-import { Combobox } from "@/components/ui/combobox";
-import { HOTELS } from "@/mocks/hotels";
-import { AIRPORTS } from "@/mocks/airports";
+import { Input, Select, Label } from "@/components/ui/input";
 import { TOUR_DESTINATIONS } from "@/mocks/tour-destinations";
-import {
-  estimateHeroQuote,
-  heroDestinationLocationId,
-  heroOriginLocationId,
-  transferKindToServiceType,
-} from "@/mocks/hero-quote";
+import { HOTEL_BOOKING_ZONES, getBookingZone, isCustomHotelId } from "@/data/booking-zones";
+import { getCancunToday, getPublicFareQuote, type PublicFareQuote } from "@/lib/public-fares";
 import { LocalizedCurrency } from "@/components/shared/public-language";
-import type { HeroQuoteEstimate, TourOrigin, TransferKind } from "@/types";
+import type { ServiceType, TourOrigin, TransferKind } from "@/types";
 
 gsap.registerPlugin(useGSAP);
 
@@ -30,96 +23,125 @@ const TRANSFER_KIND_LABELS: Record<TransferKind, string> = {
 };
 
 const HERO_ROUTE_PATH = "M24 188C120 80 207 238 302 129C387 31 459 170 628 48";
+const AIRPORT_LOCATION_ID = "loc-aeropuerto";
+
+const TOUR_DESTINATION_TO_LOCATION_ID: Record<string, string> = {
+  "tour-tulum": "loc-tulum",
+  "tour-puerto-morelos": "loc-puerto-morelos",
+  "tour-playa-del-carmen-ferry-to-cozumel": "loc-playa-carmen",
+  "tour-ferry-to-isla-mujeres": "loc-puerto-juarez",
+  "tour-cancun": "loc-zona-hotelera",
+};
 
 export function LandingHero() {
   const router = useRouter();
   const heroRef = React.useRef<HTMLElement>(null);
 
-  const [transferKind, setTransferKind] = React.useState<TransferKind>("hotel_hotel");
-  const [originHotelId, setOriginHotelId] = React.useState(HOTELS[0].id);
-  const [destinationHotelId, setDestinationHotelId] = React.useState(HOTELS[1].id);
-  const [hotelId, setHotelId] = React.useState(HOTELS[0].id);
-  const [airportId, setAirportId] = React.useState(AIRPORTS[0].id);
+  const [transferKind, setTransferKind] = React.useState<TransferKind>("aeropuerto_hotel");
+  const [originZoneId, setOriginZoneId] = React.useState("loc-zona-hotelera");
+  const [destinationZoneId, setDestinationZoneId] = React.useState("loc-puerto-morelos");
+  const [originHotelId, setOriginHotelId] = React.useState("");
+  const [destinationHotelId, setDestinationHotelId] = React.useState("");
+  const [originHotelName, setOriginHotelName] = React.useState("");
+  const [destinationHotelName, setDestinationHotelName] = React.useState("");
   const [tourOrigin, setTourOrigin] = React.useState<TourOrigin>("aeropuerto");
   const [tourDestinationId, setTourDestinationId] = React.useState(TOUR_DESTINATIONS[0].id);
   const [date, setDate] = React.useState("");
   const [time, setTime] = React.useState("");
   const [passengers, setPassengers] = React.useState(2);
-  const [estimate, setEstimate] = React.useState<HeroQuoteEstimate | null>(null);
-  const [sameHotelError, setSameHotelError] = React.useState(false);
+  const [quote, setQuote] = React.useState<PublicFareQuote | "custom" | null>(null);
+  const [routeError, setRouteError] = React.useState("");
+  const [canPlayVideo, setCanPlayVideo] = React.useState(false);
+  const today = React.useMemo(() => getCancunToday(), []);
 
   // Cualquier cambio en las opciones invalida el estimado ya mostrado.
   React.useEffect(() => {
-    setEstimate(null);
-  }, [transferKind, originHotelId, destinationHotelId, hotelId, airportId, tourOrigin, tourDestinationId, date, time, passengers]);
+    setQuote(null);
+    setRouteError("");
+  }, [transferKind, originZoneId, destinationZoneId, originHotelId, destinationHotelId, originHotelName, destinationHotelName, tourOrigin, tourDestinationId, date, time, passengers]);
+
+  React.useEffect(() => {
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    const media = window.matchMedia("(min-width: 768px) and (prefers-reduced-motion: no-preference)");
+    const update = () => setCanPlayVideo(media.matches && !connection?.saveData);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
 
   const tourDestination = TOUR_DESTINATIONS.find((d) => d.id === tourDestinationId);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const needsOriginHotel = transferKind === "hotel_hotel" || transferKind === "hotel_aeropuerto" || (transferKind === "tour" && tourOrigin === "hotel");
+    const needsDestinationHotel = transferKind === "hotel_hotel" || transferKind === "aeropuerto_hotel";
 
-    if (transferKind === "hotel_hotel" && originHotelId === destinationHotelId) {
-      setSameHotelError(true);
+    if (needsOriginHotel && !isHeroHotelComplete(originZoneId, originHotelId, originHotelName)) {
+      setRouteError("Selecciona el hotel o escribe el nombre del alojamiento de origen.");
       return;
     }
-    setSameHotelError(false);
+    if (needsDestinationHotel && !isHeroHotelComplete(destinationZoneId, destinationHotelId, destinationHotelName)) {
+      setRouteError("Selecciona el hotel o escribe el nombre del alojamiento de destino.");
+      return;
+    }
+    if (transferKind === "hotel_hotel" && originZoneId === destinationZoneId && originHotelId === destinationHotelId && originHotelName === destinationHotelName) {
+      setRouteError("El hotel de origen y destino deben ser distintos.");
+      return;
+    }
 
-    const result = estimateHeroQuote({
-      kind: transferKind,
-      passengers,
-      time,
-      airportId:
-        transferKind === "hotel_aeropuerto" || transferKind === "aeropuerto_hotel"
-          ? airportId
-          : transferKind === "tour" && tourOrigin === "aeropuerto"
-            ? airportId
-            : undefined,
-      tourDestination: transferKind === "tour" ? tourDestination : undefined,
-    });
-    setEstimate(result);
+    setRouteError("");
+    if (transferKind === "aeropuerto_hotel" || transferKind === "hotel_aeropuerto") {
+      const result = getPublicFareQuote({
+        originLocationId: transferKind === "aeropuerto_hotel" ? AIRPORT_LOCATION_ID : originZoneId,
+        destinationLocationId: transferKind === "aeropuerto_hotel" ? destinationZoneId : AIRPORT_LOCATION_ID,
+        passengers,
+        time,
+      });
+      setQuote(result ?? "custom");
+      return;
+    }
+    setQuote("custom");
   };
 
   const onContinue = () => {
-    const serviceType = transferKindToServiceType(transferKind);
-    const originLocationId = heroOriginLocationId(transferKind, tourOrigin);
-    const destinationLocationId = heroDestinationLocationId(transferKind, tourDestinationId);
-
-    let hotelLabel = "";
+    const serviceType: ServiceType = transferKind === "hotel_hotel"
+      ? "hotel_hotel"
+      : transferKind === "tour"
+        ? "a_medida"
+        : "aeropuerto";
+    const originLocationId = transferKind === "aeropuerto_hotel" || (transferKind === "tour" && tourOrigin === "aeropuerto")
+      ? AIRPORT_LOCATION_ID
+      : originZoneId;
+    const destinationLocationId = transferKind === "hotel_aeropuerto"
+      ? AIRPORT_LOCATION_ID
+      : transferKind === "tour"
+        ? TOUR_DESTINATION_TO_LOCATION_ID[tourDestinationId] ?? "loc-xcaret"
+        : destinationZoneId;
     let notes = "";
-
-    if (transferKind === "hotel_hotel") {
-      const origin = HOTELS.find((h) => h.id === originHotelId);
-      const destination = HOTELS.find((h) => h.id === destinationHotelId);
-      hotelLabel = origin?.name ?? "";
-      notes = `Traslado hotel a hotel: ${origin?.name ?? "—"} → ${destination?.name ?? "—"}.`;
-    } else if (transferKind === "hotel_aeropuerto") {
-      const hotel = HOTELS.find((h) => h.id === hotelId);
-      const airport = AIRPORTS.find((a) => a.id === airportId);
-      hotelLabel = hotel?.name ?? "";
-      notes = `Traslado hotel a aeropuerto: ${hotel?.name ?? "—"} → ${airport?.name ?? "—"}.`;
-    } else if (transferKind === "aeropuerto_hotel") {
-      const hotel = HOTELS.find((h) => h.id === hotelId);
-      const airport = AIRPORTS.find((a) => a.id === airportId);
-      hotelLabel = hotel?.name ?? "";
-      notes = `Traslado aeropuerto a hotel: ${airport?.name ?? "—"} → ${hotel?.name ?? "—"}.`;
-    } else {
-      const originLabel =
-        tourOrigin === "aeropuerto"
-          ? AIRPORTS.find((a) => a.id === airportId)?.name
-          : HOTELS.find((h) => h.id === hotelId)?.name;
-      if (tourOrigin === "hotel") hotelLabel = HOTELS.find((h) => h.id === hotelId)?.name ?? "";
-      notes = `Tour a ${tourDestination?.name ?? "—"}, salida desde ${originLabel ?? "—"}.`;
-    }
+    if (transferKind === "tour") notes = `Tour a ${tourDestination?.name ?? "—"}.`;
 
     const params = new URLSearchParams({
       origin: originLocationId,
       destination: destinationLocationId,
       passengers: String(passengers),
       serviceType,
+      direction: "sencillo",
+      fromQuote: "1",
     });
     if (date) params.set("date", date);
     if (time) params.set("time", time);
-    if (hotelLabel) params.set("hotel", hotelLabel);
+    if (originLocationId !== AIRPORT_LOCATION_ID) {
+      params.set("originHotelId", originHotelId);
+      if (originHotelName) params.set("originHotelName", originHotelName);
+    }
+    if (destinationLocationId !== AIRPORT_LOCATION_ID) {
+      params.set(
+        "destinationHotelId",
+        transferKind === "tour" ? `${destinationLocationId}-otro` : destinationHotelId,
+      );
+      const resolvedDestinationName = transferKind === "tour" ? tourDestination?.name ?? "Destino del tour" : destinationHotelName;
+      if (resolvedDestinationName) params.set("destinationHotelName", resolvedDestinationName);
+    }
     if (notes) params.set("notes", notes);
 
     router.push(`/reservar?${params.toString()}`);
@@ -181,9 +203,9 @@ export function LandingHero() {
         <div className="adventure-hero__copy relative z-10">
           <div data-hero-sticker className="adventure-stamp adventure-stamp--sun">CUN · MX<br />365 días de sol</div>
           <p className="adventure-kicker">TRASLADOS PRIVADOS EN CANCÚN Y RIVIERA MAYA</p>
-          <h1 className="adventure-hero__title" aria-label="Aterriza. Sube. Disfruta.">
-            <span className="adventure-word-mask"><span data-hero-word>ATERRIZA.</span></span>
-            <span className="adventure-word-mask"><span data-hero-word className="text-[var(--adventure-sun)]">SUBE.</span></span>
+          <h1 className="adventure-hero__title" aria-label="Aborda. Viaja. Disfruta.">
+            <span className="adventure-word-mask"><span data-hero-word>ABORDA.</span></span>
+            <span className="adventure-word-mask"><span data-hero-word className="text-[var(--adventure-sun)]">VIAJA.</span></span>
             <span className="adventure-word-mask"><span data-hero-word className="text-[var(--adventure-coral)]">DISFRUTA.</span></span>
           </h1>
           <p className="adventure-hero__lede">
@@ -195,18 +217,28 @@ export function LandingHero() {
         </div>
 
         <div data-hero-media className="adventure-hero__media">
-          <video
-            poster="/images/destinations/cancun.webp"
-            autoPlay
-            muted
-            loop
-            playsInline
-            aria-label="Costa turquesa de Cancún vista desde el aire"
-            className="h-full w-full object-cover"
-          >
-            <source src="/images/hero-cancun.webm" type="video/webm" />
-            <source src="/images/hero-cancun-optimizado.mp4" type="video/mp4" />
-          </video>
+          {canPlayVideo ? (
+            <video
+              poster="/images/destinations/cancun.webp"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label="Costa turquesa de Cancún vista desde el aire"
+              className="h-full w-full object-cover"
+            >
+              <source src="/images/hero-cancun.webm" type="video/webm" />
+              <source src="/images/hero-cancun-optimizado.mp4" type="video/mp4" />
+            </video>
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src="/images/destinations/cancun.webp"
+              alt="Costa turquesa de Cancún vista desde el aire"
+              className="h-full w-full object-cover"
+            />
+          )}
           <div className="adventure-hero__media-label"><MapPin aria-hidden /> Aeropuerto de Cancún → hotel o destino</div>
           <div data-hero-sticker data-hero-float className="adventure-sticker adventure-sticker--coral">PLAYA<br />MODE</div>
         </div>
@@ -274,59 +306,44 @@ export function LandingHero() {
 
             {transferKind === "hotel_hotel" && (
               <>
-                <div>
-                  <Label htmlFor="hero-origin-hotel">Hotel de origen</Label>
-                  <Combobox
-                    id="hero-origin-hotel"
-                    className="mt-1"
-                    options={HOTELS}
-                    value={originHotelId}
-                    onChange={setOriginHotelId}
-                    placeholder="Selecciona un hotel"
-                    searchPlaceholder="Buscar hotel..."
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="hero-destination-hotel">Hotel de destino</Label>
-                  <Combobox
-                    id="hero-destination-hotel"
-                    className="mt-1"
-                    options={HOTELS}
-                    value={destinationHotelId}
-                    onChange={setDestinationHotelId}
-                    placeholder="Selecciona un hotel"
-                    searchPlaceholder="Buscar hotel..."
-                  />
-                  {sameHotelError && (
-                    <p className="mt-1 text-xs text-destructive">El hotel de origen y destino deben ser distintos.</p>
-                  )}
-                </div>
+                <HeroZoneHotelFields
+                  prefix="hero-origin"
+                  label="Origen"
+                  zoneId={originZoneId}
+                  hotelId={originHotelId}
+                  hotelName={originHotelName}
+                  onZoneChange={(value) => { setOriginZoneId(value); setOriginHotelId(""); setOriginHotelName(""); }}
+                  onHotelChange={setOriginHotelId}
+                  onHotelNameChange={setOriginHotelName}
+                />
+                <HeroZoneHotelFields
+                  prefix="hero-destination"
+                  label="Destino"
+                  zoneId={destinationZoneId}
+                  hotelId={destinationHotelId}
+                  hotelName={destinationHotelName}
+                  onZoneChange={(value) => { setDestinationZoneId(value); setDestinationHotelId(""); setDestinationHotelName(""); }}
+                  onHotelChange={setDestinationHotelId}
+                  onHotelNameChange={setDestinationHotelName}
+                />
               </>
             )}
 
             {transferKind === "hotel_aeropuerto" && (
               <>
-                <div>
-                  <Label htmlFor="hero-hotel">Hotel</Label>
-                  <Combobox
-                    id="hero-hotel"
-                    className="mt-1"
-                    options={HOTELS}
-                    value={hotelId}
-                    onChange={setHotelId}
-                    placeholder="Selecciona un hotel"
-                    searchPlaceholder="Buscar hotel..."
-                  />
-                </div>
+                <HeroZoneHotelFields
+                  prefix="hero-origin"
+                  label="Origen"
+                  zoneId={originZoneId}
+                  hotelId={originHotelId}
+                  hotelName={originHotelName}
+                  onZoneChange={(value) => { setOriginZoneId(value); setOriginHotelId(""); setOriginHotelName(""); }}
+                  onHotelChange={setOriginHotelId}
+                  onHotelNameChange={setOriginHotelName}
+                />
                 <div>
                   <Label htmlFor="hero-airport">Aeropuerto</Label>
-                  <Select id="hero-airport" value={airportId} onChange={(e) => setAirportId(e.target.value)} className="mt-1">
-                    {AIRPORTS.map((a) => (
-                      <option key={a.id} value={a.id}>
-                        {a.name}
-                      </option>
-                    ))}
-                  </Select>
+                  <Input id="hero-airport" value="Aeropuerto Internacional de Cancún" readOnly className="mt-1" />
                 </div>
               </>
             )}
@@ -335,26 +352,18 @@ export function LandingHero() {
               <>
                 <div>
                   <Label htmlFor="hero-airport">Aeropuerto</Label>
-                  <Select id="hero-airport" value={airportId} onChange={(e) => setAirportId(e.target.value)} className="mt-1">
-                    {AIRPORTS.map((a) => (
-                      <option key={a.id} value={a.id}>
-                        {a.name}
-                      </option>
-                    ))}
-                  </Select>
+                  <Input id="hero-airport" value="Aeropuerto Internacional de Cancún" readOnly className="mt-1" />
                 </div>
-                <div>
-                  <Label htmlFor="hero-hotel">Hotel</Label>
-                  <Combobox
-                    id="hero-hotel"
-                    className="mt-1"
-                    options={HOTELS}
-                    value={hotelId}
-                    onChange={setHotelId}
-                    placeholder="Selecciona un hotel"
-                    searchPlaceholder="Buscar hotel..."
-                  />
-                </div>
+                <HeroZoneHotelFields
+                  prefix="hero-destination"
+                  label="Destino"
+                  zoneId={destinationZoneId}
+                  hotelId={destinationHotelId}
+                  hotelName={destinationHotelName}
+                  onZoneChange={(value) => { setDestinationZoneId(value); setDestinationHotelId(""); setDestinationHotelName(""); }}
+                  onHotelChange={setDestinationHotelId}
+                  onHotelNameChange={setDestinationHotelName}
+                />
               </>
             )}
 
@@ -384,38 +393,23 @@ export function LandingHero() {
                   </div>
                 </fieldset>
 
-                <div>
-                  {tourOrigin === "aeropuerto" ? (
-                    <>
-                      <Label htmlFor="hero-airport">Aeropuerto</Label>
-                      <Select
-                        id="hero-airport"
-                        value={airportId}
-                        onChange={(e) => setAirportId(e.target.value)}
-                        className="mt-1"
-                      >
-                        {AIRPORTS.map((a) => (
-                          <option key={a.id} value={a.id}>
-                            {a.name}
-                          </option>
-                        ))}
-                      </Select>
-                    </>
-                  ) : (
-                    <>
-                      <Label htmlFor="hero-hotel">Hotel</Label>
-                      <Combobox
-                        id="hero-hotel"
-                        className="mt-1"
-                        options={HOTELS}
-                        value={hotelId}
-                        onChange={setHotelId}
-                        placeholder="Selecciona un hotel"
-                        searchPlaceholder="Buscar hotel..."
-                      />
-                    </>
-                  )}
-                </div>
+                {tourOrigin === "aeropuerto" ? (
+                  <div>
+                    <Label htmlFor="hero-airport">Aeropuerto</Label>
+                    <Input id="hero-airport" value="Aeropuerto Internacional de Cancún" readOnly className="mt-1" />
+                  </div>
+                ) : (
+                  <HeroZoneHotelFields
+                    prefix="hero-origin"
+                    label="Origen"
+                    zoneId={originZoneId}
+                    hotelId={originHotelId}
+                    hotelName={originHotelName}
+                    onZoneChange={(value) => { setOriginZoneId(value); setOriginHotelId(""); setOriginHotelName(""); }}
+                    onHotelChange={setOriginHotelId}
+                    onHotelNameChange={setOriginHotelName}
+                  />
+                )}
 
                 <div>
                   <Label htmlFor="hero-tour-destination">Destino</Label>
@@ -440,6 +434,8 @@ export function LandingHero() {
               <input
                 id="hero-date"
                 type="date"
+                min={today}
+                required
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 className="mt-1 flex h-11 w-full rounded-md border border-input bg-card px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
@@ -450,6 +446,7 @@ export function LandingHero() {
               <input
                 id="hero-time"
                 type="time"
+                required
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
                 className="mt-1 flex h-11 w-full rounded-md border border-input bg-card px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
@@ -461,7 +458,8 @@ export function LandingHero() {
                 id="hero-passengers"
                 type="number"
                 min={1}
-                max={20}
+                max={60}
+                required
                 value={passengers}
                 onChange={(e) => setPassengers(Number(e.target.value))}
                 className="mt-1 flex h-11 w-full rounded-md border border-input bg-card px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
@@ -474,23 +472,101 @@ export function LandingHero() {
               <Search /> Ver precio de mi ruta
             </Button>
 
-          {estimate && (
-            <div className="adventure-estimate mt-4 p-4">
-              <p className="text-sm text-muted-foreground">{estimate.label}</p>
-              <p className="mt-1 font-heading text-2xl font-bold text-primary">
-                <LocalizedCurrency amount={estimate.total} sourceCurrency={estimate.currency} />
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Estimado ilustrativo, sujeto a confirmación en tu reservación.
-              </p>
-              <Button type="button" onClick={onContinue} className="mt-3 w-full sm:w-auto">
-                Continuar a reservar <ArrowRight aria-hidden />
-              </Button>
-            </div>
-          )}
+            {routeError && <p role="alert" className="mt-3 text-sm font-bold text-destructive">{routeError}</p>}
+
+            {quote && (
+              <div className="adventure-estimate mt-4 p-4" aria-live="polite">
+                {quote === "custom" ? (
+                  <>
+                    <p className="text-sm font-bold text-foreground">Cotización personalizada</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Enviaremos la ruta al equipo sin realizar ningún cobro. Te confirmaremos la tarifa por WhatsApp.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-muted-foreground">Tarifa vigente para tu ruta</p>
+                    <p className="mt-1 font-heading text-2xl font-bold text-primary">
+                      <LocalizedCurrency amount={quote.total} sourceCurrency={quote.currency} />
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Precio calculado según ruta, horario y pasajeros. El servidor lo verificará antes del pago.
+                    </p>
+                    {quote.departure.isNight && (
+                      <p className="mt-2 text-xs font-bold text-foreground">
+                        Tarifa nocturna aplicada (10:00 p. m.–5:00 a. m.).
+                      </p>
+                    )}
+                  </>
+                )}
+                <Button type="button" onClick={onContinue} className="mt-3 w-full sm:w-auto">
+                  Continuar a reservar <ArrowRight aria-hidden />
+                </Button>
+              </div>
+            )}
           </div>
         </form>
       </div>
     </section>
+  );
+}
+
+function isHeroHotelComplete(zoneId: string, hotelId: string, hotelName: string) {
+  const zone = getBookingZone(zoneId);
+  if (!zone || !hotelId || !zone.hotels.some((hotel) => hotel.id === hotelId)) return false;
+  return !isCustomHotelId(zoneId, hotelId) || hotelName.trim().length >= 2;
+}
+
+function HeroZoneHotelFields({
+  prefix,
+  label,
+  zoneId,
+  hotelId,
+  hotelName,
+  onZoneChange,
+  onHotelChange,
+  onHotelNameChange,
+}: {
+  prefix: string;
+  label: string;
+  zoneId: string;
+  hotelId: string;
+  hotelName: string;
+  onZoneChange: (value: string) => void;
+  onHotelChange: (value: string) => void;
+  onHotelNameChange: (value: string) => void;
+}) {
+  const zone = getBookingZone(zoneId);
+  return (
+    <>
+      <div>
+        <Label htmlFor={`${prefix}-zone`}>{label}</Label>
+        <Select id={`${prefix}-zone`} value={zoneId} onChange={(event) => onZoneChange(event.target.value)} className="mt-1">
+          {HOTEL_BOOKING_ZONES.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
+        </Select>
+      </div>
+      <div>
+        <Label htmlFor={`${prefix}-hotel`}>Hotel o alojamiento</Label>
+        <Select
+          id={`${prefix}-hotel`}
+          value={hotelId}
+          onChange={(event) => onHotelChange(event.target.value)}
+          className="mt-1"
+          required
+        >
+          <option value="">Selecciona un hotel</option>
+          {zone?.hotels.map((hotel) => <option key={hotel.id} value={hotel.id}>{hotel.name}</option>)}
+        </Select>
+        {zone && isCustomHotelId(zone.id, hotelId) && (
+          <Input
+            value={hotelName}
+            onChange={(event) => onHotelNameChange(event.target.value)}
+            placeholder="Nombre del hotel o alojamiento"
+            className="mt-2"
+            required
+          />
+        )}
+      </div>
+    </>
   );
 }

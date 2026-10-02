@@ -22,7 +22,9 @@ No crea tablas para el antiguo demo de conductores, vehículos, combustible o co
 
 ## Antes de cobrar
 
-La migración `202608200001_direct_client_tariffs.sql` carga las tarifas del **Tarifario cliente directo (29/07/2026)**. Usa cuatro importes por ruta (1–4 y 5–8 pasajeros, diurno y nocturno), capacidad máxima de 8 pasajeros por camioneta y rutas direccionales. Antes de habilitar producción confirma las dos celdas marcadas con `review_note` en `pricing_rules.metadata`.
+La migración `202608200001_direct_client_tariffs.sql` carga las tarifas del **Tarifario cliente directo (29/07/2026)**. Usa cuatro importes por ruta (1–4 y 5–8 pasajeros, diurno y nocturno), capacidad máxima de 8 pasajeros por camioneta y rutas direccionales. La migración `202609290002_sync_approved_return_tariffs.sql` conserva las correcciones aprobadas para Puerto Juárez → Aeropuerto y Tulum → Aeropuerto.
+
+La migración `202609290001_split_crococun_zone.sql` separa **Zona CrocoCun** de **Zona Puerto Morelos** para que cada una tenga su propio catálogo de hoteles. Hasta recibir un tarifario distinto, CrocoCun conserva la misma banda de precios de Puerto Morelos.
 
 ## Orden de despliegue
 

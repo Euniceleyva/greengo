@@ -1,4 +1,90 @@
 import { z } from "zod";
+import { getBookingZone, isCustomHotelId } from "@/data/booking-zones";
+
+function todayInCancun() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Cancun",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const value = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${value.year}-${value.month}-${value.day}`;
+}
+
+function validatePublicRoute(
+  data: {
+    originLocationId: string;
+    destinationLocationId: string;
+    originHotelId: string;
+    originHotelName: string;
+    destinationHotelId: string;
+    destinationHotelName: string;
+  },
+  ctx: z.RefinementCtx,
+) {
+  (["origin", "destination"] as const).forEach((side) => {
+    const locationId = data[`${side}LocationId`];
+    const hotelId = data[`${side}HotelId`];
+    const hotelName = data[`${side}HotelName`];
+    const zone = getBookingZone(locationId);
+
+    if (!zone) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [`${side}LocationId`],
+        message: "Selecciona una ubicación disponible",
+      });
+      return;
+    }
+    if (zone.category === "aeropuerto") return;
+
+    if (!hotelId || !zone.hotels.some((hotel) => hotel.id === hotelId)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [`${side}HotelId`],
+        message: `Selecciona el hotel o alojamiento de ${zone.name}`,
+      });
+      return;
+    }
+
+    if (isCustomHotelId(zone.id, hotelId) && hotelName.trim().length < 2) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [`${side}HotelName`],
+        message: "Escribe el nombre del hotel o alojamiento",
+      });
+    }
+  });
+}
+
+function validateServiceRoute(
+  data: {
+    serviceType: "hotel_hotel" | "aeropuerto" | "transporte_abierto" | "a_medida";
+    originLocationId: string;
+    destinationLocationId: string;
+  },
+  ctx: z.RefinementCtx,
+) {
+  const originIsAirport = data.originLocationId === "loc-aeropuerto";
+  const destinationIsAirport = data.destinationLocationId === "loc-aeropuerto";
+
+  if (data.serviceType === "aeropuerto" && originIsAirport === destinationIsAirport) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["destinationLocationId"],
+      message: "El origen o el destino debe ser el Aeropuerto de Cancún",
+    });
+  }
+
+  if (data.serviceType === "hotel_hotel" && (originIsAirport || destinationIsAirport)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: [originIsAirport ? "originLocationId" : "destinationLocationId"],
+      message: "Selecciona dos zonas de hotel para este servicio",
+    });
+  }
+}
 
 export const tripSchema = z
   .object({
@@ -83,20 +169,29 @@ export const reservationStep1Schema = z
   .refine((data) => data.originLocationId !== data.destinationLocationId, {
     message: "El origen y el destino no pueden ser iguales",
     path: ["destinationLocationId"],
+  })
+  .superRefine((data, ctx) => {
+    validatePublicRoute(data, ctx);
+    validateServiceRoute(data, ctx);
   });
 
 export type ReservationStep1Values = z.infer<typeof reservationStep1Schema>;
 
-export const reservationStep2Schema = z.object({
-  date: z.string().min(1, "Selecciona una fecha"),
-  time: z.string().min(1, "Selecciona una hora"),
-  returnDate: z.string().optional(),
-  returnTime: z.string().optional(),
-  passengers: z.coerce.number().int().min(1, "Mínimo 1 pasajero").max(60, "Máximo 60 pasajeros"),
-  bags: z.coerce.number().int().min(0, "Cantidad inválida").max(60),
-  flightNumber: z.string().optional(),
-  notes: z.string().optional(),
-});
+export const reservationStep2Schema = z
+  .object({
+    date: z.string().min(1, "Selecciona una fecha"),
+    time: z.string().min(1, "Selecciona una hora"),
+    returnDate: z.string().optional(),
+    returnTime: z.string().optional(),
+    passengers: z.coerce.number().int().min(1, "Mínimo 1 pasajero").max(60, "Máximo 60 pasajeros"),
+    bags: z.coerce.number().int().min(0, "Cantidad inválida").max(60),
+    flightNumber: z.string().trim().max(30, "El número de vuelo es demasiado largo").optional(),
+    notes: z.string().trim().max(1000, "Las notas no pueden superar 1000 caracteres").optional(),
+  })
+  .refine((data) => !data.date || data.date >= todayInCancun(), {
+    message: "Selecciona una fecha de hoy en adelante",
+    path: ["date"],
+  });
 
 export type ReservationStep2Values = z.infer<typeof reservationStep2Schema>;
 
@@ -152,6 +247,26 @@ export const reservationSubmissionSchema = z.object({
   .refine((data) => data.direction !== "redondo" || !data.returnDate || data.returnDate >= data.date, {
     message: "El regreso no puede ser anterior a la salida",
     path: ["returnDate"],
+  })
+  .refine(
+    (data) =>
+      data.direction !== "redondo" ||
+      !data.returnDate ||
+      data.returnDate !== data.date ||
+      !data.returnTime ||
+      data.returnTime > data.time,
+    {
+      message: "Si regresas el mismo día, la hora de regreso debe ser posterior a la salida",
+      path: ["returnTime"],
+    },
+  )
+  .refine((data) => data.date >= todayInCancun(), {
+    message: "Selecciona una fecha de hoy en adelante",
+    path: ["date"],
+  })
+  .superRefine((data, ctx) => {
+    validatePublicRoute(data, ctx);
+    validateServiceRoute(data, ctx);
   });
 
 export type ReservationSubmission = z.infer<typeof reservationSubmissionSchema>;

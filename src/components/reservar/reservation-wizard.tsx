@@ -45,8 +45,14 @@ export function ReservationWizard() {
     const serviceTypeParam = searchParams.get("serviceType");
     const hotel = searchParams.get("hotel");
     const notes = searchParams.get("notes");
+    const direction = searchParams.get("direction");
+    const originHotelId = searchParams.get("originHotelId");
+    const originHotelName = searchParams.get("originHotelName");
+    const destinationHotelId = searchParams.get("destinationHotelId");
+    const destinationHotelName = searchParams.get("destinationHotelName");
+    const fromQuote = searchParams.get("fromQuote") === "1";
 
-    if (origin || destination || date || time || passengers || serviceTypeParam || hotel || notes) {
+    if (origin || destination || date || time || passengers || serviceTypeParam || hotel || notes || originHotelId || destinationHotelId) {
       updateDraft({
         ...(origin && getBookingZone(origin) ? { originLocationId: origin } : {}),
         ...(destination && getBookingZone(destination) ? { destinationLocationId: destination } : {}),
@@ -56,10 +62,15 @@ export function ReservationWizard() {
         ...(serviceTypeParam && VALID_SERVICE_TYPES.includes(serviceTypeParam as ServiceType)
           ? { serviceType: serviceTypeParam as ServiceType }
           : {}),
+        ...(direction === "sencillo" || direction === "redondo" ? { direction } : {}),
+        ...(originHotelId ? { originHotelId } : {}),
+        ...(originHotelName ? { originHotelName } : {}),
+        ...(destinationHotelId ? { destinationHotelId } : {}),
+        ...(destinationHotelName ? { destinationHotelName, hotel: destinationHotelName } : {}),
         ...(hotel ? { hotel } : {}),
         ...(notes ? { notes } : {}),
       });
-      setStep(1);
+      setStep(fromQuote ? 2 : 1);
       clearConfirmedFolio();
     }
     setParamsApplied(true);

@@ -1,13 +1,37 @@
 import type { GalleryImage } from "@/types";
 
-// Imágenes del carrusel de la Landing Page: fotografías reales de servicios
-// de traslado de GreenGo (bienvenida en el vehículo, grupos de pasajeros y
-// una excursión a cenote).
+// Fotografías reales de traslados GreenGo. El orden de este arreglo es el
+// orden visible del carrusel de la landing page.
 export const GALLERY_IMAGES: GalleryImage[] = [
-  { id: "gallery-01", src: "/images/gallery/1.webp", alt: "Conductor de GreenGo dando la bienvenida a un pasajero en el vehículo", width: 940, height: 788 },
-  { id: "gallery-02", src: "/images/gallery/2.webp", alt: "Grupo de pasajeros sonriendo dentro de la van de traslado", width: 940, height: 788 },
-  { id: "gallery-03", src: "/images/gallery/3.webp", alt: "Pasajeros y conductor saludando al inicio del traslado", width: 940, height: 788 },
-  { id: "gallery-04", src: "/images/gallery/4.webp", alt: "Amigas celebrando el inicio de su viaje en la van de GreenGo", width: 940, height: 788 },
-  { id: "gallery-05", src: "/images/gallery/5.webp", alt: "Grupo de turistas disfrutando de un cenote en excursión", width: 940, height: 788 },
-  { id: "gallery-06", src: "/images/gallery/6.webp", alt: "Pasajeras brindando durante su traslado con GreenGo", width: 940, height: 788 },
+  { id: "gallery-01", src: "/images/gallery/01-happy-couple-private-transfer.webp", alt: "Pareja disfrutando su traslado privado en Cancún", altEn: "Couple enjoying their private transfer in Cancún", width: 1200, height: 900, objectPosition: "50% 45%" },
+  { id: "gallery-02", src: "/images/gallery/02-friends-private-van.webp", alt: "Grupo de amigas junto a su van privada en Cancún", altEn: "Group of friends beside their private van in Cancún", width: 900, height: 1200, objectPosition: "50% 36%" },
+  { id: "gallery-03", src: "/images/gallery/03-passengers-inside-van.webp", alt: "Pasajeras sonriendo dentro de una van de traslado", altEn: "Passengers smiling inside a transfer van", width: 900, height: 1200, objectPosition: "50% 36%" },
+  { id: "gallery-04", src: "/images/gallery/04-private-van-palm-lined-resort.webp", alt: "Van privada en una avenida rodeada de palmeras", altEn: "Private van on a palm-lined resort road", width: 676, height: 1200, objectPosition: "58% 58%" },
+  { id: "gallery-05", src: "/images/gallery/05-friends-inside-transfer-van.webp", alt: "Amigas viajando cómodamente dentro de la van", altEn: "Friends traveling comfortably inside the van", width: 676, height: 1200, objectPosition: "43% 40%" },
+  { id: "gallery-07", src: "/images/gallery/07-family-group-hotel-pickup.webp", alt: "Familia lista para iniciar su traslado desde el hotel", altEn: "Family ready to begin their transfer from the hotel", width: 900, height: 1200, objectPosition: "50% 36%" },
+  { id: "gallery-08", src: "/images/gallery/08-family-private-van.webp", alt: "Familia frente a su transporte privado en Cancún", altEn: "Family in front of their private transportation in Cancún", width: 900, height: 1200, objectPosition: "50% 38%" },
+  { id: "gallery-09", src: "/images/gallery/09-greengo-branded-transfer-van.webp", alt: "Van de GreenGo Transfers frente a un hotel", altEn: "GreenGo Transfers van outside a hotel", width: 1200, height: 900, objectPosition: "50% 52%" },
+  { id: "gallery-10", src: "/images/gallery/10-passenger-welcome-sign.webp", alt: "Pasajero recibido con un letrero personalizado dentro de la van", altEn: "Passenger welcomed with a personalized sign inside the van", width: 676, height: 1200, objectPosition: "50% 40%" },
+  { id: "gallery-11", src: "/images/gallery/11-family-group-private-transfer.webp", alt: "Familia reunida junto a su van de traslado privado", altEn: "Family gathered beside their private transfer van", width: 900, height: 1200, objectPosition: "50% 36%" },
+  { id: "gallery-12", src: "/images/gallery/12-couple-resort-arrival.webp", alt: "Pareja llegando con equipaje a su resort", altEn: "Couple arriving at their resort with luggage", width: 900, height: 1200, objectPosition: "50% 38%" },
+  { id: "gallery-13", src: "/images/gallery/13-travelers-luggage-hotel-arrival.webp", alt: "Viajeros con equipaje al llegar a su hotel", altEn: "Travelers with luggage arriving at their hotel", width: 900, height: 1200, objectPosition: "50% 40%" },
+  { id: "gallery-14", src: "/images/gallery/14-airport-welcome-group.webp", alt: "Grupo recibido con letrero en el Aeropuerto de Cancún", altEn: "Group welcomed with a sign at Cancún Airport", width: 900, height: 1200, objectPosition: "50% 38%" },
+  { id: "gallery-15", src: "/images/gallery/15-family-airport-reception.webp", alt: "Familia recibida por el equipo de traslado en el aeropuerto", altEn: "Family welcomed by the transfer team at the airport", width: 1200, height: 900, objectPosition: "50% 46%" },
+  { id: "gallery-16", src: "/images/gallery/16-large-family-private-van.webp", alt: "Familia numerosa junto a su van privada en la Riviera Maya", altEn: "Large family beside their private van in the Riviera Maya", width: 1200, height: 900, objectPosition: "50% 45%" },
+  { id: "gallery-18", src: "/images/gallery/18-family-riviera-maya-excursion.webp", alt: "Familia durante una excursión en la Riviera Maya", altEn: "Family during an excursion in the Riviera Maya", width: 1200, height: 900, objectPosition: "50% 46%" },
+  { id: "gallery-19", src: "/images/gallery/19-couple-driver-hotel-arrival.webp", alt: "Pareja con su conductor al llegar al hotel", altEn: "Couple with their driver upon arriving at the hotel", width: 900, height: 1200, objectPosition: "50% 38%" },
+  { id: "gallery-20", src: "/images/gallery/20-group-airport-welcome.webp", alt: "Grupo de pasajeros recibido en el Aeropuerto de Cancún", altEn: "Group of passengers welcomed at Cancún Airport", width: 1200, height: 676, objectPosition: "50% 45%" },
+  { id: "gallery-21", src: "/images/gallery/21-private-van-resort-entrance.webp", alt: "Van privada esperando en la entrada de un resort", altEn: "Private van waiting at a resort entrance", width: 900, height: 1200, objectPosition: "50% 52%" },
+  { id: "gallery-22", src: "/images/gallery/22-couple-airport-reception.webp", alt: "Pareja con letrero de bienvenida en el aeropuerto", altEn: "Couple holding a welcome sign at the airport", width: 900, height: 1200, objectPosition: "50% 36%" },
+  { id: "gallery-23", src: "/images/gallery/23-friends-private-transfer.webp", alt: "Grupo de amigas junto a su transporte privado", altEn: "Group of friends beside their private transportation", width: 1200, height: 900, objectPosition: "50% 45%" },
+  { id: "gallery-24", src: "/images/gallery/24-family-cancun-airport-welcome.webp", alt: "Familia recibida con letrero en el Aeropuerto de Cancún", altEn: "Family welcomed with a sign at Cancún Airport", width: 900, height: 1200, objectPosition: "50% 36%" },
+  { id: "gallery-25", src: "/images/gallery/25-couple-cancun-airport-pickup.webp", alt: "Pareja lista para abordar su traslado en el aeropuerto", altEn: "Couple ready to board their airport transfer", width: 1200, height: 676, objectPosition: "50% 45%" },
+  { id: "gallery-26", src: "/images/gallery/26-couple-driver-airport-selfie.webp", alt: "Pareja tomándose una foto con su conductor en el aeropuerto", altEn: "Couple taking a photo with their driver at the airport", width: 900, height: 1200, objectPosition: "50% 34%" },
+  { id: "gallery-27", src: "/images/gallery/27-friends-cancun-airport-arrival.webp", alt: "Grupo de amigas al llegar al Aeropuerto de Cancún", altEn: "Group of friends arriving at Cancún Airport", width: 900, height: 1200, objectPosition: "50% 36%" },
+  { id: "gallery-28", src: "/images/gallery/28-passengers-welcome-water.webp", alt: "Pasajeros recibidos con agua dentro de la van", altEn: "Passengers welcomed with water inside the van", width: 1200, height: 900, objectPosition: "50% 46%" },
+  { id: "gallery-29", src: "/images/gallery/29-friends-inside-van-selfie.webp", alt: "Grupo de amigos tomándose una foto dentro de la van", altEn: "Group of friends taking a photo inside the van", width: 1200, height: 900, objectPosition: "50% 45%" },
+  { id: "gallery-30", src: "/images/gallery/30-driver-passengers-selfie.webp", alt: "Conductor y pasajeras saludando dentro del vehículo", altEn: "Driver and passengers waving inside the vehicle", width: 1200, height: 900, objectPosition: "50% 44%" },
+  { id: "gallery-31", src: "/images/gallery/31-friends-thumbs-up-van.webp", alt: "Amigas dando pulgar arriba durante su traslado", altEn: "Friends giving a thumbs-up during their transfer", width: 1200, height: 900, objectPosition: "50% 44%" },
+  { id: "gallery-32", src: "/images/gallery/32-cenote-excursion-group.webp", alt: "Grupo de viajeros nadando durante una excursión a un cenote", altEn: "Group of travelers swimming during a cenote excursion", width: 1200, height: 900, objectPosition: "50% 50%" },
+  { id: "gallery-33", src: "/images/gallery/33-passengers-celebrating-van.webp", alt: "Pasajeras celebrando dentro de la van de traslado", altEn: "Passengers celebrating inside the transfer van", width: 1200, height: 900, objectPosition: "50% 44%" },
 ];

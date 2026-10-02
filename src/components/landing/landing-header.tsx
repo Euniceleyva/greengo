@@ -10,9 +10,9 @@ import { LanguageSwitch } from "@/components/shared/public-language";
 import { Logo } from "@/components/landing/ui/logo";
 
 const NAV_LINKS = [
-  { href: "#servicios", label: "Servicios" },
-  { href: "#destinos", label: "Destinos" },
   { href: "#como-funciona", label: "Cómo funciona" },
+  { href: "#resenas", label: "Reseñas" },
+  { href: "#preguntas", label: "Preguntas" },
   { href: "#contacto", label: "Contacto" },
 ];
 

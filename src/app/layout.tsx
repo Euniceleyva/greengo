@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Fredoka, Inter, Lexend, Poppins } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { WhatsAppSticky } from "@/components/shared/whatsapp-sticky";
 import { ChatbotWidgetLazy } from "@/components/shared/chatbot-widget-lazy";
 
 const fontHeading = Poppins({
@@ -68,7 +67,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="font-sans antialiased">
         {children}
-        <WhatsAppSticky />
         <ChatbotWidgetLazy />
       </body>
     </html>

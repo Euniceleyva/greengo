@@ -1,22 +1,33 @@
+import { ArrowUpRight } from "lucide-react";
 import { Accordion, AccordionItem } from "@/components/ui/accordion";
+import { WHATSAPP_PHONE } from "@/constants";
 import { FAQ_ITEMS } from "@/mocks/faq";
 
 export function LandingFaq() {
   return (
-    <section data-adventure-reveal className="adventure-faq py-20 sm:py-28">
-      <div className="mx-auto grid max-w-[1100px] gap-10 px-4 sm:px-6 lg:grid-cols-[.8fr_1.2fr] lg:px-10">
-        <div data-reveal-item>
-          <div className="adventure-stamp adventure-stamp--passport">NO TE<br />PIERDAS</div>
-          <h2>Preguntas frecuentes sobre traslados privados en Cancún.</h2>
-          <p>Resuelve dudas sobre el Aeropuerto de Cancún, equipaje, vuelos, pagos, cambios y transporte para grupos antes de reservar.</p>
+    <section id="preguntas" data-adventure-reveal className="adventure-faq scroll-mt-20 py-16 sm:py-24">
+      <div className="adventure-faq__layout mx-auto max-w-[1180px] px-4 sm:px-6 lg:px-10">
+        <div data-reveal-item className="adventure-faq__intro">
+          <h2>Respuestas claras antes de viajar.</h2>
+          <p>Reservas, vuelos, pagos y cambios: lo esencial antes de confirmar tu traslado.</p>
         </div>
 
         <div data-reveal-item className="adventure-faq__accordion">
-          <Accordion>
+          <div className="adventure-faq__manifest">
+            <span>Preguntas frecuentes</span>
+            <strong>7 preguntas</strong>
+          </div>
+          <Accordion className="adventure-faq__list" defaultOpenId={FAQ_ITEMS[0]?.id}>
             {FAQ_ITEMS.map((faq) => (
               <AccordionItem key={faq.id} id={faq.id} question={faq.question} answer={faq.answer} />
             ))}
           </Accordion>
+          <div className="adventure-faq__help">
+            <p>¿No encontraste tu respuesta?</p>
+            <a href={`https://wa.me/${WHATSAPP_PHONE}`} target="_blank" rel="noreferrer">
+              Escríbenos por WhatsApp <ArrowUpRight aria-hidden />
+            </a>
+          </div>
         </div>
       </div>
     </section>

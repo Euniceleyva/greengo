@@ -9,7 +9,7 @@ import { useGSAP } from "@gsap/react";
 import { useReservationStore } from "@/stores/reservation-store";
 import { useHydrated } from "@/lib/hooks";
 import { LOCATIONS } from "@/mocks/locations";
-import { SERVICE_TYPE_LABELS } from "@/constants";
+import { PUBLIC_SERVICE_TYPE_LABELS } from "@/constants";
 import { LocalizedCurrency } from "@/components/shared/public-language";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -169,7 +169,7 @@ export function ConfirmationClient({
             <MapPin aria-hidden />
           </div>
           <dl className="adventure-confirmation-summary">
-          <SummaryRow label="Servicio" value={SERVICE_TYPE_LABELS[serviceType]} />
+          <SummaryRow label="Servicio" value={PUBLIC_SERVICE_TYPE_LABELS[serviceType]} />
           <SummaryRow label="Sentido" value={draft.direction === "redondo" ? "Redondo" : "Sencillo"} />
           <SummaryRow label="Origen" value={origin?.name ?? "—"} />
           <SummaryRow label="Destino" value={destination?.name ?? "—"} />

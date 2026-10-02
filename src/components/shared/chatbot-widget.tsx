@@ -16,14 +16,20 @@ import {
   type PublicLanguage,
 } from "@/components/shared/public-language";
 import type { ChatbotOption } from "@/types";
+import { WhatsAppLogo } from "@/components/shared/brand-icons";
 
 export function ChatbotWidget() {
   const pathname = usePathname();
   const router = useRouter();
-  const { isOpen, isTyping, currentNodeId, messages, toggleOpen, selectOption, recordChoice } = useChatbotStore();
+  const { isOpen, isTyping, currentNodeId, messages, toggleOpen, close, selectOption, recordChoice } = useChatbotStore();
   const [language, setLanguage] = React.useState<PublicLanguage>("es");
   const listRef = React.useRef<HTMLDivElement>(null);
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const handleClose = React.useCallback(() => {
+    close();
+    window.requestAnimationFrame(() => triggerRef.current?.focus());
+  }, [close]);
 
   React.useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
@@ -35,11 +41,11 @@ export function ChatbotWidget() {
 
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) toggleOpen();
+      if (e.key === "Escape" && isOpen) handleClose();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [isOpen, toggleOpen]);
+  }, [handleClose, isOpen]);
 
   React.useEffect(() => {
     const saved = window.localStorage.getItem(PUBLIC_LANGUAGE_STORAGE_KEY);
@@ -62,6 +68,12 @@ export function ChatbotWidget() {
   const chatText = (message: { text: string; textEn?: string }) =>
     language === "en" ? message.textEn ?? t(message.text) : message.text;
   const optionLabel = (option: ChatbotOption) => (language === "en" ? option.labelEn : option.label);
+  const openWhatsApp = () => {
+    const message = language === "en"
+      ? "Hi, I need help with a GreenGo Transfers booking."
+      : "Hola, necesito ayuda con una reservación de GreenGo Transfers.";
+    window.open(`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+  };
 
   const handleOption = (option: ChatbotOption) => {
     if (option.action.kind === "node") {
@@ -79,7 +91,7 @@ export function ChatbotWidget() {
     }
     // action.kind === "link"
     recordChoice(option.label, option.labelEn);
-    toggleOpen();
+    handleClose();
     router.push(option.action.href);
   };
 
@@ -87,8 +99,8 @@ export function ChatbotWidget() {
     <>
       {isOpen && (
         <div
-          role="dialog"
-          aria-label={t("Asistente virtual de GreenGo")}
+          role="region"
+          aria-labelledby="greengo-support-title"
           className="greengo-chatbot-panel"
         >
           <div className="greengo-chatbot-header">
@@ -97,14 +109,14 @@ export function ChatbotWidget() {
                 <Bot className="h-5 w-5" aria-hidden />
               </span>
               <div className="min-w-0">
-                <span className="greengo-chatbot-title">{t("Asistente GreenGo")}</span>
+                <span id="greengo-support-title" className="greengo-chatbot-title">{t("Asistente GreenGo")}</span>
                 <p className="greengo-chatbot-subtitle">{t("Rutas, tarifas y reservas")}</p>
               </div>
             </div>
             <button
               ref={closeButtonRef}
               type="button"
-              onClick={toggleOpen}
+              onClick={handleClose}
               aria-label={t("Cerrar asistente")}
               className="greengo-chatbot-close"
             >
@@ -148,10 +160,18 @@ export function ChatbotWidget() {
               ))}
             </div>
           )}
+          <div className="greengo-chatbot-whatsapp-wrap">
+            <button type="button" onClick={openWhatsApp} className="greengo-chatbot-whatsapp">
+              <WhatsAppLogo className="h-5 w-5" />
+              <span>{t("Continuar por WhatsApp")}</span>
+              <ArrowUpRight className="h-4 w-4" aria-hidden />
+            </button>
+          </div>
         </div>
       )}
 
       <button
+        ref={triggerRef}
         type="button"
         onClick={toggleOpen}
         aria-label={isOpen ? t("Cerrar asistente virtual") : t("Abrir asistente virtual")}
@@ -164,6 +184,7 @@ export function ChatbotWidget() {
             <Sparkles className="greengo-assistant-spark" aria-hidden />
           </>
         )}
+        <span className="greengo-assistant-label">{isOpen ? t("Cerrar") : t("Ayuda")}</span>
       </button>
     </>
   );

@@ -10,16 +10,16 @@ interface CarouselProps {
   autoPlayMs?: number;
   slides: React.ReactNode[];
   ariaLabel: string;
+  language?: "es" | "en";
 }
 
-/** Carrusel accesible basado en Embla: autoplay pausable, gestos táctiles, teclado e indicadores. */
-export function Carousel({ className, autoPlayMs = 5000, slides, ariaLabel }: CarouselProps) {
+/** Carrusel accesible basado en Embla: autoplay pausable, gestos táctiles y teclado. */
+export function Carousel({ className, autoPlayMs = 5000, slides, ariaLabel, language = "es" }: CarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [isPlaying, setIsPlaying] = React.useState(true);
   const autoplayRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const scrollTo = React.useCallback((index: number) => emblaApi?.scrollTo(index), [emblaApi]);
   const scrollPrev = React.useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = React.useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
@@ -53,7 +53,7 @@ export function Carousel({ className, autoPlayMs = 5000, slides, ariaLabel }: Ca
     <div
       className={cn("relative", className)}
       role="region"
-      aria-roledescription="carrusel"
+      aria-roledescription={language === "en" ? "carousel" : "carrusel"}
       aria-label={ariaLabel}
       onKeyDown={onKeyDown}
     >
@@ -64,8 +64,8 @@ export function Carousel({ className, autoPlayMs = 5000, slides, ariaLabel }: Ca
               key={i}
               className="min-w-0 flex-[0_0_100%]"
               role="group"
-              aria-roledescription="diapositiva"
-              aria-label={`${i + 1} de ${slides.length}`}
+              aria-roledescription={language === "en" ? "slide" : "diapositiva"}
+              aria-label={`${i + 1} ${language === "en" ? "of" : "de"} ${slides.length}`}
               aria-hidden={selectedIndex !== i}
             >
               {slide}
@@ -77,7 +77,7 @@ export function Carousel({ className, autoPlayMs = 5000, slides, ariaLabel }: Ca
       <button
         type="button"
         onClick={scrollPrev}
-        aria-label="Anterior"
+        aria-label={language === "en" ? "Previous image" : "Imagen anterior"}
         className="absolute left-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center bg-transparent text-white drop-shadow-[0_2px_8px_rgba(0,0,0,.9)] transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <ArrowLeft className="h-8 w-8" strokeWidth={3} />
@@ -85,37 +85,24 @@ export function Carousel({ className, autoPlayMs = 5000, slides, ariaLabel }: Ca
       <button
         type="button"
         onClick={scrollNext}
-        aria-label="Siguiente"
+        aria-label={language === "en" ? "Next image" : "Imagen siguiente"}
         className="absolute right-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center bg-transparent text-white drop-shadow-[0_2px_8px_rgba(0,0,0,.9)] transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <ArrowRight className="h-8 w-8" strokeWidth={3} />
       </button>
 
-      <div className="mt-3 flex items-center justify-center gap-3">
-        <button
-          type="button"
-          onClick={() => setIsPlaying((v) => !v)}
-          aria-label={isPlaying ? "Pausar carrusel" : "Reanudar carrusel"}
-          className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-        </button>
-        <div className="flex items-center gap-2">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => scrollTo(i)}
-              aria-label={`Ir a la diapositiva ${i + 1}`}
-              aria-current={selectedIndex === i}
-              className={cn(
-                "h-2.5 rounded-full transition-all",
-                selectedIndex === i ? "w-6 bg-primary" : "w-2.5 bg-border hover:bg-muted-foreground/40",
-              )}
-            />
-          ))}
-        </div>
-      </div>
+      <button
+        type="button"
+        onClick={() => setIsPlaying((v) => !v)}
+        aria-label={
+          language === "en"
+            ? isPlaying ? "Pause carousel" : "Resume carousel"
+            : isPlaying ? "Pausar carrusel" : "Reanudar carrusel"
+        }
+        className="absolute bottom-4 right-4 flex h-11 w-11 items-center justify-center rounded-full bg-black/65 text-white shadow-md transition-[background-color,transform] hover:scale-105 hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/60"
+      >
+        {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+      </button>
     </div>
   );
 }
