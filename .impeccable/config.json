@@ -1,0 +1,32 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "src/app/globals.css"
+        ],
+        "createdAt": "2026-09-27T02:55:15.481Z",
+        "reason": "assistant decided: the flagged selectors are square full-width media, content dividers, and headers with no border radius; detector matched border-bottom syntax without a rounded card"
+      },
+      {
+        "rule": "overused-font",
+        "value": "arial",
+        "createdAt": "2026-09-27T02:55:20.651Z",
+        "reason": "assistant decided: Arial is limited to the accounting letter print surface for deterministic cross-platform and PDF-compatible metrics, not used as the product display voice"
+      },
+      {
+        "rule": "codex-grid-background",
+        "value": "*",
+        "files": [
+          "src/app/globals.css"
+        ],
+        "createdAt": "2026-09-27T02:55:45.983Z",
+        "reason": "assistant decided: the reservation background uses two sparse radial dot textures from the established travel-map visual system, not a linear grid or line-field overlay"
+      }
+    ]
+  }
+}
